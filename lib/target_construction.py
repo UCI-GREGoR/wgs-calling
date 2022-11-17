@@ -3,6 +3,17 @@ import os
 import pandas as pd
 
 
+def map_fastqs_to_sampleid(wildcards, manifest, fq1) -> str:
+    """
+    Query input manifest to find sampleid of an input fastq
+    """
+    result = ""
+    query = fq1
+    result = [x[0] for x in zip(manifest["sampleid"], manifest["r1"]) if x[1] == query]
+    assert len(result) == 1
+    return result[0]
+
+
 def map_fastqs_to_manifest(wildcards, manifest, readtag) -> str:
     """
     Query input manifest to find path of an input fastq
@@ -21,8 +32,6 @@ def map_fastqs_to_manifest(wildcards, manifest, readtag) -> str:
             for x in zip(manifest["projectid"], manifest["r2"])
             if x[0] == wildcards.projectid and os.path.basename(x[1]) == query
         ]
-    print(query)
-    print(result)
     assert len(result) == 1
     return result[0]
 
@@ -53,4 +62,17 @@ def construct_fastp_targets(manifest: pd.DataFrame) -> list:
     From basic input manifest entries, construct output targets for
     a run of fastp
     """
-    return []
+    results_prefix = "results/fastp"
+    results_r1 = [
+        "{}/{}/{}_fastp.zip".format(
+            results_prefix, x[0], os.path.basename(x[1]).rstrip(".fastq.gz")
+        )
+        for x in zip(manifest["projectid"], manifest["r1"])
+    ]
+    results_r2 = [
+        "{}/{}/{}_fastp.zip".format(
+            results_prefix, x[0], os.path.basename(x[1]).rstrip(".fastq.gz")
+        )
+        for x in zip(manifest["projectid"], manifest["r2"])
+    ]
+    return [results_r1, results_r2]
