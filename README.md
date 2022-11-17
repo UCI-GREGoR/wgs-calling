@@ -15,7 +15,7 @@ If you use this workflow in a paper, don't forget to give credits to the authors
 
 1. Clone this repository to your local system, into the place where you want to perform the data analysis.
 ```
-    git clone ______
+    git clone git@gitlab.com:lightning.auriga1/wgs-pipeline.git
 ```
 
 ### Step 2: Configure workflow
