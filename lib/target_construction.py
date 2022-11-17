@@ -60,14 +60,14 @@ def construct_fastp_targets(manifest: pd.DataFrame) -> list:
     """
     results_prefix = "results/fastp"
     results_r1 = [
-        "{}/{}/{}_fastp.zip".format(
-            results_prefix, x[0], os.path.basename(x[1]).rstrip(".fastq.gz")
+        "{}/{}/{}_fastp.html".format(
+            results_prefix, x[0], os.path.basename(x[1]).rstrip(".fastq.gz").split("_R1_")[0]
         )
         for x in zip(manifest["projectid"], manifest["r1"])
     ]
     results_r2 = [
-        "{}/{}/{}_fastp.zip".format(
-            results_prefix, x[0], os.path.basename(x[1]).rstrip(".fastq.gz")
+        "{}/{}/{}_fastp.html".format(
+            results_prefix, x[0], os.path.basename(x[1]).rstrip(".fastq.gz").split("_R2_")[0]
         )
         for x in zip(manifest["projectid"], manifest["r2"])
     ]
