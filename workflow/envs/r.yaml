@@ -1,0 +1,11 @@
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - r-base>=4
+  - r-ggplot2
+  - pandoc
+  - icu<60
+  - r-rcolorbrewer
+  - r-rmarkdown
+  - r-kableextra
