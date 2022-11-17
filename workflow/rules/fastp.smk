@@ -42,5 +42,5 @@ rule run_fastp:
         "--reads_to_process 100000000 "
         "--dup_calc_accuracy 6 "
         "--trim_tail1=1 "
-        "-j {params.sample}_fastp.json -h {params.sample}_fastp.html "
+        "-j {params.sampleid}_fastp.json -h {params.sampleid}_fastp.html "
         "-w {threads} -z 1"
