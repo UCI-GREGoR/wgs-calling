@@ -14,31 +14,9 @@ rule run_fastp:
         r2_json="results/fastp/{projectid}/{prefix}_R2_{suffix}_fastp.json",
     params:
         outdir="results/fastp/{projectid}",
-        sampleid=lambda wildcards: tc.map_fastqs_to_sampleid(
-            wildcards,
-            manifest,
-            "results/fastqs/{}/{}_R1_{}.fastq.gz".format(
-                wildcards.projectid, wildcards.prefix, wildcards.suffix
-            ),
-        ),
-        r1_fastq=lambda wildcards: "{}_1_fastp.fastq".format(
-            tc.map_fastqs_to_sampleid(
-                wildcards,
-                manifest,
-                "results/fastqs/{}/{}_R1_{}.fastq.gz".format(
-                    wildcards.projectid, wildcards.prefix, wildcards.suffix
-                ),
-            )
-        ),
-        r2_fastq=lambda wildcards: "{}_2_fastp.fastq".format(
-            tc.map_fastqs_to_sampleid(
-                wildcards,
-                manifest,
-                "results/fastqs/{}/{}_R1_{}.fastq.gz".format(
-                    wildcards.projectid, wildcards.prefix, wildcards.suffix
-                ),
-            )
-        ),
+        sampleid=tc.map_fastqs_to_sampleid,
+        r1_fastq=lambda wildcards: "{}_1_fastp.fastq".format(tc.map_fastqs_to_sampleid(wildcards)),
+        r2_fastq=lambda wildcards: "{}_2_fastp.fastq".format(tc.map_fastqs_to_sampleid(wildcards)),
         quality=10,
     conda:
         "../envs/fastp.yaml"

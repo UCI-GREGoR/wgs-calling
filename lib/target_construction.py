@@ -3,15 +3,11 @@ import os
 import pandas as pd
 
 
-def map_fastqs_to_sampleid(wildcards, manifest, fq1) -> str:
+def map_fastqs_to_sampleid(wildcards) -> str:
     """
-    Query input manifest to find sampleid of an input fastq
+    Determine sample ID from fastq filename
     """
-    result = ""
-    query = fq1
-    result = [x[0] for x in zip(manifest["sampleid"], manifest["r1"]) if x[1] == query]
-    assert len(result) == 1
-    return result[0]
+    return os.path.basename(wildcards.prefix).split("_L0")[0]
 
 
 def map_fastqs_to_manifest(wildcards, manifest, readtag) -> str:
