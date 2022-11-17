@@ -18,12 +18,13 @@ rule run_fastp:
         r1_fastq=lambda wildcards: "{}_1_fastp.fastq".format(tc.map_fastqs_to_sampleid(wildcards)),
         r2_fastq=lambda wildcards: "{}_2_fastp.fastq".format(tc.map_fastqs_to_sampleid(wildcards)),
         quality=10,
+        dup_calc_accuracy=3,
     conda:
         "../envs/fastp.yaml"
-    threads: 1
+    threads: 2
     resources:
-        h_vmem="8000",
-        mem_mb="8000",
+        h_vmem="16000",
+        mem_mb="16000",
         qname="small",
     shell:
         "mkdir -p {params.outdir} && "
@@ -34,13 +35,12 @@ rule run_fastp:
         "--detect_adapter_for_pe "
         "-q {params.quality} -u 60 "
         "--trim_poly_g "
-        "--dont_overwrite "
         "--verbose "
         "-D --overrepresentation_analysis "
         "--overrepresentation_sampling 100 "
         "--low_complexity_filter "
         "--reads_to_process 100000000 "
-        "--dup_calc_accuracy 6 "
+        "--dup_calc_accuracy {params.dup_calc_accuracy} "
         "--trim_tail1=1 "
         "-j {params.sampleid}_fastp.json -h {params.sampleid}_fastp.html "
         "-w {threads} -z 1"
