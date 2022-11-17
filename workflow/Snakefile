@@ -1,7 +1,13 @@
 # The main entry point of your workflow.
 # After configuring, running snakemake -n in a clone of this repository should successfully execute a dry-run of the workflow.
 
+import os
+import pathlib
+import pandas as pd
 from snakemake.utils import validate
+
+sys.path.insert(0, ".")
+from lib import target_construction as tc
 
 
 configfile: "config/config.yaml"
@@ -9,7 +15,12 @@ configfile: "config/config.yaml"
 
 validate(config, "../schema/global_config_schema.yaml")
 
-TARGETS = []
+
+manifest = config["manifest"]
+manifest = pd.read_csv(manifest, sep="\t")
+
+
+TARGETS = [tc.construct_fastqc_targets(manifest), tc.construct_fastp_targets(manifest)]
 
 
 rule all:
@@ -17,8 +28,10 @@ rule all:
         TARGETS,
 
 
+include: "rules/acquire_data.smk"
 include: "rules/bwamem2.smk"
 include: "rules/duphold.smk"
+include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
 include: "rules/manta.smk"
 include: "rules/multiqc.smk"
