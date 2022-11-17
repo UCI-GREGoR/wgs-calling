@@ -12,6 +12,15 @@ rule run_fastp:
         r2_html="results/fastp/{projectid}/{prefix}_R2_{suffix}_fastp.html",
         r1_json="results/fastp/{projectid}/{prefix}_R1_{suffix}_fastp.json",
         r2_json="results/fastp/{projectid}/{prefix}_R2_{suffix}_fastp.json",
+    params:
+        outdir="results/fastp/{projectid}",
+        sampleid=lambda wildcards: map_fastqs_to_sample_id(
+            wildcards,
+            manifest,
+            "results/fastqs/{}/{}_R1_{}.fastq.gz".format(
+                wildcards.projectid, wildcards.prefix, wildcards.suffix
+            ),
+        ),
         r1_fastq=lambda wildcards: "{}_1_fastp.fastq".format(
             map_fastqs_to_sample_id(
                 wildcards,
@@ -29,15 +38,6 @@ rule run_fastp:
                     wildcards.projectid, wildcards.prefix, wildcards.suffix
                 ),
             )
-        ),
-    params:
-        outdir="results/fastp/{projectid}",
-        sampleid=lambda wildcards: map_fastqs_to_sample_id(
-            wildcards,
-            manifest,
-            "results/fastqs/{}/{}_R1_{}.fastq.gz".format(
-                wildcards.projectid, wildcards.prefix, wildcards.suffix
-            ),
         ),
         quality=10,
     conda:
