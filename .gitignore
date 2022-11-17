@@ -1,5 +1,7 @@
 # Logs from cluster submissions
 logs/
+run_*.o*
+run_*.e*
 
 # Emacs backup files
 *~
