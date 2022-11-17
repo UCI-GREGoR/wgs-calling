@@ -2,3 +2,24 @@
 # In case of sample based data, it should be complemented by a manifest file that contains
 # one row per sample. It can be parsed easily via pandas.
 manifest: "config/manifest.tsv"
+
+references:
+  grch37:
+    fasta: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta"
+    fasta-index: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta.fai"
+bwa:
+  grch37:
+    bwa-fasta: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/ert/human_g1k_v37_modified.fasta"
+    bwa-amb: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta.amb"
+    bwa-ann: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta.ann"
+    bwa-bwt: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta.bwt.2bit.64"
+    bwa-fai: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta.fai"
+    bwa-fxi: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/ert/human_g1k_v37_modified.ert.fxi"
+    bwa-pac: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta.pac"
+    bwa-sa: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/ert/human_g1k_v37_modified.ert.sa"
+    bwa-0123: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta.0123"
+dnascope:
+  grch37:
+    model: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/sentieon/SentieonDNAscopeModel1.1.model"
+    dbsnp-vcf: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/sentieon/dbsnp_138.b37.vcf.gz"
+    dbsnp-vcf-tbi: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/sentieon/dbsnp_138.b37.vcf.gz.tbi"

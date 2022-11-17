@@ -1,0 +1,66 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: global configuration
+properties:
+  manifest:
+    type: string
+  references:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          fasta:
+            type: string
+          fasta-index:
+            type: string
+        required:
+          - fasta
+          - fasta-index
+        additionalProperties: no
+    required:
+      - grch37
+  bwa:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          bwa-fasta:
+            type: string
+          bwa-amb:
+            type: string
+          bwa-ann:
+            type: string
+          bwa-bwt:
+            type: string
+          bwa-fai:
+            type: string
+          bwa-fxi:
+            type: string
+          bwa-pac:
+            type: string
+          bwa-sa:
+            type: string
+          bwa-0123:
+            type: string
+    required:
+      - grch37
+  dnascope:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          model:
+            type: string
+          dbsnp-vcf:
+            type: string
+          dbsnp-vcf-tbi:
+            type: string
+  required:
+    - grch37
+required:
+  - references
+  - bwa
+  - dnascope
+additionalProperties: no
