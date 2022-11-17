@@ -22,8 +22,8 @@ rule run_fastp:
         "../envs/fastp.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
-        mem_mb="4000",
+        h_vmem="8000",
+        mem_mb="8000",
         qname="small",
     shell:
         "mkdir -p {params.outdir} && "
