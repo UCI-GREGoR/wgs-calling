@@ -6,7 +6,8 @@ rule run_fastq_multiqc:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(manifest),
         fastp=lambda wildcards: tc.construct_fastp_targets(manifest),
     output:
-        "results/multiqc/multiqc.fastq.html",
+        html="results/multiqc/multiqc.fastq.html",
+        data_zip="results/multiqc/multiqc.fastq_data.zip",
     params:
         target_dirs=list(
             set(
@@ -24,9 +25,9 @@ rule run_fastq_multiqc:
         h_vmem="4000",
         qname="small",
     shell:
-        "multiqc {params.target_dirs} -p "
+        "multiqc {params.target_dirs} "
         "-m fastqc -m fastp "
         "-x '*.fastq.gz' -x '*.fastq' "
         "--profile-runtime --zip-data-dir "
         "-f -i 'MultiQC for Raw Fastqs' "
-        "-n {output}"
+        "-n {output.html}"
