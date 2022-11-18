@@ -50,7 +50,8 @@ def construct_fastqc_targets(manifest: pd.DataFrame) -> list:
         )
         for x in zip(manifest["projectid"], manifest["r2"])
     ]
-    return [results_r1, results_r2]
+    results_r1.extend(results_r2)
+    return results_r1
 
 
 def construct_fastp_targets(manifest: pd.DataFrame) -> list:
@@ -71,4 +72,5 @@ def construct_fastp_targets(manifest: pd.DataFrame) -> list:
         )
         for x in zip(manifest["projectid"], manifest["r2"])
     ]
-    return [results_r1, results_r2]
+    results_r1.extend(results_r2)
+    return results_r1
