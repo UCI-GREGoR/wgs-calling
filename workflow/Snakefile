@@ -35,4 +35,5 @@ include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
 include: "rules/manta.smk"
 include: "rules/multiqc.smk"
+include: "rules/somalier.smk"
 
