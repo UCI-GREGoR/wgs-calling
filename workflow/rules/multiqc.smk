@@ -8,10 +8,14 @@ rule run_fastq_multiqc:
     output:
         "results/multiqc/multiqc.fastq.html",
     params:
-        target_dirs=expand(
-            "results/{toolname}/{projectid}",
-            toolname=["fastqc", "fastp"],
-            projectid=manifest["projectid"],
+        target_dirs=list(
+            set(
+                expand(
+                    "results/{toolname}/{projectid}",
+                    toolname=["fastqc", "fastp"],
+                    projectid=manifest["projectid"],
+                )
+            )
         ),
     conda:
         "../envs/multiqc.yaml"
