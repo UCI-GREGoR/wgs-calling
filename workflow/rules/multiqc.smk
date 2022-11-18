@@ -24,9 +24,9 @@ rule run_fastq_multiqc:
         h_vmem="4000",
         qname="small",
     shell:
-        "multiqc {params.target_dirs} -p -k tsv "
+        "multiqc {params.target_dirs} -p "
         "-m fastqc -m fastp "
         "-x '*.fastq.gz' -x '*.fastq' "
-        "--profile-runtime "
+        "--profile-runtime --zip-data-dir "
         "-f -i 'MultiQC for Raw Fastqs' "
         "-n {output}"
