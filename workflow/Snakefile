@@ -20,7 +20,9 @@ manifest = config["manifest"]
 manifest = pd.read_csv(manifest, sep="\t")
 
 
-TARGETS = [tc.construct_fastqc_targets(manifest), tc.construct_fastp_targets(manifest)]
+TARGETS = [
+    "results/multiqc/multiqc.fastq.html",
+]
 
 
 rule all:
