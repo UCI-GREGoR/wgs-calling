@@ -1,5 +1,6 @@
 channels:
+  - https://raw.githubusercontent.com/lightning.auriga/conda-builds/default/conda-builds
   - bioconda
   - conda-forge
 dependencies:
-  - bwa-mem2
+  - bwa-mem2-lisa
