@@ -11,9 +11,10 @@ def map_fastq_from_project_and_sample(wildcards, manifest, rp) -> str:
     result = manifest.query(query)
     assert len(result) == 1
     if rp == "R1":
-        return result["r1"]
+        result = result["r1"]
     else:
-        return result["r2"]
+        result = result["r2"]
+    return "results/fastqs/{}/{}".format(wildcards.projectid, os.path.basename(result.to_list()[0]))
 
 
 def map_fastqs_to_sampleid(wildcards) -> str:
