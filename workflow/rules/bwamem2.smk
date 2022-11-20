@@ -10,8 +10,8 @@ rule bwa_map_and_sort:
         bam="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam",
         bai="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam.bai",
     params:
-        K="",
-        k="",
+        K="60000000",
+        k="19",
         softclip_alts="",
         readgroup=lambda wildcards: "@RG\\tID:{}\\tSM:{}\\tLB:{}\\tPL:\\tPU:{}".format(
             "RG1", wildcards.sampleid, wildcards.sampleid, "Illumina", wildcards.sampleid
