@@ -21,6 +21,7 @@ manifest = pd.read_csv(manifest, sep="\t")
 
 
 TARGETS = [
+    tc.construct_bwamem2_targets(manifest),
     "results/multiqc/multiqc.fastq.html",
 ]
 

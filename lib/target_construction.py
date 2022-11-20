@@ -3,6 +3,19 @@ import os
 import pandas as pd
 
 
+def map_fastq_from_project_and_sample(wildcards, manifest, rp) -> str:
+    """
+    Get a particular fastq based on projectid and sampleid
+    """
+    query = 'projectid == "{}" and sampleid == "{}"'.format(wildcards.projectid, wildcards.sampleid)
+    result = manifest.query(query)
+    assert len(result) == 1
+    if rp == "R1":
+        return result["r1"]
+    else:
+        return result["r2"]
+
+
 def map_fastqs_to_sampleid(wildcards) -> str:
     """
     Determine sample ID from fastq filename
@@ -30,6 +43,18 @@ def map_fastqs_to_manifest(wildcards, manifest, readtag) -> str:
         ]
     assert len(result) == 1
     return result[0]
+
+
+def construct_bwamem2_targets(manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    a run of bwa-mem2
+    """
+    result = [
+        "results/bwa-mem2/{}/{}.bwa2a.bam".format(x[0], x[1])
+        for x in zip(manifest["projectid"], manifest["sampleid"])
+    ]
+    return result
 
 
 def construct_fastqc_targets(manifest: pd.DataFrame) -> list:
