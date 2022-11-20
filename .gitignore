@@ -1,3 +1,6 @@
+# Genomic reference data
+references/
+
 # Logs from cluster submissions
 logs/
 run_*.o*
