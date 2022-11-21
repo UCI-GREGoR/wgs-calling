@@ -10,7 +10,7 @@ rule bwa_map_and_sort:
         bam="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam",
         bai="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam.bai",
     params:
-        K="60000000",
+        K="1000000",
         k="19",
         softclip_alts="",
         readgroup=lambda wildcards: "@RG\\tID:{}\\tSM:{}\\tLB:{}\\tPL:\\tPU:{}".format(
@@ -19,9 +19,9 @@ rule bwa_map_and_sort:
         tmpdir="temp",
     conda:
         "../envs/bwamem2.yaml"
-    threads: 12
+    threads: 4
     resources:
-        h_vmem="24000",
+        h_vmem="32000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -29,4 +29,4 @@ rule bwa_map_and_sort:
         'bwa-mem2 mem -t {threads} -K {params.K} -k {params.k} -Y -R "{params.readgroup}" {params.softclip_alts} '
         "{input.bwa_fasta} {input.fastq1} {input.fastq2} | "
         "samtools fixmate -@ {threads} -u -m - - | "
-        'samtools sort -l 1 -m 2G -@ {threads} -T {params.tmpdir} -O BAM --write-index -o "{output.bam}##{output.bai}"'
+        "samtools sort -l 1 -m 2G -@ {threads} -T {params.tmpdir} -O BAM --write-index -o {output.bam}##idx##{output.bai}"
