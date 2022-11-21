@@ -32,6 +32,7 @@ rule all:
 
 
 include: "rules/acquire_data.smk"
+include: "rules/alignstats.smk"
 include: "rules/bwamem2.smk"
 include: "rules/duphold.smk"
 include: "rules/fastp.smk"
@@ -41,3 +42,4 @@ include: "rules/markdups.smk"
 include: "rules/multiqc.smk"
 include: "rules/somalier.smk"
 
+include: "rules/verifybamid2.smk"
