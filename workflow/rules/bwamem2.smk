@@ -29,4 +29,4 @@ rule bwa_map_and_sort:
         'bwa-mem2 mem -t {threads} -K {params.K} -k {params.k} -Y -R "{params.readgroup}" {params.softclip_alts} '
         "{input.bwa_fasta} {input.fastq1} {input.fastq2} | "
         "samtools fixmate -@ {threads} -u -m - - | "
-        "samtools sort -l 1 -m 2G -@ {threads} -T {params.tmpdir} -O BAM --write-index -o ${output.bam}##{output.bai}"
+        'samtools sort -l 1 -m 2G -@ {threads} -T {params.tmpdir} -O BAM --write-index -o "{output.bam}##{output.bai}"'
