@@ -13,7 +13,7 @@ rule bwa_map_and_sort:
         K="1000000",
         k="19",
         softclip_alts="",
-        readgroup=lambda wildcards: "@RG\\tID:{}\\tSM:{}\\tLB:{}\\tPL:\\tPU:{}".format(
+        readgroup=lambda wildcards: "@RG\\tID:{}\\tSM:{}\\tLB:{}\\tPL:{}\\tPU:{}".format(
             "RG1", wildcards.sampleid, wildcards.sampleid, "Illumina", wildcards.sampleid
         ),
         tmpdir="temp",
