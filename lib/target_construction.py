@@ -58,6 +58,18 @@ def construct_bwamem2_targets(manifest: pd.DataFrame) -> list:
     return result
 
 
+def construct_markdups_targets(manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    a run of samtools markdups
+    """
+    result = [
+        "results/markdups/{}/{}.mrkdup.sort.bam".format(x[0], x[1])
+        for x in zip(manifest["projectid"], manifest["sampleid"])
+    ]
+    return result
+
+
 def construct_fastqc_targets(manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for

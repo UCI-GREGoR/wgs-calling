@@ -21,7 +21,7 @@ manifest = pd.read_csv(manifest, sep="\t")
 
 
 TARGETS = [
-    tc.construct_bwamem2_targets(manifest),
+    tc.construct_markdups_targets(manifest),
     "results/multiqc/multiqc.fastq.html",
 ]
 
@@ -37,6 +37,7 @@ include: "rules/duphold.smk"
 include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
 include: "rules/manta.smk"
+include: "rules/markdups.smk"
 include: "rules/multiqc.smk"
 include: "rules/somalier.smk"
 
