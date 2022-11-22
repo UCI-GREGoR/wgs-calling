@@ -120,4 +120,4 @@ rule picard_collectgcbiasmetrics:
         "-REFERENCE_SEQUENCE {input.fasta} "
         "-OUTPUT {output.metrics} "
         "-SUMMARY_OUTPUT {output.summary} "
-        "-CHART_OUTPUT {output.chart}"
+        "-CHART_OUTPUT {output.pdf}"
