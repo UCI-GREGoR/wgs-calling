@@ -70,6 +70,18 @@ def construct_markdups_targets(manifest: pd.DataFrame) -> list:
     return result
 
 
+def construct_contamination_targets(manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    a run of verifybamid2 (for contamination)
+    """
+    result = [
+        "results/contamination/{}/{}.vb2.selfSM".format(x[0], x[1])
+        for x in zip(manifest["projectid"], manifest["sampleid"])
+    ]
+    return result
+
+
 def construct_fastqc_targets(manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for

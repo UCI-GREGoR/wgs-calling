@@ -21,7 +21,7 @@ manifest = pd.read_csv(manifest, sep="\t")
 
 
 TARGETS = [
-    tc.construct_markdups_targets(manifest),
+    tc.construct_contamination_targets(manifest),
     "results/multiqc/multiqc.fastq.html",
 ]
 
