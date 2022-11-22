@@ -109,7 +109,11 @@ def construct_picard_qc_targets(manifest: pd.DataFrame) -> list:
         "results/collectgcbiasmetrics/{}/{}.picard.gc_bias_metrics.txt".format(x[0], x[1])
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
-    return [result1, result2]
+    result3 = [
+        "results/collectwgsmetrics/{}/{}.picard.collect_wgs_metrics.txt".format(x[0], x[1])
+        for x in zip(manifest["projectid"], manifest["sampleid"])
+    ]
+    return [result1, result2, result3]
 
 
 def construct_fastqc_targets(manifest: pd.DataFrame) -> list:
