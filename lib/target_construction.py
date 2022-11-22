@@ -128,6 +128,18 @@ def construct_somalier_extract_targets(manifest: pd.DataFrame) -> list:
     return result
 
 
+def construct_somalier_relate_targets(manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    a run of somalier relate
+    """
+    result = [
+        "results/somalier/{}/relate/somalier.html".format(x)
+        for x in list(manifest["projectid"].unique())
+    ]
+    return result
+
+
 def construct_fastqc_targets(manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
