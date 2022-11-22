@@ -67,15 +67,15 @@ rule picard_collectmultiplemetrics:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
+        h_vmem="10000",
         qname="small",
         tmpdir="temp",
     shell:
         "mkdir -p temp/ && "
         'gatk --java-options "{params.java_args}" CollectMultipleMetrics '
         "-INPUT {input.bam} "
-        "-REFERENCE {input.fasta} "
-        "-EXTENSION {params.extension} "
+        "-REFERENCE_SEQUENCE {input.fasta} "
+        "-FILE_EXTENSION {params.extension} "
         "-VALIDATION_STRINGENCY {params.validation_stringency} "
         "-METRIC_ACCUMULATION_LEVEL {params.metric_accumulation_level} "
         "-LEVEL {params.metric_accumulation_level} "
