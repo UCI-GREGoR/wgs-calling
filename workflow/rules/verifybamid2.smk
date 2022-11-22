@@ -13,7 +13,7 @@ rule estimate_contamination:
         ),
     output:
         selfSM="{pathprefix}/contamination/{fileprefix}.vb2.selfSM",
-        tsv="{pathprefix}/contamination/{fileprefix}.vb2.tsv",
+        ancestry="{pathprefix}/contamination/{fileprefix}.vb2.Ancestry",
     params:
         outprefix="{pathprefix}/contamination/{fileprefix}.vb2",
         db_prefix=config["verifybamid2"]["grch37"]["db-prefix"],
@@ -30,4 +30,5 @@ rule estimate_contamination:
         "--Reference {input.fasta} "
         "--SVDPrefix {params.db_prefix} "
         "--Verbose "
+        "--DisableSanityCheck "
         "--NumThread {threads}"
