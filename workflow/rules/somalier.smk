@@ -29,7 +29,7 @@ rule somalier_relate:
     """
     input:
         somalier=lambda wildcards: tc.construct_somalier_extract_targets(manifest),
-        ped="",
+        ped="{pathprefix}/somalier/{projectid}/relate/somalier.ped",
     output:
         html="{pathprefix}/somalier/{projectid}/relate/somalier.html",
         pairs="{pathprefix}/somalier/{projectid}/relate/somalier.pairs.tsv",
