@@ -7,8 +7,10 @@ references:
   grch37:
     fasta: "references/reference_genome/human_g1k_v37_modified.fasta"
     fasta-index: "references/reference_genome/human_g1k_v37_modified.fasta.fai"
+    fasta-dict: "references/reference_genome/human_g1k_v37_modified.fasta.dict"
 #    fasta: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta"
 #    fasta-index: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta.fai"
+#    fasta-dict: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified.fasta.dict"
 bwa:
   grch37:
     bwa-fasta: "references/bwa/human_g1k_v37_modified.fasta"

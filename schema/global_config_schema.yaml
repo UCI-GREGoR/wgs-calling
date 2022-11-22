@@ -13,9 +13,12 @@ properties:
             type: string
           fasta-index:
             type: string
+          fasta-dict:
+            type: string
         required:
           - fasta
           - fasta-index
+          - fasta-dict
         additionalProperties: no
     required:
       - grch37
