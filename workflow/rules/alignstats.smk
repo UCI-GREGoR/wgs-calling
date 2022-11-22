@@ -31,7 +31,7 @@ rule merge_alignstats:
     input:
         json=lambda wildcards: tc.construct_alignstats_targets(manifest),
     output:
-        tsv="results/alignstats/combined_alignstats.tsv",
+        tsv="results/alignstats/alignstats_summary_mqc.tsv",
     threads: 1
     resources:
         h_vmem="2000",
