@@ -5,8 +5,10 @@ manifest: "config/manifest.tsv"
 
 references:
   grch37:
-    fasta: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta"
-    fasta-index: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta.fai"
+    fasta: "references/reference_genome/human_g1k_v37_modified.fasta"
+    fasta-index: "references/reference_genome/human_g1k_v37_modified.fasta.fai"
+#    fasta: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta"
+#    fasta-index: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta.fai"
 bwa:
   grch37:
     bwa-fasta: "references/bwa/human_g1k_v37_modified.fasta"
@@ -26,4 +28,5 @@ dnascope:
     dbsnp-vcf-tbi: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/sentieon/dbsnp_138.b37.vcf.gz.tbi"
 verifybamid2:
   grch37:
-    db-prefix: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/verifybamid/VerifyBamID/resource/1000g.phase3.100k.b37.vcf.gz.dat"
+    db-prefix: "references/contamination/1000g.phase3.100k.b37.vcf.gz.dat"
+#    db-prefix: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/verifybamid/VerifyBamID/resource/1000g.phase3.100k.b37.vcf.gz.dat"
