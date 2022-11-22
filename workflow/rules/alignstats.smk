@@ -22,3 +22,19 @@ rule run_alignstats:
         "-j bam "
         "-v -P 10 -p 10 "
         "-q {params.min_qual}"
+
+
+rule merge_alignstats:
+    """
+    Combine json-format alignstats output into a single big table
+    """
+    input:
+        json=lambda wildcards: tc.construct_alignstats_targets(manifest),
+    output:
+        tsv="results/alignstats/combined_alignstats.tsv",
+    threads: 1
+    resources:
+        h_vmem="2000",
+        qname="small",
+    script:
+        "../scripts/alignstats_json_to_tsv.py"
