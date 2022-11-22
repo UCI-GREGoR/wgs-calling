@@ -28,7 +28,7 @@ rule somalier_relate:
     Compute relatedness metrics on preprocessed alignment data with somalier.
     """
     input:
-        somalier=lambda wildcards: tc.construct_somalier_extract_targets(manifest),
+        somalier=lambda wildcards: tc.construct_somalier_extract_targets(wildcards, manifest),
         ped="{pathprefix}/somalier/{projectid}/relate/somalier.ped",
     output:
         html="{pathprefix}/somalier/{projectid}/relate/somalier.html",

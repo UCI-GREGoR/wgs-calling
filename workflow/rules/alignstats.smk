@@ -29,9 +29,9 @@ rule merge_alignstats:
     Combine json-format alignstats output into a single big table
     """
     input:
-        json=lambda wildcards: tc.construct_alignstats_targets(manifest),
+        json=lambda wildcards: tc.construct_alignstats_targets(wildcards, manifest),
     output:
-        tsv="results/alignstats/alignstats_summary_mqc.tsv",
+        tsv="results/alignstats/{projectid}/alignstats_summary_mqc.tsv",
     threads: 1
     resources:
         h_vmem="2000",

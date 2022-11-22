@@ -3,6 +3,8 @@ description: global configuration
 properties:
   manifest:
     type: string
+  multiqc-config:
+    type: string
   references:
     type: object
     patternProperties:

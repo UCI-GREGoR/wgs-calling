@@ -26,6 +26,7 @@ Configure the workflow according to your needs via editing the files in the `con
 The following settings are recognized in `config/config.yaml`. Note that each reference data option below exists under an arbitrary tag denoting desired reference genome build. This tag is completely arbitrary and will be used to recognize the requested build for the current pipeline run.
 
 - `manifest`: relative path to run manifest
+- `multiqc-config`: relative path to configuration settings for post-alignment multiQC report
 - `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
 - `references`: human genome reference data applicable to multiple tools
   - `fasta`: human sequence fasta file

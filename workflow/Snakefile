@@ -21,11 +21,11 @@ manifest = pd.read_csv(manifest, sep="\t")
 
 
 TARGETS = [
-    tc.construct_contamination_targets(manifest),
-    tc.construct_picard_qc_targets(manifest),
-    "results/alignstats/combined_alignstats.tsv",
-    tc.construct_somalier_relate_targets(manifest),
-    "results/multiqc/multiqc.fastq.html",
+    expand(
+        "results/multiqc/{projectid}/multiqc.{runtype}.html",
+        projectid=list(manifest["projectid"].unique()),
+        runtype=["fastq", "alignment"],
+    )
 ]
 
 

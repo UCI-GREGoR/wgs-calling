@@ -70,77 +70,89 @@ def construct_markdups_targets(manifest: pd.DataFrame) -> list:
     return result
 
 
-def construct_contamination_targets(manifest: pd.DataFrame) -> list:
+def construct_contamination_targets(wildcards, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of verifybamid2 (for contamination)
     """
     result = [
-        "results/contamination/{}/{}.vb2.selfSM".format(x[0], x[1])
-        for x in zip(manifest["projectid"], manifest["sampleid"])
+        "results/contamination/{}/{}.vb2.selfSM".format(wildcards.projectid, x)
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
     ]
     return result
 
 
-def construct_alignstats_targets(manifest: pd.DataFrame) -> list:
+def construct_alignstats_targets(wildcards, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of alignstats
     """
     result = [
-        "results/alignstats/{}/{}.bwa2a.alignstats.json".format(x[0], x[1])
-        for x in zip(manifest["projectid"], manifest["sampleid"])
+        "results/alignstats/{}/{}.bwa2a.alignstats.json".format(wildcards.projectid, x)
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
     ]
     return result
 
 
-def construct_picard_qc_targets(manifest: pd.DataFrame) -> list:
+def construct_combined_alignstats_targets(wildcards) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    combined alignstats output
+    """
+    result = ["results/alignstats/{}/alignstats_summary_mqc.tsv".format(wildcards.projectid)]
+    return result
+
+
+def construct_picard_qc_targets(wildcards, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     various QC passes with picard
     """
     result1 = [
         "results/collectmultiplemetrics/{}/{}.picard.alignment_summary_metrics.txt".format(
-            x[0], x[1]
+            wildcards.projectid, x
         )
-        for x in zip(manifest["projectid"], manifest["sampleid"])
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
     ]
     result2 = [
-        "results/collectgcbiasmetrics/{}/{}.picard.gc_bias_metrics.txt".format(x[0], x[1])
-        for x in zip(manifest["projectid"], manifest["sampleid"])
+        "results/collectgcbiasmetrics/{}/{}.picard.gc_bias_metrics.txt".format(
+            wildcards.projectid, x
+        )
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
     ]
     result3 = [
-        "results/collectwgsmetrics/{}/{}.picard.collect_wgs_metrics.txt".format(x[0], x[1])
-        for x in zip(manifest["projectid"], manifest["sampleid"])
+        "results/collectwgsmetrics/{}/{}.picard.collect_wgs_metrics.txt".format(
+            wildcards.projectid, x
+        )
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
     ]
-    return [result1, result2, result3]
+    result = [result1, result2, result3]
+    result = [y for x in result for y in x]
+    return result
 
 
-def construct_somalier_extract_targets(manifest: pd.DataFrame) -> list:
+def construct_somalier_extract_targets(wildcards, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of somalier extract
     """
     result = [
-        "results/somalier/{}/extract/{}.somalier".format(x[0], x[1])
-        for x in zip(manifest["projectid"], manifest["sampleid"])
+        "results/somalier/{}/extract/{}.somalier".format(wildcards.projectid, x)
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
     ]
     return result
 
 
-def construct_somalier_relate_targets(manifest: pd.DataFrame) -> list:
+def construct_somalier_relate_targets(wildcards) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of somalier relate
     """
-    result = [
-        "results/somalier/{}/relate/somalier.html".format(x)
-        for x in list(manifest["projectid"].unique())
-    ]
+    result = ["results/somalier/{}/relate/somalier.html".format(wildcards.projectid)]
     return result
 
 
-def construct_fastqc_targets(manifest: pd.DataFrame) -> list:
+def construct_fastqc_targets(wildcards, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of fastQC
@@ -148,21 +160,21 @@ def construct_fastqc_targets(manifest: pd.DataFrame) -> list:
     results_prefix = "results/fastqc"
     results_r1 = [
         "{}/{}/{}_fastqc.zip".format(
-            results_prefix, x[0], os.path.basename(x[1]).rstrip(".fastq.gz")
+            results_prefix, wildcards.projectid, os.path.basename(x).rstrip(".fastq.gz")
         )
-        for x in zip(manifest["projectid"], manifest["r1"])
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r1"].to_list()
     ]
     results_r2 = [
         "{}/{}/{}_fastqc.zip".format(
-            results_prefix, x[0], os.path.basename(x[1]).rstrip(".fastq.gz")
+            results_prefix, wildcards.projectid, os.path.basename(x).rstrip(".fastq.gz")
         )
-        for x in zip(manifest["projectid"], manifest["r2"])
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r2"].to_list()
     ]
     results_r1.extend(results_r2)
     return results_r1
 
 
-def construct_fastp_targets(manifest: pd.DataFrame) -> list:
+def construct_fastp_targets(wildcards, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of fastp
@@ -170,15 +182,19 @@ def construct_fastp_targets(manifest: pd.DataFrame) -> list:
     results_prefix = "results/fastp"
     results_r1 = [
         "{}/{}/{}_fastp.html".format(
-            results_prefix, x[0], os.path.basename(x[1]).rstrip(".fastq.gz").split("_R1_")[0]
+            results_prefix,
+            wildcards.projectid,
+            os.path.basename(x).rstrip(".fastq.gz").split("_R1_")[0],
         )
-        for x in zip(manifest["projectid"], manifest["r1"])
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r1"].to_list()
     ]
     results_r2 = [
         "{}/{}/{}_fastp.html".format(
-            results_prefix, x[0], os.path.basename(x[1]).rstrip(".fastq.gz").split("_R2_")[0]
+            results_prefix,
+            wildcards.projectid,
+            os.path.basename(x).rstrip(".fastq.gz").split("_R2_")[0],
         )
-        for x in zip(manifest["projectid"], manifest["r2"])
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r2"].to_list()
     ]
     results_r1.extend(results_r2)
     return results_r1
