@@ -121,3 +121,35 @@ rule picard_collectgcbiasmetrics:
         "-OUTPUT {output.metrics} "
         "-SUMMARY_OUTPUT {output.summary} "
         "-CHART_OUTPUT {output.pdf}"
+
+
+rule picard_collectwgsmetrics:
+    """
+    Run gatk version of picard CollectWgsMetrics
+    """
+    input:
+        bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
+        bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        fasta=config["references"]["grch37"]["fasta"],
+        fai=config["references"]["grch37"]["fasta-index"],
+        dic=config["references"]["grch37"]["fasta-dict"],
+        intervals=config["references"]["grch37"]["reportable-regions"],
+    output:
+        txt="{pathprefix}/collectwgsmetrics/{fileprefix}.picard.collect_wgs_metrics.txt",
+    params:
+        tmpdir="temp",
+        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
+    conda:
+        "../envs/gatk4.yaml"
+    threads: 1
+    resources:
+        h_vmem="10000",
+        qname="small",
+        tmpdir="temp",
+    shell:
+        "mkdir -p temp/ && "
+        'gatk --java-options "{params.java_args}" CollectWgsMetrics '
+        "-INPUT {input.bam} "
+        "-REFERENCE_SEQUENCE {input.fasta} "
+        "-OUTPUT {output.txt} "
+        "-INTERVALS {input.intervals}"

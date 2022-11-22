@@ -8,9 +8,11 @@ references:
     fasta: "references/reference_genome/human_g1k_v37_modified.fasta"
     fasta-index: "references/reference_genome/human_g1k_v37_modified.fasta.fai"
     fasta-dict: "references/reference_genome/human_g1k_v37_modified.fasta.dict"
+    reportable-regions: "references/reference_genome/NA12878_RR.intervals"
 #    fasta: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta"
 #    fasta-index: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta.fai"
 #    fasta-dict: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified.fasta.dict"
+#    reportable-regions: "s3://invitae-health-chameleon-dev/archive/wgs-validation/references/NA12878/NA12878_RR.intervals"
 bwa:
   grch37:
     bwa-fasta: "references/bwa/human_g1k_v37_modified.fasta"

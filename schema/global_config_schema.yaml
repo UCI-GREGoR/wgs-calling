@@ -15,10 +15,13 @@ properties:
             type: string
           fasta-dict:
             type: string
+          reportable-regions:
+            type: string
         required:
           - fasta
           - fasta-index
           - fasta-dict
+          - reportable-regions
         additionalProperties: no
     required:
       - grch37
