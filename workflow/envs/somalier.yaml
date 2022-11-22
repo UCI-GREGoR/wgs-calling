@@ -1,4 +1,5 @@
 channels:
+  - https://raw.githubusercontent.com/lightning.auriga/conda-builds/default/conda-builds
   - bioconda
   - conda-forge
 dependencies:
