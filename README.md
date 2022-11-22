@@ -1,15 +1,14 @@
 # Snakemake workflow: WGS Pipeline
 
-This is the template for a new Snakemake workflow. Replace this text with a comprehensive description covering the purpose and domain.
-Insert your code into the respective folders, i.e. `scripts`, `rules`, and `envs`. Define the entry point of the workflow in the `Snakefile` and the main configuration in the `config.yaml` file.
+This workflow is intended to be the R&D space for the PMGRC WGS analysis pipeline. It will first support existing functionality from variously [marigold](https://github.com/invitae-internal/marigold-pipes), [nextflow-pipelines](https://github.com/invitae-internal/nextflow-pipelines), and the descendants of `nextflow-pipelines` after splitting out into individual repositories. When that back compatibility is complete, additional features will be sandboxed and tested here.
+
+New global targets should be added in `workflow/Snakefile`. Content in `workflow/Snakefile` and the snakefiles in `workflow/rules` should be specifically _rules_; python infrastructure should be composed as subroutines under `lib/` and constructed in such a manner as to be testable with [pytest](https://docs.pytest.org/en/7.2.x/). Rules can call embedded scripts (in python or R/Rmd) from `workflow/scripts`; again, these should be constructed to be testable with pytest or [testthat](https://testthat.r-lib.org/).
 
 ## Authors
 
 * Lightning Auriga (@lightning.auriga)
 
 ## Usage
-
-If you use this workflow in a paper, don't forget to give credits to the authors by citing the URL of this (original) repository and, if available, its DOI (see above).
 
 ### Step 1: Obtain a copy of this workflow
 
@@ -18,9 +17,33 @@ If you use this workflow in a paper, don't forget to give credits to the authors
     git clone git@gitlab.com:lightning.auriga1/wgs-pipeline.git
 ```
 
+Note that this requires local git ssh key configuration; see [here](https://docs.gitlab.com/ee/user/ssh.html) for instructions as required.
+
 ### Step 2: Configure workflow
 
 Configure the workflow according to your needs via editing the files in the `config/` folder. Adjust `config.yaml` to configure the workflow execution, and `manifest.tsv` to specify your sample setup.
+
+The following settings are recognized in `config/config.yaml`. Note that each reference data option below exists under an arbitrary tag denoting desired reference genome build. This tag is completely arbitrary and will be used to recognize the requested build for the current pipeline run.
+
+- `manifest`: relative path to run manifest
+- `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
+- `references`: human genome reference data applicable to multiple tools
+  - `fasta`: human sequence fasta file
+  - `fasta-index`: fai format index file for above fasta
+  - `fasta-dict`: dict file for above fasta
+- `bwa`: reference data files specific to [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2)
+  - `fasta`: human sequence fasta file
+  - note that there are other files here that have been ported in from legacy; they exist in legacy in a rather disorganized fashion, and are flagged for cleanup before further annotation will be provided here.
+- `dnascope`: reference data files specific to [Sentieon DNAscope](https://support.sentieon.com/manual/DNAscope_usage/dnascope/)
+  - `model`: DNAscope model file
+  - `dbsnp-vcf`: dbSNP backend vcf file
+  - `dbsnp-vcf-tbi`: tbi format index file for above vcf
+- `verifybamid2`: reference data files specific to [VerifyBamID2](https://github.com/Griffan/VerifyBamID)
+  - `db-prefix`: filename prefix for assorted Verify annotation file suffixes: V, UD, mu, bed.
+
+The following columns are expected in the run manifest, by default at `config/manifest.tsv`:
+- thing
+- otherthing
 
 ### Step 3: Install Snakemake
 
@@ -52,6 +75,8 @@ See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/exe
 
 ### Step 5: Investigate results
 
+TBD; the only current targeted output is multiqc output in `results/multiqc`.
+
 ### Step 6: Commit changes
 
 Whenever you change something, don't forget to commit the changes back to your github copy of the repository:
@@ -73,13 +98,18 @@ Whenever you want to synchronize your workflow copy with new developments from u
 
 ### Step 8: Contribute back
 
-In case you have also changed or added steps, please consider contributing them back to the original repository:
+In case you have also changed or added steps, please consider contributing them back to the original repository. This project follows git flow; feature branches off of dev are welcome.
 
-1. [Fork](https://help.github.com/en/articles/fork-a-repo) the original repo to a personal or lab account.
-2. [Clone](https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html) the fork to your local system, to a different place than where you ran your analysis.
-3. Copy the modified files from your analysis to the clone of your fork, e.g., `cp -r workflow path/to/fork`. Make sure to **not** accidentally copy config file contents or sample sheets. Instead, manually update the example config files if necessary.
-4. Commit and push your changes to your fork.
-5. Create a [merge request](https://docs.gitlab.com/ee/user/project/merge_requests/) against the original repository.
+1. [Clone](https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html) the fork to your local system, to a different place than where you ran your analysis.
+2. Check out a branch off of dev:
+```
+git fetch
+git checkout dev
+git checkout -b your-new-branch
+```
+3. Make whatever changes best please you to your feature branch.
+4. Commit and push your changes to your branch.
+5. Create a [merge request](https://docs.gitlab.com/ee/user/project/merge_requests/) against dev.
 
 ## Testing
 
