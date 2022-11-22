@@ -22,6 +22,7 @@ manifest = pd.read_csv(manifest, sep="\t")
 
 TARGETS = [
     tc.construct_contamination_targets(manifest),
+    tc.construct_alignstats_targets(manifest),
     "results/multiqc/multiqc.fastq.html",
 ]
 

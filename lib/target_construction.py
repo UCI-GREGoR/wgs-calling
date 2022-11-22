@@ -82,6 +82,18 @@ def construct_contamination_targets(manifest: pd.DataFrame) -> list:
     return result
 
 
+def construct_alignstats_targets(manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    a run of alignstats
+    """
+    result = [
+        "results/alignstats/{}/{}.bwa2a.alignstats.json".format(x[0], x[1])
+        for x in zip(manifest["projectid"], manifest["sampleid"])
+    ]
+    return result
+
+
 def construct_fastqc_targets(manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
