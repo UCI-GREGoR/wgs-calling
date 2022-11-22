@@ -138,12 +138,12 @@ rule picard_collectwgsmetrics:
         txt="{pathprefix}/collectwgsmetrics/{fileprefix}.picard.collect_wgs_metrics.txt",
     params:
         tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
+        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx6000m",
     conda:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        h_vmem="10000",
+        h_vmem="12000",
         qname="small",
         tmpdir="temp",
     shell:
