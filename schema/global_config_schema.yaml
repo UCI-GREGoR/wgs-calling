@@ -57,10 +57,24 @@ properties:
             type: string
           dbsnp-vcf-tbi:
             type: string
-  required:
-    - grch37
+    required:
+      - grch37
+  verifybamid2:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          db-prefix:
+            type: string
+        required:
+          - db-prefix
+        additionalProperties: no
+    required:
+      - grch37
 required:
   - references
   - bwa
   - dnascope
+  - verifybamid2
 additionalProperties: no

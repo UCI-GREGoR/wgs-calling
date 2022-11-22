@@ -24,3 +24,6 @@ dnascope:
     model: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/sentieon/SentieonDNAscopeModel1.1.model"
     dbsnp-vcf: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/sentieon/dbsnp_138.b37.vcf.gz"
     dbsnp-vcf-tbi: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/sentieon/dbsnp_138.b37.vcf.gz.tbi"
+verifybamid2:
+  grch37:
+    db-prefix: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/verifybamid/VerifyBamID/resource/1000g.phase3.100k.b37.vcf.gz.dat"
