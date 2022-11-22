@@ -99,13 +99,17 @@ def construct_picard_qc_targets(manifest: pd.DataFrame) -> list:
     From basic input manifest entries, construct output targets for
     various QC passes with picard
     """
-    result = [
+    result1 = [
         "results/collectmultiplemetrics/{}/{}.picard.alignment_summary_metrics.txt".format(
             x[0], x[1]
         )
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
-    return result
+    result2 = [
+        "results/collectgcbiasmetrics/{}/{}.picard.gc_bias_metrics.txt".format(x[0], x[1])
+        for x in zip(manifest["projectid"], manifest["sampleid"])
+    ]
+    return [result1, result2]
 
 
 def construct_fastqc_targets(manifest: pd.DataFrame) -> list:
