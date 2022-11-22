@@ -43,7 +43,7 @@ rule somalier_relate:
         h_vmem="4000",
         qname="small",
     shell:
-        "somalier relate --ped {input.ped} -o {params.outprefix} {input}"
+        "somalier relate --ped {input.ped} -o {params.outprefix} {input.somalier}"
 
 
 rule somalier_build_pedfile:
