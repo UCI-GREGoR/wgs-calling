@@ -9,7 +9,6 @@ genome-build: "grch37"
 references:
   grch37:
     fasta: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta"
-    fasta-dict: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified.fasta.dict"
     reportable-regions: "s3://invitae-health-chameleon-dev/archive/wgs-validation/references/NA12878/NA12878_RR.intervals"
 dnascope:
   grch37:

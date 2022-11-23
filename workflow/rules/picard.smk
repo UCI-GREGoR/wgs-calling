@@ -1,3 +1,29 @@
+rule create_sequence_dictionary:
+    """
+    For a reference fasta, create a sequence dictionary (.dict extension)
+    """
+    input:
+        "{prefix}fasta",
+    output:
+        "{prefix}fasta.dict",
+    params:
+        tmpdir="temp",
+        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
+    conda:
+        "../envs/gatk4.yaml"
+    threads: 1
+    resources:
+        h_vmem="10000",
+        qname="small",
+        tmpdir="temp",
+    shell:
+        "mkdir -p temp/ && "
+        'gatk --java-options "{params.java_args}" CreateSequenceDictionary '
+        "-REFERENCE {input} "
+        "-OUTPUT {output} "
+        "--TMP_DIR {params.tmpdir}"
+
+
 rule mark_duplicates:
     """
     Use samtools markdups to mark duplicates on aligned reads

@@ -30,7 +30,6 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
 - `references`: human genome reference data applicable to multiple tools
   - `fasta`: human sequence fasta file
-  - `fasta-dict`: dict file for above fasta
   - note that the other bwa-style index files attached to this fasta used to be imported by the nextflow workflow. however, presumably by accident,
     these annotation files were getting pulled from various different directories in a way that suggested that they might be delinked from their
 	source fasta. in reality, the source reference fastas were probably the same; but to avoid any difficulties downstream, now only the fasta
