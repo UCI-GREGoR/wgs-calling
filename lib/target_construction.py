@@ -175,13 +175,13 @@ def construct_fastqc_targets(wildcards, manifest: pd.DataFrame) -> list:
     results_prefix = "results/fastqc"
     results_r1 = [
         "{}/{}/{}_fastqc.zip".format(
-            results_prefix, wildcards.projectid, os.path.basename(x).rstrip(".fastq.gz")
+            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix(".fastq.gz")
         )
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r1"].to_list()
     ]
     results_r2 = [
         "{}/{}/{}_fastqc.zip".format(
-            results_prefix, wildcards.projectid, os.path.basename(x).rstrip(".fastq.gz")
+            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix(".fastq.gz")
         )
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r2"].to_list()
     ]
@@ -199,7 +199,7 @@ def construct_fastp_targets(wildcards, manifest: pd.DataFrame) -> list:
         "{}/{}/{}_fastp.html".format(
             results_prefix,
             wildcards.projectid,
-            os.path.basename(x).rstrip(".fastq.gz").split("_R1_")[0],
+            os.path.basename(x).removesuffix(".fastq.gz").split("_R1_")[0],
         )
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r1"].to_list()
     ]
@@ -207,7 +207,7 @@ def construct_fastp_targets(wildcards, manifest: pd.DataFrame) -> list:
         "{}/{}/{}_fastp.html".format(
             results_prefix,
             wildcards.projectid,
-            os.path.basename(x).rstrip(".fastq.gz").split("_R2_")[0],
+            os.path.basename(x).removesuffix(".fastq.gz").split("_R2_")[0],
         )
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r2"].to_list()
     ]
@@ -222,7 +222,7 @@ def map_reference_file(wildcards, config: dict):
     remote provider structure as required.
     """
     queries = wildcards.reference_file.split("/")
-    queries[len(queries) - 1] = queries[len(queries) - 1].replace(".", "-")
+    queries[len(queries) - 1] = queries[len(queries) - 1].removeprefix("ref.").replace(".", "-")
     current_lvl = config
     for query in queries:
         current_lvl = current_lvl[query]

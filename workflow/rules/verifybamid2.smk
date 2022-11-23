@@ -5,9 +5,9 @@ rule estimate_contamination:
     input:
         bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
         bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
-        fasta="reference_data/references/{}/fasta".format(reference_build),
+        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         db_files=expand(
-            "reference_data/verifybamid2/{genome}/db.{suffix}",
+            "reference_data/verifybamid2/{genome}/ref.db.{suffix}",
             genome=reference_build,
             suffix=["V", "UD", "mu", "bed"],
         ),
@@ -16,7 +16,7 @@ rule estimate_contamination:
         ancestry="{pathprefix}/contamination/{fileprefix}.vb2.Ancestry",
     params:
         outprefix="{pathprefix}/contamination/{fileprefix}.vb2",
-        db_prefix="reference_data/verifybamid2/{}/db".format(reference_build),
+        db_prefix="reference_data/verifybamid2/{}/ref.db".format(reference_build),
     conda:
         "../envs/verifybamid2.yaml"
     threads: 4
