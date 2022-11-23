@@ -4,7 +4,10 @@
 import os
 import pathlib
 import pandas as pd
+from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 from snakemake.utils import validate
+
+S3 = S3RemoteProvider()
 
 sys.path.insert(0, ".")
 from lib import target_construction as tc
@@ -43,6 +46,7 @@ include: "rules/fastqc.smk"
 include: "rules/manta.smk"
 include: "rules/multiqc.smk"
 include: "rules/picard.smk"
+include: "rules/references.smk"
 include: "rules/somalier.smk"
 
 include: "rules/verifybamid2.smk"

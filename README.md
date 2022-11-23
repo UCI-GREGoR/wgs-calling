@@ -30,17 +30,20 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
 - `references`: human genome reference data applicable to multiple tools
   - `fasta`: human sequence fasta file
-  - `fasta-index`: fai format index file for above fasta
   - `fasta-dict`: dict file for above fasta
-- `bwa`: reference data files specific to [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2)
-  - `fasta`: human sequence fasta file
-  - note that there are other files here that have been ported in from legacy; they exist in legacy in a rather disorganized fashion, and are flagged for cleanup before further annotation will be provided here.
+  - note that the other bwa-style index files attached to this fasta used to be imported by the nextflow workflow. however, presumably by accident,
+    these annotation files were getting pulled from various different directories in a way that suggested that they might be delinked from their
+	source fasta. in reality, the source reference fastas were probably the same; but to avoid any difficulties downstream, now only the fasta
+	itself is pulled in from remote, and the index files are regenerated. this also substantially cleans up the configuration.
 - `dnascope`: reference data files specific to [Sentieon DNAscope](https://support.sentieon.com/manual/DNAscope_usage/dnascope/)
   - `model`: DNAscope model file
-  - `dbsnp-vcf`: dbSNP backend vcf file
-  - `dbsnp-vcf-tbi`: tbi format index file for above vcf
+  - `dbsnp-vcf-gz`: dbSNP backend vcf.gz file
+  - `dbsnp-vcf-gz-tbi`: tbi format index file for above vcf
 - `verifybamid2`: reference data files specific to [VerifyBamID2](https://github.com/Griffan/VerifyBamID)
-  - `db-prefix`: filename prefix for assorted Verify annotation file suffixes: V, UD, mu, bed.
+  - `db-V`: filename for assorted Verify annotation files
+  - `db-UD`: filename for assorted Verify annotation files
+  - `db-mu`: filename for assorted Verify annotation files
+  - `db-bed`: filename for assorted Verify annotation files
 
 The following columns are expected in the run manifest, by default at `config/manifest.tsv`:
 - thing

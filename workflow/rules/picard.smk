@@ -37,9 +37,9 @@ rule picard_collectmultiplemetrics:
     input:
         bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
         bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
-        fasta=config["references"][reference_build]["fasta"],
-        fai=config["references"][reference_build]["fasta-index"],
-        dic=config["references"][reference_build]["fasta-dict"],
+        fasta="reference_data/references/{}/fasta".format(reference_build),
+        fai="reference_data/references/{}/fasta.fai".format(reference_build),
+        dic="reference_data/references/{}/fasta.dict".format(reference_build),
     output:
         expand(
             "{{pathprefix}}/collectmultiplemetrics/{{fileprefix}}.picard.{suffix}",
@@ -96,9 +96,9 @@ rule picard_collectgcbiasmetrics:
     input:
         bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
         bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
-        fasta=config["references"][reference_build]["fasta"],
-        fai=config["references"][reference_build]["fasta-index"],
-        dic=config["references"][reference_build]["fasta-dict"],
+        fasta="reference_data/references/{}/fasta".format(reference_build),
+        fai="reference_data/references/{}/fasta.fai".format(reference_build),
+        dic="reference_data/references/{}/fasta.dict".format(reference_build),
     output:
         metrics="{pathprefix}/collectgcbiasmetrics/{fileprefix}.picard.gc_bias_metrics.txt",
         summary="{pathprefix}/collectgcbiasmetrics/{fileprefix}.picard.gc_bias_metrics_summary.txt",
@@ -130,10 +130,10 @@ rule picard_collectwgsmetrics:
     input:
         bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
         bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
-        fasta=config["references"][reference_build]["fasta"],
-        fai=config["references"][reference_build]["fasta-index"],
-        dic=config["references"][reference_build]["fasta-dict"],
-        intervals=config["references"][reference_build]["reportable-regions"],
+        fasta="reference_data/references/{}/fasta".format(reference_build),
+        fai="reference_data/references/{}/fasta.fai".format(reference_build),
+        dic="reference_data/references/{}/fasta.dict".format(reference_build),
+        intervals="reference_data/references/{}/reportable-regions".format(reference_build),
     output:
         txt="{pathprefix}/collectwgsmetrics/{fileprefix}.picard.collect_wgs_metrics.txt",
     params:

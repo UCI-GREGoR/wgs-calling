@@ -1,3 +1,25 @@
+rule bwa_index:
+    """
+    From a fasta file, run bwa index to generate annotation files
+    """
+    input:
+        fasta="reference_data/references/{}/fasta".format(reference_build),
+    output:
+        index_files=expand(
+            "reference_data/references/{genome}/fasta.{suffix}",
+            genome=reference_build,
+            suffix=["ann", "amb", "ann", "bwt.2bit.64", "fai", "fxi", "pac", "sa"],
+        ),
+    conda:
+        "../envs/bwamem2.yaml"
+    threads: 1
+    resources:
+        h_vmem="20000",
+        qname="small",
+    shell:
+        "bwa index {input.fasta}"
+
+
 rule bwa_map_and_sort:
     """
     Align fastqs to a reference genome
@@ -5,7 +27,12 @@ rule bwa_map_and_sort:
     input:
         fastq1=lambda wildcards: tc.map_fastq_from_project_and_sample(wildcards, manifest, "R1"),
         fastq2=lambda wildcards: tc.map_fastq_from_project_and_sample(wildcards, manifest, "R2"),
-        bwa_fasta=config["bwa"][reference_build]["bwa-fasta"],
+        bwa_fasta="reference_data/references/{}/fasta".format(reference_build),
+        bwa_other_files=expand(
+            "reference_data/references/{genome}/fasta.{suffix}",
+            genome=reference_build,
+            suffix=["ann", "amb", "ann", "bwt.2bit.64", "fai", "fxi", "pac", "sa"],
+        ),
     output:
         bam="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam",
         bai="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam.bai",

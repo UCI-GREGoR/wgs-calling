@@ -1,6 +1,9 @@
 import os
 
 import pandas as pd
+from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
+
+S3 = S3RemoteProvider()
 
 
 def map_fastq_from_project_and_sample(wildcards, manifest, rp) -> str:
@@ -198,3 +201,19 @@ def construct_fastp_targets(wildcards, manifest: pd.DataFrame) -> list:
     ]
     results_r1.extend(results_r2)
     return results_r1
+
+
+def map_reference_file(wildcards, config: dict):
+    """
+    Use wildcard information to figure out what configured
+    reference file is needed, and then wrap that file in a
+    remote provider structure as required.
+    """
+    queries = wildcards.reference_file.split("/")
+    queries[len(queries) - 1] = queries[len(queries) - 1].replace(".", "-")
+    current_lvl = config
+    for query in queries:
+        current_lvl = current_lvl[query]
+    if current_lvl.startswith("s3://"):
+        return S3.remote(current_lvl)
+    return current_lvl

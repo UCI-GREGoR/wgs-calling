@@ -16,44 +16,15 @@ properties:
         properties:
           fasta:
             type: string
-          fasta-index:
-            type: string
           fasta-dict:
             type: string
           reportable-regions:
             type: string
         required:
           - fasta
-          - fasta-index
           - fasta-dict
           - reportable-regions
         additionalProperties: no
-    required:
-      - grch37
-  bwa:
-    type: object
-    patternProperties:
-      "^grch[0-9]+$":
-        type: object
-        properties:
-          bwa-fasta:
-            type: string
-          bwa-amb:
-            type: string
-          bwa-ann:
-            type: string
-          bwa-bwt:
-            type: string
-          bwa-fai:
-            type: string
-          bwa-fxi:
-            type: string
-          bwa-pac:
-            type: string
-          bwa-sa:
-            type: string
-          bwa-0123:
-            type: string
     required:
       - grch37
   dnascope:
@@ -64,9 +35,9 @@ properties:
         properties:
           model:
             type: string
-          dbsnp-vcf:
+          dbsnp-vcf-gz:
             type: string
-          dbsnp-vcf-tbi:
+          dbsnp-vcf-gz-tbi:
             type: string
     required:
       - grch37
@@ -76,10 +47,19 @@ properties:
       "^grch[0-9]+$":
         type: object
         properties:
-          db-prefix:
+          db-V:
+            type: string
+          db-UD:
+            type: string
+          db-mu:
+            type: string
+          db-bed:
             type: string
         required:
-          - db-prefix
+          - db-V
+          - db-UD
+          - db-mu
+          - db-bed
         additionalProperties: no
     required:
       - grch37
@@ -88,7 +68,6 @@ required:
   - multiqc-config
   - genome-build
   - references
-  - bwa
   - dnascope
   - verifybamid2
 additionalProperties: no

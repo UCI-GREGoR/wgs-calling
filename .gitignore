@@ -1,5 +1,6 @@
 # Genomic reference data
 references/
+reference_data/
 
 # Logs from cluster submissions
 logs/

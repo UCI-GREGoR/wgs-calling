@@ -5,7 +5,8 @@ rule somalier_extract:
     input:
         bam="{pathprefix}/markdups/{projectid}/{fileprefix}.mrkdup.sort.bam",
         bai="{pathprefix}/markdups/{projectid}/{fileprefix}.mrkdup.sort.bam.bai",
-        fasta=config["references"][reference_build]["fasta"],
+        fasta="reference_data/references/{}/fasta".format(reference_build),
+        fai="reference_data/references/{}/fasta.fai".format(reference_build),
     output:
         "{pathprefix}/somalier/{projectid}/extract/{fileprefix}.somalier",
     params:
