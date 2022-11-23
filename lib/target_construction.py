@@ -85,6 +85,18 @@ def construct_contamination_targets(wildcards, manifest: pd.DataFrame) -> list:
     return result
 
 
+def construct_mosdepth_targets(wildcards, manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    a run of mosdepth
+    """
+    result = [
+        "results/mosdepth/{}/{}.mosdepth.global.dist.txt".format(wildcards.projectid, x)
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
+    ]
+    return result
+
+
 def construct_alignstats_targets(wildcards, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for

@@ -43,6 +43,7 @@ rule run_multiqc_alignment:
         alignstats=tc.construct_combined_alignstats_targets,
         somalier=tc.construct_somalier_relate_targets,
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
+        mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
         multiqc_config=config["multiqc-config"],
     output:
         html="results/multiqc/{projectid}/multiqc.alignment.html",
