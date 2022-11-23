@@ -1,14 +1,33 @@
+rule samtools_index_fasta:
+    """
+    Given a fasta, generate its fai index file.
+    """
+    input:
+        "{prefix}fasta",
+    output:
+        "{prefix}fasta.fai",
+    conda:
+        "../envs/bwamem2.yaml"
+    threads: 1
+    resources:
+        h_vmem="4000",
+        qname="small",
+    shell:
+        "samtools faidx {input}"
+
+
 rule bwa_index:
     """
     From a fasta file, run bwa index to generate annotation files
     """
     input:
         fasta="reference_data/references/{}/fasta".format(reference_build),
+        fai="reference_data/references/{}/fasta.fai".format(reference_build),
     output:
         index_files=expand(
             "reference_data/references/{genome}/fasta.{suffix}",
             genome=reference_build,
-            suffix=["ann", "amb", "ann", "bwt.2bit.64", "fai", "fxi", "pac", "sa"],
+            suffix=["amb", "ann", "bwt.2bit.64", "pac"],
         ),
     conda:
         "../envs/bwamem2.yaml"
@@ -31,7 +50,7 @@ rule bwa_map_and_sort:
         bwa_other_files=expand(
             "reference_data/references/{genome}/fasta.{suffix}",
             genome=reference_build,
-            suffix=["ann", "amb", "ann", "bwt.2bit.64", "fai", "fxi", "pac", "sa"],
+            suffix=["ann", "amb", "bwt.2bit.64", "fai", "pac"],
         ),
     output:
         bam="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam",
