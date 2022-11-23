@@ -16,7 +16,7 @@ rule estimate_contamination:
         ancestry="{pathprefix}/contamination/{fileprefix}.vb2.Ancestry",
     params:
         outprefix="{pathprefix}/contamination/{fileprefix}.vb2",
-        db_prefix="reference_data/verifybamid2/{}/db",
+        db_prefix="reference_data/verifybamid2/{}/db".format(reference_build),
     conda:
         "../envs/verifybamid2.yaml"
     threads: 4
