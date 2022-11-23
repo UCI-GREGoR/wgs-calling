@@ -63,6 +63,25 @@ properties:
         additionalProperties: no
     required:
       - grch37
+  octopus:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          forest-model:
+            type: string
+          error-model:
+            type: string
+          skip-regions:
+            type: string
+        required:
+          - forest-model
+          - error-model
+          - skip-regions
+        additionalProperties: no
+    required:
+      - grch37
 required:
   - manifest
   - multiqc-config
@@ -70,4 +89,5 @@ required:
   - references
   - dnascope
   - verifybamid2
+  - octopus
 additionalProperties: no

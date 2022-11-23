@@ -44,6 +44,11 @@ The following settings are recognized in `config/config.yaml`. Note that each re
   - `db-UD`: filename for assorted Verify annotation files
   - `db-mu`: filename for assorted Verify annotation files
   - `db-bed`: filename for assorted Verify annotation files
+- `octopus`: reference data files specific to [octopus](https://github.com/luntergroup/octopus)
+  - `forest-model`: forest model annotation file for `--forest-model`
+  - `error-model`: error model annotation file for `--sequence-error-model`
+  - `skip-regions`: region annotation for `--skip-regions-file`
+
 
 The following columns are expected in the run manifest, by default at `config/manifest.tsv`:
 - thing
