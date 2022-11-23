@@ -5,6 +5,9 @@ properties:
     type: string
   multiqc-config:
     type: string
+  reference-build:
+    type: string
+    pattern: "^grch[0-9]+$"
   references:
     type: object
     patternProperties:
@@ -81,6 +84,9 @@ properties:
     required:
       - grch37
 required:
+  - manifest
+  - multiqc-config
+  - reference-build
   - references
   - bwa
   - dnascope

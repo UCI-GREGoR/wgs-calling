@@ -5,7 +5,7 @@ rule bwa_map_and_sort:
     input:
         fastq1=lambda wildcards: tc.map_fastq_from_project_and_sample(wildcards, manifest, "R1"),
         fastq2=lambda wildcards: tc.map_fastq_from_project_and_sample(wildcards, manifest, "R2"),
-        bwa_fasta=config["bwa"]["grch37"]["bwa-fasta"],
+        bwa_fasta=config["bwa"][reference_build]["bwa-fasta"],
     output:
         bam="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam",
         bai="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam.bai",

@@ -5,10 +5,10 @@ rule estimate_contamination:
     input:
         bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
         bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
-        fasta=config["references"]["grch37"]["fasta"],
+        fasta=config["references"][reference_build]["fasta"],
         db_files=expand(
             "{prefix}.{suffix}",
-            prefix=config["verifybamid2"]["grch37"]["db-prefix"],
+            prefix=config["verifybamid2"][reference_build]["db-prefix"],
             suffix=["V", "UD", "mu", "bed"],
         ),
     output:
@@ -16,7 +16,7 @@ rule estimate_contamination:
         ancestry="{pathprefix}/contamination/{fileprefix}.vb2.Ancestry",
     params:
         outprefix="{pathprefix}/contamination/{fileprefix}.vb2",
-        db_prefix=config["verifybamid2"]["grch37"]["db-prefix"],
+        db_prefix=config["verifybamid2"][reference_build]["db-prefix"],
     conda:
         "../envs/verifybamid2.yaml"
     threads: 4
