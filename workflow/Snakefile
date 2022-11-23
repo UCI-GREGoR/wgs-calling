@@ -18,7 +18,7 @@ validate(config, "../schema/global_config_schema.yaml")
 
 manifest = config["manifest"]
 manifest = pd.read_csv(manifest, sep="\t")
-reference_build = config["reference-build"]
+reference_build = config["genome-build"]
 
 TARGETS = [
     expand(

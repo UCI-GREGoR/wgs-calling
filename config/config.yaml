@@ -3,7 +3,7 @@
 # one row per sample. It can be parsed easily via pandas.
 manifest: "config/manifest.tsv"
 multiqc-config: "config/multiqc_config.yaml"
-reference-build: "grch37"
+genome-build: "grch37"
 
 
 references:

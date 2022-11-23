@@ -5,7 +5,7 @@ properties:
     type: string
   multiqc-config:
     type: string
-  reference-build:
+  genome-build:
     type: string
     pattern: "^grch[0-9]+$"
   references:
@@ -86,7 +86,7 @@ properties:
 required:
   - manifest
   - multiqc-config
-  - reference-build
+  - genome-build
   - references
   - bwa
   - dnascope
