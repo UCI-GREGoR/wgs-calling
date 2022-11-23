@@ -26,6 +26,8 @@ rule run_mosdepth:
         win_size=1000,
         mapq=0,
         T="0,10,20,30",
+    conda:
+        "../envs/mosdepth.yaml"
     threads: 1
     resources:
         h_vmem="4000",
