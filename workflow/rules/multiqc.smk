@@ -60,6 +60,7 @@ rule run_multiqc_alignment:
                         "collectgcbiasmetrics",
                         "collectwgsmetrics",
                         "somalier",
+                        "mosdepth",
                     ],
                 )
             )
@@ -73,7 +74,7 @@ rule run_multiqc_alignment:
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
-        "-m fastqc -m fastp -m verifybamid -m picard -m somalier -m custom_content "
+        "-m fastqc -m fastp -m verifybamid -m picard -m somalier -m mosdepth -m custom_content "
         "--interactive "
         "-x '*.js' "
         "-x '*.bam' "
