@@ -17,8 +17,10 @@ rule run_mosdepth:
                 "mosdepth.region.dist.txt",
                 "per-base.bed.gz",
                 "regions.bed.gz",
-                "quantized.bed.gz",
                 "thresholds.bed.gz",
+                "per-base.bed.gz.csi",
+                "regions.bed.gz.csi",
+                "thresholds.bed.gz.csi",
             ],
         ),
     params:
