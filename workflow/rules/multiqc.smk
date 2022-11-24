@@ -79,6 +79,6 @@ rule run_multiqc_alignment:
         "-x '*.bam' "
         "-x '*.fastq.gz' "
         "-x '*.pyc' "
-        "-p -f -i 'MultiQC for Read Alignment' "
+        "-f -i 'MultiQC for Read Alignment' "
         "-n {output.html} "
         "--profile-runtime --zip-data-dir"
