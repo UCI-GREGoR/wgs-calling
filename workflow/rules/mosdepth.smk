@@ -38,4 +38,4 @@ rule run_mosdepth:
         "--fast-mode "
         "--mapq {params.mapq} "
         "-T {params.T} "
-        "{input.bam}"
+        "{params.outprefix} {input.bam}"
