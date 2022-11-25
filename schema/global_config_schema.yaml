@@ -72,10 +72,13 @@ properties:
             type: string
           skip-regions:
             type: string
+          calling-ranges:
+            type: string
         required:
           - forest-model
           - error-model
           - skip-regions
+          - calling-ranges
         additionalProperties: no
     required:
       - grch37
