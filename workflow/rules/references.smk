@@ -19,7 +19,7 @@ rule download_reference_data:
         qname="small",
         tmpdir="temp/",
     shell:
-        'if [[ "{params}" == s3://* ]] ; then aws s3 cp {input} {output} ; else cp {input} {output} ; fi'
+        'if [[ "{params}" == s3://* ]] ; then aws s3 cp {params} {output} ; else cp {params} {output} ; fi'
 
 
 rule index_vcf:
