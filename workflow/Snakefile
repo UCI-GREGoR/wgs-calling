@@ -29,7 +29,8 @@ TARGETS = [
         "results/multiqc/{projectid}/multiqc.{runtype}.html",
         projectid=list(manifest["projectid"].unique()),
         runtype=["fastq", "alignment"],
-    )
+    ),
+    tc.construct_octopus_targets(manifest),
 ]
 
 
@@ -47,6 +48,7 @@ include: "rules/fastqc.smk"
 include: "rules/manta.smk"
 include: "rules/mosdepth.smk"
 include: "rules/multiqc.smk"
+
 include: "rules/picard.smk"
 include: "rules/references.smk"
 include: "rules/somalier.smk"
