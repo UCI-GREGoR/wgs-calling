@@ -7,17 +7,19 @@ rule download_reference_data:
     which uses the path contents between 'reference_data' and the actual
     filename to determine which configured reference file to pull.
     """
-    input:
-        lambda wildcards: tc.map_reference_file(wildcards, config),
     output:
         "reference_data/{reference_file}",
+    params:
+        lambda wildcards: tc.map_reference_file(wildcards, config),
+    conda:
+        "../envs/awscli.yaml"
     threads: 1
     resources:
         h_vmem="2000",
         qname="small",
         tmpdir="temp/",
     shell:
-        "cp {input} {output}"
+        'if [[ "{params}" == s3://* ]] ; then aws s3 cp {input} {output} ; else cp {input} {output} ; fi'
 
 
 rule index_vcf:

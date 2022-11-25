@@ -34,6 +34,15 @@ TARGETS = [
 ]
 
 
+## To deal with the fact that s3 remote provider service is very slow
+## and sometimes buggy, while not interfering with a streamlined
+## reference file naming convention, I'll use a snakemake functionality
+## for resolving ambiguous rule determination that I really dislike otherwise.
+## This is flagged for possible better resolution in the future.
+ruleorder: samtools_index_fasta > download_reference_data
+ruleorder: create_sequence_dictionary > download_reference_data
+
+
 rule all:
     input:
         TARGETS,

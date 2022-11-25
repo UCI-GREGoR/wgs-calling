@@ -238,6 +238,12 @@ def map_reference_file(wildcards, config: dict):
     current_lvl = config
     for query in queries:
         current_lvl = current_lvl[query]
-    if current_lvl.startswith("s3://"):
-        return S3.remote(current_lvl)
+    ## The intention for this function was to distinguish between S3 file paths and others,
+    ## and return wrapped objects related to the remote provider service when appropriate.
+    ## Unfortunately, there are assorted discrepancies with the S3 remote provider service
+    ## functionality that I've yet to work out, and so for the time being I'm going to fall
+    ## back to using awscli with bash conditional logic. But the actual functionality was
+    ## supposed to look like:
+    ## if current_lvl.startswith("s3://"):
+    ##     return S3.remote(current_lvl)
     return current_lvl
