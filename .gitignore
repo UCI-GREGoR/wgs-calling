@@ -1,3 +1,6 @@
+# ad hoc temp space
+temp/
+
 # Genomic reference data
 references/
 reference_data/
