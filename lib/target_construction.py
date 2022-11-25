@@ -164,7 +164,7 @@ def construct_manta_targets(manifest: pd.DataFrame) -> list:
     manta caller
     """
     result = [
-        "results/manta/{}/{}.manta.vcf.gz".format(x[0], x[1])
+        "results/manta/{}/{}.duphold-filtered.vcf.gz".format(x[0], x[1])
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
     return result
@@ -176,7 +176,7 @@ def construct_tiddit_targets(manifest: pd.DataFrame) -> list:
     tiddit caller
     """
     result = [
-        "results/tiddit/{}/{}.tiddit.vcf.gz".format(x[0], x[1])
+        "results/tiddit/{}/{}.duphold-filtered.vcf.gz".format(x[0], x[1])
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
     return result
