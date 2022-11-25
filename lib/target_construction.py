@@ -149,10 +149,34 @@ def construct_picard_qc_targets(wildcards, manifest: pd.DataFrame) -> list:
 def construct_octopus_targets(manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
-    octopus aligner, after scattergather is complete
+    octopus caller, after scattergather is complete
     """
     result = [
         "results/octopus/{}/{}.sorted.vcf.gz".format(x[0], x[1])
+        for x in zip(manifest["projectid"], manifest["sampleid"])
+    ]
+    return result
+
+
+def construct_manta_targets(manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    manta caller
+    """
+    result = [
+        "results/manta/{}/{}.manta.vcf.gz".format(x[0], x[1])
+        for x in zip(manifest["projectid"], manifest["sampleid"])
+    ]
+    return result
+
+
+def construct_tiddit_targets(manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    tiddit caller
+    """
+    result = [
+        "results/tiddit/{}/{}.tiddit.vcf.gz".format(x[0], x[1])
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
     return result

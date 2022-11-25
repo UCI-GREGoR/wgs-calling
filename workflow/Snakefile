@@ -31,6 +31,8 @@ TARGETS = [
         runtype=["fastq", "alignment"],
     ),
     tc.construct_octopus_targets(manifest),
+    tc.construct_manta_targets(manifest),
+    tc.construct_tiddit_targets(manifest),
 ]
 
 
