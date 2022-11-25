@@ -152,7 +152,7 @@ def construct_octopus_targets(manifest: pd.DataFrame) -> list:
     octopus aligner, after scattergather is complete
     """
     result = [
-        "results/octopus/{}/{}.vcf.gz".format(x[0], x[1])
+        "results/octopus/{}/{}.sorted.vcf.gz".format(x[0], x[1])
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
     return result
