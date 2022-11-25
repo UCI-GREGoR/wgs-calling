@@ -3,8 +3,8 @@ rule manta_configure:
     Configure manta SV caller on a single bamfile.
     """
     input:
-        bam="results/markdups/{projectid}/{subjectid}.mrkdup.sort.bam",
-        bai="results/markdups/{projectid}/{subjectid}.mrkdup.sort.bam.bai",
+        bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
+        bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
@@ -29,8 +29,8 @@ rule manta_run:
     After run configuration, actually run manta SV caller.
     """
     input:
-        bam="results/markdups/{projectid}/{subjectid}.mrkdup.sort.bam",
-        bai="results/markdups/{projectid}/{subjectid}.mrkdup.sort.bam.bai",
+        bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
+        bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         script="temp/manta_workdir/{projectid}/{sampleid}/runWorkflow.py",

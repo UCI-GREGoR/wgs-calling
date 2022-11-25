@@ -44,6 +44,7 @@ TARGETS = [
 ruleorder: samtools_index_fasta > download_reference_data
 ruleorder: create_sequence_dictionary > download_reference_data
 ruleorder: octopus_run_task > index_vcf
+ruleorder: manta_run > index_vcf
 
 
 rule all:
