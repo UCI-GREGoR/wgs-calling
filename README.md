@@ -28,6 +28,12 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `manifest`: relative path to run manifest
 - `multiqc-config`: relative path to configuration settings for post-alignment multiQC report
 - `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
+- `behaviors`: user-configurable modifiers to how the pipeline will run
+  - `aligner`: which alignment tool to use. permitted values: `bwa-mem2`
+  - `snv-caller`: which calling tool to use for SNVs. permitted values: `octopus`
+  - `outcome`: which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`
+  - `trim-adapters-before-alignment`: whether to use adapter trimmed fastq output of `fastp` as input to aligner.
+    permitted values: `yes`, `no`, or `legacy`. legacy behavior for this option is to not use trimmed output for alignment.
 - `references`: human genome reference data applicable to multiple tools
   - `fasta`: human sequence fasta file
   - note that the other bwa-style index files attached to this fasta used to be imported by the nextflow workflow. however, presumably by accident,

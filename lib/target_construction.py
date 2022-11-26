@@ -6,10 +6,16 @@ from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 S3 = S3RemoteProvider()
 
 
-def map_fastq_from_project_and_sample(wildcards, manifest, rp) -> str:
+def map_fastq_from_project_and_sample(wildcards, config, manifest, rp) -> str:
     """
     Get a particular fastq based on projectid and sampleid
     """
+    ## New: allow rewiring of the DAG to provide adapter-trimmed fastqs directly to aligner
+    if config["behaviors"]["trim-adapters-before-alignment"] == "yes":
+        return "results/fastp/{}/{}_{}_fastp.fastq".format(
+            wildcards.projectid, wildcards.sampleid, rp
+        )
+
     query = 'projectid == "{}" and sampleid == "{}"'.format(wildcards.projectid, wildcards.sampleid)
     result = manifest.query(query)
     assert len(result) == 1

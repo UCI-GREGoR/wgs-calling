@@ -8,6 +8,29 @@ properties:
   genome-build:
     type: string
     pattern: "^grch[0-9]+$"
+  behaviors:
+    type: object
+    properties:
+      aligner:
+        type: string
+        pattern: "^bwa-mem2$"
+      snv-caller:
+        type: string
+        pattern: "^octopus$"
+      outcome:
+        type: string
+        pattern: "^fastqc$|^alignment$|^calling$"
+      trim-adapters-before-alignment:
+        oneOf:
+          - type: boolean
+          - type: string
+            pattern: "^legacy$"
+    required:
+      - aligner
+      - snv-caller
+      - outcome
+      - trim-adapters-before-alignment
+    additionalProperties: no
   references:
     type: object
     patternProperties:
@@ -86,6 +109,7 @@ required:
   - manifest
   - multiqc-config
   - genome-build
+  - behaviors
   - references
   - dnascope
   - verifybamid2

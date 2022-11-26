@@ -5,6 +5,13 @@ manifest: "config/manifest.tsv"
 multiqc-config: "config/multiqc_config.yaml"
 genome-build: "grch37"
 
+behaviors:
+  aligner: "bwa-mem2"
+  snv-caller: "octopus"
+  outcome: "calling"
+  trim-adapters-before-alignment: "legacy"
+
+
 
 references:
   grch37:

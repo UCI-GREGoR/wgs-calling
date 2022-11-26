@@ -48,8 +48,12 @@ rule bwa_map_and_sort:
     Align fastqs to a reference genome
     """
     input:
-        fastq1=lambda wildcards: tc.map_fastq_from_project_and_sample(wildcards, manifest, "R1"),
-        fastq2=lambda wildcards: tc.map_fastq_from_project_and_sample(wildcards, manifest, "R2"),
+        fastq1=lambda wildcards: tc.map_fastq_from_project_and_sample(
+            wildcards, config, manifest, "R1"
+        ),
+        fastq2=lambda wildcards: tc.map_fastq_from_project_and_sample(
+            wildcards, config, manifest, "R2"
+        ),
         bwa_fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         bwa_other_files=expand(
             "reference_data/references/{genome}/ref.fasta.{suffix}",
