@@ -57,30 +57,6 @@ def map_fastqs_to_manifest(wildcards, manifest, readtag) -> str:
     return result[0]
 
 
-def construct_bwamem2_targets(manifest: pd.DataFrame) -> list:
-    """
-    From basic input manifest entries, construct output targets for
-    a run of bwa-mem2
-    """
-    result = [
-        "results/bwa-mem2/{}/{}.bwa2a.bam".format(x[0], x[1])
-        for x in zip(manifest["projectid"], manifest["sampleid"])
-    ]
-    return result
-
-
-def construct_markdups_targets(manifest: pd.DataFrame) -> list:
-    """
-    From basic input manifest entries, construct output targets for
-    a run of samtools markdups
-    """
-    result = [
-        "results/markdups/{}/{}.mrkdup.sort.bam".format(x[0], x[1])
-        for x in zip(manifest["projectid"], manifest["sampleid"])
-    ]
-    return result
-
-
 def construct_contamination_targets(wildcards, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
@@ -173,30 +149,6 @@ def construct_sv_targets(manifest: pd.DataFrame) -> list:
     """
     result = [
         "results/final/{}/{}.sv.vcf.gz".format(x[0], x[1])
-        for x in zip(manifest["projectid"], manifest["sampleid"])
-    ]
-    return result
-
-
-def construct_manta_targets(manifest: pd.DataFrame) -> list:
-    """
-    From basic input manifest entries, construct output targets for
-    manta caller
-    """
-    result = [
-        "results/manta/{}/{}.duphold-filtered.vcf.gz".format(x[0], x[1])
-        for x in zip(manifest["projectid"], manifest["sampleid"])
-    ]
-    return result
-
-
-def construct_tiddit_targets(manifest: pd.DataFrame) -> list:
-    """
-    From basic input manifest entries, construct output targets for
-    tiddit caller
-    """
-    result = [
-        "results/tiddit/{}/{}.duphold-filtered.vcf.gz".format(x[0], x[1])
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
     return result
