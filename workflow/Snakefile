@@ -5,6 +5,7 @@ import os
 import pathlib
 import pandas as pd
 from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
+from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 from snakemake.utils import validate
 
 S3 = S3RemoteProvider()
@@ -49,6 +50,7 @@ if config["behaviors"]["outcome"] == "calling":
 ## for resolving ambiguous rule determination that I really dislike otherwise.
 ## This is flagged for possible better resolution in the future.
 ruleorder: samtools_index_fasta > download_reference_data
+ruleorder: index_vcf > download_reference_data
 ruleorder: create_sequence_dictionary > download_reference_data
 ruleorder: octopus_run_task > index_vcf
 ruleorder: manta_run > index_vcf

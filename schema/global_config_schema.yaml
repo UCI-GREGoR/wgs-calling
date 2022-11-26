@@ -62,8 +62,10 @@ properties:
             type: string
           dbsnp-vcf-gz:
             type: string
-          dbsnp-vcf-gz-tbi:
-            type: string
+        required:
+          - model
+          - dbsnp-vcf-gz
+        additionalProperties: no
     required:
       - grch37
   verifybamid2:
@@ -90,25 +92,26 @@ properties:
       - grch37
   octopus:
     type: object
+    properties:
+      forest-model:
+        type: string
+      error-model:
+        type: string
     patternProperties:
       "^grch[0-9]+$":
         type: object
         properties:
-          forest-model:
-            type: string
-          error-model:
-            type: string
           skip-regions:
             type: string
           calling-ranges:
             type: string
         required:
-          - forest-model
-          - error-model
           - skip-regions
           - calling-ranges
         additionalProperties: no
     required:
+      - forest-model
+      - error-model
       - grch37
 required:
   - manifest

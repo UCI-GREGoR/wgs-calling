@@ -1,9 +1,11 @@
 import os
 
 import pandas as pd
+from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 
 S3 = S3RemoteProvider()
+HTTP = HTTPRemoteProvider()
 
 
 def map_fastq_from_project_and_sample(wildcards, config, manifest, rp) -> str:
@@ -286,6 +288,8 @@ def map_reference_file(wildcards, config: dict):
     ## functionality that I've yet to work out, and so for the time being I'm going to fall
     ## back to using awscli with bash conditional logic. But the actual functionality was
     ## supposed to look like:
-    ## if current_lvl.startswith("s3://"):
-    ##     return S3.remote(current_lvl)
+    if current_lvl.startswith("s3://"):
+        return S3.remote(current_lvl)
+    elif current_lvl.startswith("https://"):
+        return HTTP.remote(current_lvl)
     return current_lvl

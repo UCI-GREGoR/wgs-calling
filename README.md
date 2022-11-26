@@ -44,15 +44,14 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `dnascope`: reference data files specific to [Sentieon DNAscope](https://support.sentieon.com/manual/DNAscope_usage/dnascope/)
   - `model`: DNAscope model file
   - `dbsnp-vcf-gz`: dbSNP backend vcf.gz file
-  - `dbsnp-vcf-gz-tbi`: tbi format index file for above vcf
 - `verifybamid2`: reference data files specific to [VerifyBamID2](https://github.com/Griffan/VerifyBamID)
   - `db-V`: filename for assorted Verify annotation files
   - `db-UD`: filename for assorted Verify annotation files
   - `db-mu`: filename for assorted Verify annotation files
   - `db-bed`: filename for assorted Verify annotation files
 - `octopus`: reference data files specific to [octopus](https://github.com/luntergroup/octopus)
-  - `forest-model`: forest model annotation file for `--forest-model`
-  - `error-model`: error model annotation file for `--sequence-error-model`
+  - `forest-model`: forest model annotation file for `--forest-model` [note: this is independent of genome build (probably)]
+  - `error-model`: error model annotation file for `--sequence-error-model` [note: this is independent of genome build (probably)]
   - `skip-regions`: region annotation for `--skip-regions-file`
 
 
