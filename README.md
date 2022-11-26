@@ -31,6 +31,7 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `behaviors`: user-configurable modifiers to how the pipeline will run
   - `aligner`: which alignment tool to use. permitted values: `bwa-mem2`
   - `snv-caller`: which calling tool to use for SNVs. permitted values: `octopus`
+  - `sv-callers`: which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`
   - `outcome`: which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`
   - `trim-adapters-before-alignment`: whether to use adapter trimmed fastq output of `fastp` as input to aligner.
     permitted values: `yes`, `no`, or `legacy`. legacy behavior for this option is to not use trimmed output for alignment.
