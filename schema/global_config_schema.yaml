@@ -17,6 +17,11 @@ properties:
       snv-caller:
         type: string
         pattern: "^octopus$"
+      sv-callers:
+        type: array
+        items:
+          type: string
+          pattern: "^manta$|^tiddit$"
       outcome:
         type: string
         pattern: "^fastqc$|^alignment$|^calling$"

@@ -38,8 +38,7 @@ if config["behaviors"]["outcome"] != "fastqc":
 if config["behaviors"]["outcome"] == "calling":
     TARGETS.append(
         [
-            tc.construct_manta_targets(manifest),
-            tc.construct_tiddit_targets(manifest),
+            tc.construct_sv_targets(manifest),
         ]
     )
 
@@ -73,5 +72,6 @@ include: "rules/multiqc.smk"
 include: "rules/picard.smk"
 include: "rules/references.smk"
 include: "rules/somalier.smk"
+include: "rules/svdb.smk"
 
 include: "rules/verifybamid2.smk"

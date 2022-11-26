@@ -8,6 +8,9 @@ genome-build: "grch37"
 behaviors:
   aligner: "bwa-mem2"
   snv-caller: "octopus"
+  sv-callers:
+    - "manta"
+    - "tiddit"
   outcome: "calling"
   trim-adapters-before-alignment: "legacy"
 

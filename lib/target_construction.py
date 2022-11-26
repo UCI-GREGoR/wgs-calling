@@ -164,6 +164,18 @@ def construct_octopus_targets(manifest: pd.DataFrame) -> list:
     return result
 
 
+def construct_sv_targets(manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    arbitrary SV calling
+    """
+    result = [
+        "results/final/{}/{}.sv.vcf.gz".format(x[0], x[1])
+        for x in zip(manifest["projectid"], manifest["sampleid"])
+    ]
+    return result
+
+
 def construct_manta_targets(manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
