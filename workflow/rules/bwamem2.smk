@@ -61,10 +61,10 @@ rule bwa_map_and_sort:
             suffix=["ann", "amb", "bwt.2bit.64", "fai", "pac"],
         ),
     output:
-        bam="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam",
-        bai="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam.bai",
+        bam="results/bwa-mem2/{projectid}/{sampleid}_{lane}.bwa2a.bam",
+        bai="results/bwa-mem2/{projectid}/{sampleid}_{lane}.bwa2a.bam.bai",
     benchmark:
-        "results/performance_benchmarks/bwa_map_and_sort/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/bwa_map_and_sort/{projectid}/{sampleid}_{lane}.tsv"
     params:
         K="1000000",
         k="19",

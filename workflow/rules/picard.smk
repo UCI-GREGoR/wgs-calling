@@ -31,14 +31,14 @@ rule mark_duplicates:
     Use samtools markdups to mark duplicates on aligned reads
     """
     input:
-        bam="results/bwa-mem2/{fileprefix}.bwa2a.bam",
-        bai="results/bwa-mem2/{fileprefix}.bwa2a.bam.bai",
+        bam=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bwa2a.bam"),
+        bai=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bwa2a.bam.bai"),
     output:
-        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
-        score="results/markdups/{fileprefix}.mrkdup.score.txt",
+        bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
+        bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
+        score="results/markdups/{projectid}/{sampleid}.mrkdup.score.txt",
     benchmark:
-        "results/performance_benchmarks/mark_duplicates/{fileprefix}.tsv"
+        "results/performance_benchmarks/mark_duplicates/{projectid}/{sampleid}.tsv"
     params:
         tmpdir="temp",
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
@@ -57,7 +57,7 @@ rule mark_duplicates:
         "-METRICS_FILE {output.score} "
         "--CREATE_INDEX true "
         "--TMP_DIR {params.tmpdir} && "
-        "mv results/markdups/{wildcards.fileprefix}.mrkdup.sort.bai {output.bai}"
+        "mv results/markdups/{wildcards.projectid}/{wildcards.sampleid}.mrkdup.sort.bai {output.bai}"
 
 
 rule picard_collectmultiplemetrics:

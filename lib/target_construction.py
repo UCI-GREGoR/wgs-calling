@@ -14,11 +14,13 @@ def map_fastq_from_project_and_sample(wildcards, config, manifest, rp) -> str:
     """
     ## New: allow rewiring of the DAG to provide adapter-trimmed fastqs directly to aligner
     if config["behaviors"]["trim-adapters-before-alignment"] == "yes":
-        return "results/fastp/{}/{}_{}_fastp.fastq".format(
-            wildcards.projectid, wildcards.sampleid, rp
+        return "results/fastp/{}/{}_{}_{}_fastp.fastq".format(
+            wildcards.projectid, wildcards.sampleid, wildcards.lane, rp
         )
 
-    query = 'projectid == "{}" and sampleid == "{}"'.format(wildcards.projectid, wildcards.sampleid)
+    query = 'projectid == "{}" and sampleid == "{}" and lane == "{}"'.format(
+        wildcards.projectid, wildcards.sampleid, wildcards.lane
+    )
     result = manifest.query(query)
     assert len(result) == 1
     if rp == "R1":
@@ -40,7 +42,9 @@ def map_fastqs_to_manifest(wildcards, manifest, readtag) -> str:
     Query input manifest to find path of an input fastq
     """
     result = ""
-    query = "{}_{}_{}.fastq.gz".format(wildcards.prefix, readtag, wildcards.suffix)
+    query = "{}_{}_{}_{}.fastq.gz".format(
+        wildcards.prefix, wildcards.lane, readtag, wildcards.suffix
+    )
     if readtag == "R1":
         result = [
             x[1]
@@ -55,6 +59,22 @@ def map_fastqs_to_manifest(wildcards, manifest, readtag) -> str:
         ]
     assert len(result) == 1
     return result[0]
+
+
+def get_bams_by_lane(wildcards, config, manifest, suffix) -> list:
+    """
+    For a project and sample, get all the expected bams for the subject based on manifest lanes
+    """
+    query = 'projectid == "{}" and sampleid == "{}"'.format(wildcards.projectid, wildcards.sampleid)
+    result = manifest.query(query)
+    available_lanes = result["lane"]
+    result = [
+        "results/{}/{}/{}_{}.{}".format(
+            config["behaviors"]["aligner"], wildcards.projectid, wildcards.sampleid, x, suffix
+        )
+        for x in available_lanes
+    ]
+    return result
 
 
 def construct_contamination_targets(wildcards, manifest: pd.DataFrame) -> list:
