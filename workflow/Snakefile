@@ -22,6 +22,10 @@ validate(config, "../schema/global_config_schema.yaml")
 
 manifest = config["manifest"]
 manifest = pd.read_csv(manifest, sep="\t")
+
+
+validate(manifest, "../schema/manifest_schema.yaml")
+
 reference_build = config["genome-build"]
 octopus_num_intervals = 20
 

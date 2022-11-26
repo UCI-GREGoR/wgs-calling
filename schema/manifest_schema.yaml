@@ -1,0 +1,17 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: an entry in the sample manifest
+properties:
+  projectid:
+    type: string
+  sampleid:
+    type: string
+  r1:
+    type: string
+  r2:
+    type: string
+required:
+  - projectid
+  - sampleid
+  - r1
+  - r2
+additionalProperties: no
