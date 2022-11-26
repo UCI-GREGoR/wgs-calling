@@ -8,6 +8,8 @@ rule copy_fastqs:
     output:
         r1="results/fastqs/{projectid}/{prefix}_R1_{suffix}.fastq.gz",
         r2="results/fastqs/{projectid}/{prefix}_R2_{suffix}.fastq.gz",
+    benchmark:
+        "results/performance_benchmarks/copy_fastqs/{projectid}/{prefix}_{suffix}.fastq.tsv"
     threads: 1
     resources:
         h_vmem="500",

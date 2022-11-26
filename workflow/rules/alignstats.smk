@@ -3,10 +3,12 @@ rule run_alignstats:
     Run alignstats utility on post-markdups bams
     """
     input:
-        bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
+        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
     output:
-        json="{pathprefix}/alignstats/{fileprefix}.bwa2a.alignstats.json",
+        json="results/alignstats/{fileprefix}.bwa2a.alignstats.json",
+    benchmark:
+        "results/performance_benchmarks/run_alignstats/{fileprefix}.tsv"
     params:
         min_qual=20,
     conda:
@@ -32,6 +34,8 @@ rule merge_alignstats:
         json=lambda wildcards: tc.construct_alignstats_targets(wildcards, manifest),
     output:
         tsv="results/alignstats/{projectid}/alignstats_summary_mqc.tsv",
+    benchmark:
+        "results/performance_benchmarks/merge_alignstats/{projectid}/alignstats_summary_mqc.tsv"
     threads: 1
     resources:
         h_vmem="2000",

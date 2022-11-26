@@ -6,6 +6,8 @@ rule samtools_index_fasta:
         "{prefix}fasta",
     output:
         "{prefix}fasta.fai",
+    benchmark:
+        "results/performance_benchmarks/samtools_index_fasta/{prefix}fasta.fai.tsv"
     conda:
         "../envs/bwamem2.yaml"
     threads: 1
@@ -29,6 +31,8 @@ rule bwa_index:
             genome=reference_build,
             suffix=["amb", "ann", "bwt.2bit.64", "pac"],
         ),
+    benchmark:
+        "results/performance_benchmarks/bwa_index/{}/ref.fasta.tsv".format(reference_build)
     conda:
         "../envs/bwamem2.yaml"
     threads: 1
@@ -55,6 +59,8 @@ rule bwa_map_and_sort:
     output:
         bam="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam",
         bai="results/bwa-mem2/{projectid}/{sampleid}.bwa2a.bam.bai",
+    benchmark:
+        "results/performance_benchmarks/bwa_map_and_sort/{projectid}/{sampleid}.tsv"
     params:
         K="1000000",
         k="19",

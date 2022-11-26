@@ -3,8 +3,8 @@ rule estimate_contamination:
     Use verifybamid2 to estimate contamination in samples
     """
     input:
-        bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
+        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         db_files=expand(
             "reference_data/verifybamid2/{genome}/ref.db.{suffix}",
@@ -12,10 +12,12 @@ rule estimate_contamination:
             suffix=["V", "UD", "mu", "bed"],
         ),
     output:
-        selfSM="{pathprefix}/contamination/{fileprefix}.vb2.selfSM",
-        ancestry="{pathprefix}/contamination/{fileprefix}.vb2.Ancestry",
+        selfSM="results/contamination/{fileprefix}.vb2.selfSM",
+        ancestry="results/contamination/{fileprefix}.vb2.Ancestry",
+    benchmark:
+        "results/performance_benchmarks/estimate_contamination/{fileprefix}.tsv"
     params:
-        outprefix="{pathprefix}/contamination/{fileprefix}.vb2",
+        outprefix="results/contamination/{fileprefix}.vb2",
         db_prefix="reference_data/verifybamid2/{}/ref.db".format(reference_build),
     conda:
         "../envs/verifybamid2.yaml"

@@ -13,6 +13,8 @@ rule run_fastp:
         r1_unp_fastq="results/fastp/{projectid}/{prefix}_R1_unp_fastp.fastq",
         r2_unp_fastq="results/fastp/{projectid}/{prefix}_R2_unp_fastp.fastq",
         failed_fastq="results/fastp/{projectid}/{prefix}_failed.fastq",
+    benchmark:
+        "results/performance_benchmarks/run_fastp/{projectid}/{prefix}.tsv"
     params:
         outprefix=lambda wildcards: expand(
             "results/fastp/{projectid}/{sampleid}",

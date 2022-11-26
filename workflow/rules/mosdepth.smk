@@ -6,11 +6,11 @@ rule run_mosdepth:
     name of speed; that can always be adjusted later if desired.
     """
     input:
-        bam="{fileprefix}/markdups/{projectid}/{prefix}.mrkdup.sort.bam",
-        bai="{fileprefix}/markdups/{projectid}/{prefix}.mrkdup.sort.bam.bai",
+        bam="results/markdups/{projectid}/{prefix}.mrkdup.sort.bam",
+        bai="results/markdups/{projectid}/{prefix}.mrkdup.sort.bam.bai",
     output:
         assorted_files=expand(
-            "{{fileprefix}}/mosdepth/{{projectid}}/{{prefix}}.{suffix}",
+            "results/mosdepth/{{projectid}}/{{prefix}}.{suffix}",
             suffix=[
                 "mosdepth.global.dist.txt",
                 "mosdepth.summary.txt",
@@ -23,8 +23,10 @@ rule run_mosdepth:
                 "thresholds.bed.gz.csi",
             ],
         ),
+    benchmark:
+        "results/performance_benchmarks/run_mosdepth/{projectid}/{prefix}.tsv"
     params:
-        outprefix="{fileprefix}/mosdepth/{projectid}/{prefix}",
+        outprefix="results/mosdepth/{projectid}/{prefix}",
         win_size=1000,
         mapq=0,
         T="0,10,20,30",

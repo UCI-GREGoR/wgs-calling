@@ -11,6 +11,8 @@ rule download_reference_data:
         "reference_data/{reference_file}",
     params:
         lambda wildcards: tc.map_reference_file(wildcards, config),
+    benchmark:
+        "results/performance_benchmarks/download_reference_data/{reference_file}.tsv"
     conda:
         "../envs/awscli.yaml"
     threads: 1
@@ -30,6 +32,8 @@ rule index_vcf:
         "{prefix}.vcf.gz",
     output:
         "{prefix}.vcf.gz.tbi",
+    benchmark:
+        "results/performance_benchmarks/index_vcf/{prefix}.tsv"
     conda:
         "../envs/bcftools.yaml"
     threads: 1

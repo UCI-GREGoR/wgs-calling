@@ -13,6 +13,8 @@ rule duphold_run:
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
         bcf=temp("results/{toolname}/{projectid}/{sampleid}.duphold-annotated.bcf"),
+    benchmark:
+        "results/performance_benchmarks/duphold_run/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/duphold.yaml"
     threads: 4
@@ -31,6 +33,8 @@ rule duphold_apply:
         bcf="results/{toolname}/{projectid}/{sampleid}.duphold-annotated.bcf",
     output:
         vcf="results/{toolname}/{projectid}/{sampleid}.duphold-filtered.vcf.gz",
+    benchmark:
+        "results/performance_benchmarks/duphold_apply/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
     threads: 4

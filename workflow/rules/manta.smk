@@ -9,6 +9,8 @@ rule manta_configure:
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
         temp("temp/manta_workdir/{projectid}/{sampleid}/runWorkflow.py"),
+    benchmark:
+        "results/performance_benchmarks/manta_configure/{projectid}/{sampleid}.tsv"
     params:
         tmpdir="temp/manta_workdir/{projectid}/{sampleid}",
     conda:
@@ -37,6 +39,8 @@ rule manta_run:
     output:
         vcf=temp("temp/manta_workdir/{projectid}/{sampleid}/diploidSV.vcf.gz"),
         tbi=temp("temp/manta_workdir/{projectid}/{sampleid}/diploidSV.vcf.gz.tbi"),
+    benchmark:
+        "results/performance_benchmarks/manta_run/{projectid}/{sampleid}.tsv"
     params:
         tmpdir="temp/manta_workdir/{projectid}/{sampleid}",
     conda:
@@ -61,6 +65,8 @@ rule manta_sort_output:
         tbi="temp/manta_workdir/{projectid}/{sampleid}/diploidSV.vcf.gz.tbi",
     output:
         vcf="results/manta/{projectid}/{sampleid}.manta.vcf.gz",
+    benchmark:
+        "results/performance_benchmarks/manta_sort_output/{projectid}/{sampleid}.tsv"
     params:
         tmpdir="temp/manta_workdir/{projectid}/{sampleid}",
     conda:

@@ -6,6 +6,8 @@ rule create_sequence_dictionary:
         "{prefix}fasta",
     output:
         "{prefix}fasta.dict",
+    benchmark:
+        "results/performance_benchmarks/create_sequence_dictionary/{prefix}fasta.tsv"
     params:
         tmpdir="temp",
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
@@ -29,12 +31,14 @@ rule mark_duplicates:
     Use samtools markdups to mark duplicates on aligned reads
     """
     input:
-        bam="{pathprefix}/bwa-mem2/{fileprefix}.bwa2a.bam",
-        bai="{pathprefix}/bwa-mem2/{fileprefix}.bwa2a.bam.bai",
+        bam="results/bwa-mem2/{fileprefix}.bwa2a.bam",
+        bai="results/bwa-mem2/{fileprefix}.bwa2a.bam.bai",
     output:
-        bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
-        score="{pathprefix}/markdups/{fileprefix}.mrkdup.score.txt",
+        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
+        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        score="results/markdups/{fileprefix}.mrkdup.score.txt",
+    benchmark:
+        "results/performance_benchmarks/mark_duplicates/{fileprefix}.tsv"
     params:
         tmpdir="temp",
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
@@ -53,7 +57,7 @@ rule mark_duplicates:
         "-METRICS_FILE {output.score} "
         "--CREATE_INDEX true "
         "--TMP_DIR {params.tmpdir} && "
-        "mv {wildcards.pathprefix}/markdups/{wildcards.fileprefix}.mrkdup.sort.bai {output.bai}"
+        "mv results/markdups/{wildcards.fileprefix}.mrkdup.sort.bai {output.bai}"
 
 
 rule picard_collectmultiplemetrics:
@@ -61,14 +65,14 @@ rule picard_collectmultiplemetrics:
     Run gatk version of picard CollectMultipleMetrics
     """
     input:
-        bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
+        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
     output:
         expand(
-            "{{pathprefix}}/collectmultiplemetrics/{{fileprefix}}.picard.{suffix}",
+            "results/collectmultiplemetrics/{{fileprefix}}.picard.{suffix}",
             suffix=[
                 "alignment_summary_metrics.txt",
                 "base_distribution_by_cycle_metrics.txt",
@@ -81,10 +85,12 @@ rule picard_collectmultiplemetrics:
                 "quality_yield_metrics.txt",
             ],
         ),
+    benchmark:
+        "results/performance_benchmarks/picard_collectmultiplemetrics/{fileprefix}.tsv"
     params:
         tmpdir="temp",
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
-        outprefix="{pathprefix}/collectmultiplemetrics/{fileprefix}.picard",
+        outprefix="results/collectmultiplemetrics/{fileprefix}.picard",
         extension=".txt",
         validation_stringency="LENIENT",
         metric_accumulation_level="SAMPLE",
@@ -120,15 +126,17 @@ rule picard_collectgcbiasmetrics:
     Run gatk version of picard CollectGcBiasMetrics
     """
     input:
-        bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
+        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
     output:
-        metrics="{pathprefix}/collectgcbiasmetrics/{fileprefix}.picard.gc_bias_metrics.txt",
-        summary="{pathprefix}/collectgcbiasmetrics/{fileprefix}.picard.gc_bias_metrics_summary.txt",
-        pdf="{pathprefix}/collectgcbiasmetrics/{fileprefix}.picard.gc_bias_metrics_chart.pdf",
+        metrics="results/collectgcbiasmetrics/{fileprefix}.picard.gc_bias_metrics.txt",
+        summary="results/collectgcbiasmetrics/{fileprefix}.picard.gc_bias_metrics_summary.txt",
+        pdf="results/collectgcbiasmetrics/{fileprefix}.picard.gc_bias_metrics_chart.pdf",
+    benchmark:
+        "results/performance_benchmarks/picard_collectgcbiasmetrics/{fileprefix}.tsv"
     params:
         tmpdir="temp",
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
@@ -154,14 +162,16 @@ rule picard_collectwgsmetrics:
     Run gatk version of picard CollectWgsMetrics
     """
     input:
-        bam="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="{pathprefix}/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
+        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
         intervals="reference_data/references/{}/ref.reportable-regions".format(reference_build),
     output:
-        txt="{pathprefix}/collectwgsmetrics/{fileprefix}.picard.collect_wgs_metrics.txt",
+        txt="results/collectwgsmetrics/{fileprefix}.picard.collect_wgs_metrics.txt",
+    benchmark:
+        "results/performance_benchmarks/picard_collectwgsmetrics/{fileprefix}.tsv"
     params:
         tmpdir="temp",
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx6000m",

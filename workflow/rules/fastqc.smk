@@ -10,6 +10,8 @@ rule run_fastqc:
         r2_zip="results/fastqc/{projectid}/{prefix}_R2_{suffix}_fastqc.zip",
         r1_html="results/fastqc/{projectid}/{prefix}_R1_{suffix}_fastqc.html",
         r2_html="results/fastqc/{projectid}/{prefix}_R2_{suffix}_fastqc.html",
+    benchmark:
+        "results/fastqc/{projectid}/{prefix}_{suffix}_fastqc.tsv"
     params:
         outdir="results/fastqc/{projectid}",
     conda:

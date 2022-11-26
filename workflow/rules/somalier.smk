@@ -3,14 +3,16 @@ rule somalier_extract:
     Run somalier extract on a single bam.
     """
     input:
-        bam="{pathprefix}/markdups/{projectid}/{fileprefix}.mrkdup.sort.bam",
-        bai="{pathprefix}/markdups/{projectid}/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/markdups/{projectid}/{fileprefix}.mrkdup.sort.bam",
+        bai="results/markdups/{projectid}/{fileprefix}.mrkdup.sort.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
-        "{pathprefix}/somalier/{projectid}/extract/{fileprefix}.somalier",
+        "results/somalier/{projectid}/extract/{fileprefix}.somalier",
+    benchmark:
+        "results/performance_benchmarks/somalier_extract/{projectid}/{fileprefix}.tsv"
     params:
-        extract_dir="{pathprefix}/somalier/{projectid}/extract",
+        extract_dir="results/somalier/{projectid}/extract",
     conda:
         "../envs/somalier.yaml"
     threads: 1
@@ -30,13 +32,15 @@ rule somalier_relate:
     """
     input:
         somalier=lambda wildcards: tc.construct_somalier_extract_targets(wildcards, manifest),
-        ped="{pathprefix}/somalier/{projectid}/relate/somalier.ped",
+        ped="results/somalier/{projectid}/relate/somalier.ped",
     output:
-        html="{pathprefix}/somalier/{projectid}/relate/somalier.html",
-        pairs="{pathprefix}/somalier/{projectid}/relate/somalier.pairs.tsv",
-        samples="{pathprefix}/somalier/{projectid}/relate/somalier.samples.tsv",
+        html="results/somalier/{projectid}/relate/somalier.html",
+        pairs="results/somalier/{projectid}/relate/somalier.pairs.tsv",
+        samples="results/somalier/{projectid}/relate/somalier.samples.tsv",
+    benchmark:
+        "results/performance_benchmarks/somalier_relate/{projectid}.tsv"
     params:
-        outprefix="{pathprefix}/somalier/{projectid}/relate/somalier",
+        outprefix="results/somalier/{projectid}/relate/somalier",
     conda:
         "../envs/somalier.yaml"
     threads: 1
@@ -54,7 +58,7 @@ rule somalier_build_pedfile:
     In v0.0.1 here, this pedfile will only contain placeholders.
     """
     output:
-        "{pathprefix}/somalier/{projectid}/relate/somalier.ped",
+        "results/somalier/{projectid}/relate/somalier.ped",
     params:
         subjectids=lambda wildcards: manifest.loc[
             manifest["projectid"] == wildcards.projectid, "sampleid"

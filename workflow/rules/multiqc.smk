@@ -8,6 +8,8 @@ rule run_multiqc_fastq:
     output:
         html="results/multiqc/{projectid}/multiqc.fastq.html",
         data_zip="results/multiqc/{projectid}/multiqc.fastq_data.zip",
+    benchmark:
+        "results/performance_benchmarks/run_multiqc_fastq/{projectid}.tsv"
     params:
         target_dirs=list(
             set(
@@ -48,6 +50,8 @@ rule run_multiqc_alignment:
     output:
         html="results/multiqc/{projectid}/multiqc.alignment.html",
         data_zip="results/multiqc/{projectid}/multiqc.alignment_data.zip",
+    benchmark:
+        "results/performance_benchmarks/run_multiqc_alignment/{projectid}.tsv"
     params:
         target_dirs=list(
             set(
