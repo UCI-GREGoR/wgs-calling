@@ -94,7 +94,9 @@ See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/exe
 
 ### Step 5: Investigate results
 
-TBD; the only current targeted output is multiqc output in `results/multiqc`.
+- the results of fastqc on input reads are stored in `results/multiqc`
+- the results of fastqc on post-alignment data are stored in `results/multiqc`
+- the results of SNV and SV variant calling are stored in `results/final`
 
 ### Step 6: Commit changes
 
