@@ -8,6 +8,8 @@ rule copy_fastqs:
     output:
         r1="results/fastqs/{projectid}/{prefix}_{lane}_R1_{suffix}.fastq.gz",
         r2="results/fastqs/{projectid}/{prefix}_{lane}_R2_{suffix}.fastq.gz",
+    params:
+        symlink_target=config["behaviors"]["symlink-fastqs"],
     benchmark:
         "results/performance_benchmarks/copy_fastqs/{projectid}/{prefix}_{lane}_{suffix}.fastq.tsv"
     threads: 1
@@ -15,4 +17,6 @@ rule copy_fastqs:
         h_vmem="500",
         qname="small",
     shell:
-        "cp {input.r1} {output.r1} && cp {input.r2} {output.r2}"
+        'if [[ "{params.symlink_target}" == "True" ]] ; then '
+        "ln -s $(readlink -m {input.r1}) {output.r1} && ln -s $(readlink -m {input.r2}) {output.r2} ; "
+        "else cp {input.r1} {output.r1} && cp {input.r2} {output.r2} ; fi"

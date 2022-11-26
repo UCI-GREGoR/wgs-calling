@@ -12,6 +12,7 @@ behaviors:
     - "manta"
     - "tiddit"
   outcome: "calling"
+  symlink-fastqs: yes
   trim-adapters-before-alignment: "legacy"
 
 

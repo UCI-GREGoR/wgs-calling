@@ -25,6 +25,8 @@ properties:
       outcome:
         type: string
         pattern: "^fastqc$|^alignment$|^calling$"
+      symlink-fastqs:
+        type: boolean
       trim-adapters-before-alignment:
         oneOf:
           - type: boolean
@@ -34,6 +36,7 @@ properties:
       - aligner
       - snv-caller
       - outcome
+      - symlink-fastqs
       - trim-adapters-before-alignment
     additionalProperties: no
   references:
