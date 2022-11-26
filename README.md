@@ -58,8 +58,11 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 
 
 The following columns are expected in the run manifest, by default at `config/manifest.tsv`:
-- thing
-- otherthing
+- `projectid`: run ID, or other desired grouping of sequencing samples. this will be a subdirectory under individual tools in `results/`
+- `sampleid`: sequencing ID for sample
+- `r1`: R1 fastq.gz file for sample
+- `r1`: R2 fastq.gz file for sample
+- `lane`: (optional) sequencing lane code, with `L00` prefix. if not specified, will be assumed to be `L001`
 
 ### Step 3: Install Snakemake
 
