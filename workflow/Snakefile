@@ -33,14 +33,27 @@ TARGETS = [
     expand(
         "results/multiqc/{projectid}/multiqc.{runtype}.html",
         projectid=list(manifest["projectid"].unique()),
-        runtype=["fastq", "alignment"],
+        runtype="fastq",
     ),
 ]
 
 if config["behaviors"]["outcome"] != "fastqc":
-    TARGETS.append(tc.construct_octopus_targets(manifest))
+    TARGETS.append(
+        [
+            expand(
+                "results/multiqc/{projectid}/multiqc.{runtype}.html",
+                projectid=list(manifest["projectid"].unique()),
+                runtype="alignment",
+            )
+        ]
+    )
 
 if config["behaviors"]["outcome"] == "calling":
+    TARGETS.append(
+        [
+            tc.construct_octopus_targets(manifest),
+        ]
+    )
     TARGETS.append(
         [
             tc.construct_sv_targets(manifest),
