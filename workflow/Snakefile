@@ -13,13 +13,16 @@ S3 = S3RemoteProvider()
 sys.path.insert(0, ".")
 from lib import target_construction as tc
 
+shell.executable("/bin/bash")
+shell.prefix("set -euo pipefail; ")
+
 
 configfile: "config/config.yaml"
 
 
 validate(config, "../schema/global_config_schema.yaml")
 
-
+tempDir = "temp"
 manifest = config["manifest"]
 manifest = pd.read_csv(manifest, sep="\t")
 
