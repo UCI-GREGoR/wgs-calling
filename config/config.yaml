@@ -11,7 +11,7 @@ behaviors:
   sv-callers:
     - "manta"
     - "tiddit"
-  outcome: "calling"
+  outcome: "fastqc"
   symlink-fastqs: yes
   trim-adapters-before-alignment: "legacy"
 
