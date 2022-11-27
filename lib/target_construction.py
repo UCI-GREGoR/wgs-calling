@@ -37,22 +37,11 @@ def map_fastqs_to_manifest(wildcards: Namedlist, manifest: pd.DataFrame, readtag
     """
     Query input manifest to find path of an input fastq
     """
-    result = ""
-    query = "{}_{}_{}_{}.fastq.gz".format(
-        wildcards.prefix, wildcards.lane, readtag, wildcards.suffix
+    query = 'projectid == "{}" and sampleid == "{}" and lane == "{}"'.format(
+        wildcards.projectid, wildcards.sampleid, wildcards.lane
     )
-    if readtag == "R1":
-        result = [
-            x[1]
-            for x in zip(manifest["projectid"], manifest["r1"])
-            if x[0] == wildcards.projectid and os.path.basename(x[1]) == query
-        ]
-    else:
-        result = [
-            x[1]
-            for x in zip(manifest["projectid"], manifest["r2"])
-            if x[0] == wildcards.projectid and os.path.basename(x[1]) == query
-        ]
+    result = manifest.query(query)
+    result = result[readtag.lower()].to_list()
     assert len(result) == 1
     return result[0]
 
