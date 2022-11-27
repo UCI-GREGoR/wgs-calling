@@ -30,3 +30,21 @@ def test_map_fastq_from_project_and_sample(
         wildcards_with_lane, config, standard_manifest, readname
     )
     assert observed == expected
+
+
+@pytest.mark.parametrize(
+    "readname",
+    ["R1", "R2"],
+)
+def test_map_fastqs_to_manifest(
+    wildcards_with_lane,
+    standard_manifest,
+    readname,
+):
+    """
+    Test that map_fastqs_to_manifest can manage
+    to link between wildcards and manifest entries.
+    """
+    expected = "fn4_{}.fq.gz".format(readname)
+    observed = tc.map_fastqs_to_manifest(wildcards_with_lane, standard_manifest, readname)
+    assert observed == expected
