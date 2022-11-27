@@ -48,3 +48,20 @@ def test_map_fastqs_to_manifest(
     expected = "fn4_{}.fq.gz".format(readname)
     observed = tc.map_fastqs_to_manifest(wildcards_with_lane, standard_manifest, readname)
     assert observed == expected
+
+
+@pytest.mark.parametrize(
+    "suffix",
+    ["mysuffix.bam", "mysuffix.bam.bai"],
+)
+def test_get_bams_by_lane(wildcards_without_lane, standard_config, standard_manifest, suffix):
+    """
+    Test that get_bams_by_lane can manage
+    to acquire all lane-specific files for a sample
+    based on manifest fastq entries.
+    """
+    expected = ["results/bwa-mem2/PROJ1/SAM2_{}.{}".format(x, suffix) for x in ["L001", "L002"]]
+    observed = tc.get_bams_by_lane(
+        wildcards_without_lane, standard_config, standard_manifest, suffix
+    )
+    assert observed == expected
