@@ -1,0 +1,5 @@
+[run]
+omit =
+    workflow/scripts/tests/*py
+    lib/test*py
+    lib/__init__.py
