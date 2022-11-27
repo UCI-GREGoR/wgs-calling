@@ -26,10 +26,7 @@ def map_fastq_from_project_and_sample(
     )
     result = manifest.query(query)
     assert len(result) == 1
-    if rp == "R1":
-        result = result["r1"]
-    else:
-        result = result["r2"]
+    result = result[rp.lower()]
     return "results/fastqs/{}/{}".format(wildcards.projectid, os.path.basename(result.to_list()[0]))
 
 
