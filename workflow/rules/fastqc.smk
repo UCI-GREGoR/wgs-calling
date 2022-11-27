@@ -16,10 +16,9 @@ rule run_fastqc:
         outdir="results/fastqc/{projectid}",
     conda:
         "../envs/fastqc.yaml"
-    threads: 1
+    threads: 4
     resources:
-        h_vmem="4000",
-        mem_mb="4000",
+        h_vmem="8000",
         qname="small",
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
