@@ -133,7 +133,7 @@ def construct_picard_qc_targets(wildcards: Namedlist, manifest: pd.DataFrame) ->
     ]
     result = [result1, result2, result3]
     result = [y for x in result for y in x]
-    return result
+    return list(set(result))
 
 
 def construct_octopus_targets(manifest: pd.DataFrame) -> list:

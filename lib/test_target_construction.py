@@ -122,3 +122,26 @@ def test_construct_combined_alignstats_targets(wildcards_without_lane):
     expected = ["results/alignstats/PROJ1/alignstats_summary_mqc.tsv"]
     observed = tc.construct_combined_alignstats_targets(wildcards_without_lane)
     assert observed == expected
+
+
+def test_construct_picard_qc_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_picard_qc_targets can determine
+    the output files for each picard post-alignment qc utility.
+    """
+    expected = [
+        "results/collectmultiplemetrics/PROJ1/SAM1.picard.alignment_summary_metrics.txt",
+        "results/collectmultiplemetrics/PROJ1/SAM2.picard.alignment_summary_metrics.txt",
+        "results/collectmultiplemetrics/PROJ1/SAM3.picard.alignment_summary_metrics.txt",
+        "results/collectgcbiasmetrics/PROJ1/SAM1.picard.gc_bias_metrics.txt",
+        "results/collectgcbiasmetrics/PROJ1/SAM2.picard.gc_bias_metrics.txt",
+        "results/collectgcbiasmetrics/PROJ1/SAM3.picard.gc_bias_metrics.txt",
+        "results/collectwgsmetrics/PROJ1/SAM1.picard.collect_wgs_metrics.txt",
+        "results/collectwgsmetrics/PROJ1/SAM2.picard.collect_wgs_metrics.txt",
+        "results/collectwgsmetrics/PROJ1/SAM3.picard.collect_wgs_metrics.txt",
+    ]
+    observed = tc.construct_picard_qc_targets(wildcards_without_lane, standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
