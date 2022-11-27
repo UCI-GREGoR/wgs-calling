@@ -80,3 +80,19 @@ def test_construct_contamination_targets(wildcards_without_lane, standard_manife
     expected.sort()
     observed.sort()
     assert observed == expected
+
+
+def test_construct_mosdepth_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_mosdepth_targets can determine
+    the output files of mosdepth.
+    """
+    expected = [
+        "results/mosdepth/PROJ1/{}.mosdepth.global.dist.txt".format(x)
+        for x in ["SAM1", "SAM2", "SAM3"]
+    ]
+    observed = tc.construct_mosdepth_targets(wildcards_without_lane, standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
