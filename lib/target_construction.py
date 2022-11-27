@@ -1,6 +1,7 @@
 import os
 
 import pandas as pd
+from snakemake.io import AnnotatedString, Namedlist
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 
@@ -8,7 +9,9 @@ S3 = S3RemoteProvider()
 HTTP = HTTPRemoteProvider()
 
 
-def map_fastq_from_project_and_sample(wildcards, config, manifest, rp) -> str:
+def map_fastq_from_project_and_sample(
+    wildcards: Namedlist, config: dict, manifest: pd.DataFrame, rp: str
+) -> str:
     """
     Get a particular fastq based on projectid and sampleid
     """
@@ -30,14 +33,14 @@ def map_fastq_from_project_and_sample(wildcards, config, manifest, rp) -> str:
     return "results/fastqs/{}/{}".format(wildcards.projectid, os.path.basename(result.to_list()[0]))
 
 
-def map_fastqs_to_sampleid(wildcards) -> str:
+def map_fastqs_to_sampleid(wildcards: Namedlist) -> str:
     """
     Determine sample ID from fastq filename
     """
     return os.path.basename(wildcards.prefix).split("_L0")[0]
 
 
-def map_fastqs_to_manifest(wildcards, manifest, readtag) -> str:
+def map_fastqs_to_manifest(wildcards: Namedlist, manifest: pd.DataFrame, readtag: str) -> str:
     """
     Query input manifest to find path of an input fastq
     """
@@ -61,7 +64,9 @@ def map_fastqs_to_manifest(wildcards, manifest, readtag) -> str:
     return result[0]
 
 
-def get_bams_by_lane(wildcards, config, manifest, suffix) -> list:
+def get_bams_by_lane(
+    wildcards: Namedlist, config: dict, manifest: pd.DataFrame, suffix: str
+) -> list:
     """
     For a project and sample, get all the expected bams for the subject based on manifest lanes
     """
@@ -77,7 +82,7 @@ def get_bams_by_lane(wildcards, config, manifest, suffix) -> list:
     return result
 
 
-def construct_contamination_targets(wildcards, manifest: pd.DataFrame) -> list:
+def construct_contamination_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of verifybamid2 (for contamination)
@@ -89,7 +94,7 @@ def construct_contamination_targets(wildcards, manifest: pd.DataFrame) -> list:
     return result
 
 
-def construct_mosdepth_targets(wildcards, manifest: pd.DataFrame) -> list:
+def construct_mosdepth_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of mosdepth
@@ -101,7 +106,7 @@ def construct_mosdepth_targets(wildcards, manifest: pd.DataFrame) -> list:
     return result
 
 
-def construct_alignstats_targets(wildcards, manifest: pd.DataFrame) -> list:
+def construct_alignstats_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of alignstats
@@ -113,7 +118,7 @@ def construct_alignstats_targets(wildcards, manifest: pd.DataFrame) -> list:
     return result
 
 
-def construct_combined_alignstats_targets(wildcards) -> list:
+def construct_combined_alignstats_targets(wildcards: Namedlist) -> list:
     """
     From basic input manifest entries, construct output targets for
     combined alignstats output
@@ -122,7 +127,7 @@ def construct_combined_alignstats_targets(wildcards) -> list:
     return result
 
 
-def construct_picard_qc_targets(wildcards, manifest: pd.DataFrame) -> list:
+def construct_picard_qc_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     various QC passes with picard
@@ -174,7 +179,7 @@ def construct_sv_targets(manifest: pd.DataFrame) -> list:
     return result
 
 
-def construct_somalier_extract_targets(wildcards, manifest: pd.DataFrame) -> list:
+def construct_somalier_extract_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of somalier extract
@@ -186,7 +191,7 @@ def construct_somalier_extract_targets(wildcards, manifest: pd.DataFrame) -> lis
     return result
 
 
-def construct_somalier_relate_targets(wildcards) -> list:
+def construct_somalier_relate_targets(wildcards: Namedlist) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of somalier relate
@@ -195,7 +200,7 @@ def construct_somalier_relate_targets(wildcards) -> list:
     return result
 
 
-def construct_fastqc_targets(wildcards, manifest: pd.DataFrame) -> list:
+def construct_fastqc_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of fastQC
@@ -217,7 +222,7 @@ def construct_fastqc_targets(wildcards, manifest: pd.DataFrame) -> list:
     return results_r1
 
 
-def construct_fastp_targets(wildcards, manifest: pd.DataFrame) -> list:
+def construct_fastp_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of fastp
@@ -243,7 +248,7 @@ def construct_fastp_targets(wildcards, manifest: pd.DataFrame) -> list:
     return results_r1
 
 
-def map_reference_file(wildcards, config: dict):
+def map_reference_file(wildcards: Namedlist, config: dict) -> str | AnnotatedString:
     """
     Use wildcard information to figure out what configured
     reference file is needed, and then wrap that file in a
