@@ -3,24 +3,20 @@ rule run_fastp:
     Run fastp on a paired end library
     """
     input:
-        r1="results/fastqs/{projectid}/{prefix}_R1_001.fastq.gz",
-        r2="results/fastqs/{projectid}/{prefix}_R2_001.fastq.gz",
+        r1="results/fastqs/{projectid}/{sampleid}_{lane}_R1_001.fastq.gz",
+        r2="results/fastqs/{projectid}/{sampleid}_{lane}_R2_001.fastq.gz",
     output:
-        html="results/fastp/{projectid}/{prefix}_fastp.html",
-        json="results/fastp/{projectid}/{prefix}_fastp.json",
-        r1_fastq="results/fastp/{projectid}/{prefix}_R1_fastp.fastq",
-        r2_fastq="results/fastp/{projectid}/{prefix}_R2_fastp.fastq",
-        r1_unp_fastq="results/fastp/{projectid}/{prefix}_R1_unp_fastp.fastq",
-        r2_unp_fastq="results/fastp/{projectid}/{prefix}_R2_unp_fastp.fastq",
-        failed_fastq="results/fastp/{projectid}/{prefix}_failed.fastq",
+        html="results/fastp/{projectid}/{sampleid}_{lane}_fastp.html",
+        json="results/fastp/{projectid}/{sampleid}_{lane}_fastp.json",
+        r1_fastq="results/fastp/{projectid}/{sampleid}_{lane}_R1_fastp.fastq",
+        r2_fastq="results/fastp/{projectid}/{sampleid}_{lane}_R2_fastp.fastq",
+        r1_unp_fastq="results/fastp/{projectid}/{sampleid}_{lane}_R1_unp_fastp.fastq",
+        r2_unp_fastq="results/fastp/{projectid}/{sampleid}_{lane}_R2_unp_fastp.fastq",
+        failed_fastq="results/fastp/{projectid}/{sampleid}_{lane}_failed.fastq",
     benchmark:
-        "results/performance_benchmarks/run_fastp/{projectid}/{prefix}.tsv"
+        "results/performance_benchmarks/run_fastp/{projectid}/{sampleid}_{lane}.tsv"
     params:
-        outprefix=lambda wildcards: expand(
-            "results/fastp/{projectid}/{sampleid}",
-            projectid=wildcards.projectid,
-            sampleid=tc.map_fastqs_to_sampleid(wildcards),
-        ),
+        outprefix="results/fastp/{projectid}/{sampleid}_{lane}",
         quality=10,
         dup_calc_accuracy=3,
     conda:

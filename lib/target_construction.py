@@ -33,13 +33,6 @@ def map_fastq_from_project_and_sample(
     return "results/fastqs/{}/{}".format(wildcards.projectid, os.path.basename(result.to_list()[0]))
 
 
-def map_fastqs_to_sampleid(wildcards: Namedlist) -> str:
-    """
-    Determine sample ID from fastq filename
-    """
-    return os.path.basename(wildcards.prefix).split("_L0")[0]
-
-
 def map_fastqs_to_manifest(wildcards: Namedlist, manifest: pd.DataFrame, readtag: str) -> str:
     """
     Query input manifest to find path of an input fastq
