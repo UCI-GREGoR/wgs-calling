@@ -96,3 +96,29 @@ def test_construct_mosdepth_targets(wildcards_without_lane, standard_manifest):
     expected.sort()
     observed.sort()
     assert observed == expected
+
+
+def test_construct_alignstats_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_alignstats_targets can determine
+    the output files of alignstats.
+    """
+    expected = [
+        "results/alignstats/PROJ1/{}.bwa2a.alignstats.json".format(x)
+        for x in ["SAM1", "SAM2", "SAM3"]
+    ]
+    observed = tc.construct_alignstats_targets(wildcards_without_lane, standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
+
+
+def test_construct_combined_alignstats_targets(wildcards_without_lane):
+    """
+    Test that construct_combined_alignstats_targets can determine
+    the (post-merge) output of alignstats for a project.
+    """
+    expected = ["results/alignstats/PROJ1/alignstats_summary_mqc.tsv"]
+    observed = tc.construct_combined_alignstats_targets(wildcards_without_lane)
+    assert observed == expected

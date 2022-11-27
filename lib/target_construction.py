@@ -94,7 +94,7 @@ def construct_alignstats_targets(wildcards: Namedlist, manifest: pd.DataFrame) -
         "results/alignstats/{}/{}.bwa2a.alignstats.json".format(wildcards.projectid, x)
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
     ]
-    return result
+    return list(set(result))
 
 
 def construct_combined_alignstats_targets(wildcards: Namedlist) -> list:
@@ -102,6 +102,8 @@ def construct_combined_alignstats_targets(wildcards: Namedlist) -> list:
     From basic input manifest entries, construct output targets for
     combined alignstats output
     """
+    ## this is somewhat idiosyncratic, but similar functions all return lists, and snakemake
+    ## doesn't care, but having this return a list as well is helpful for consistency's sake.
     result = ["results/alignstats/{}/alignstats_summary_mqc.tsv".format(wildcards.projectid)]
     return result
 
