@@ -73,7 +73,7 @@ def construct_contamination_targets(wildcards: Namedlist, manifest: pd.DataFrame
         "results/contamination/{}/{}.vb2.selfSM".format(wildcards.projectid, x)
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
     ]
-    return result
+    return list(set(result))
 
 
 def construct_mosdepth_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:

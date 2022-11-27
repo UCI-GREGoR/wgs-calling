@@ -65,3 +65,18 @@ def test_get_bams_by_lane(wildcards_without_lane, standard_config, standard_mani
         wildcards_without_lane, standard_config, standard_manifest, suffix
     )
     assert observed == expected
+
+
+def test_construct_contamination_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_contamination_targets can determine
+    the output files of verifybamid2.
+    """
+    expected = [
+        "results/contamination/PROJ1/{}.vb2.selfSM".format(x) for x in ["SAM1", "SAM2", "SAM3"]
+    ]
+    observed = tc.construct_contamination_targets(wildcards_without_lane, standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
