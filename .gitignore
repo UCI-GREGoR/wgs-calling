@@ -1,3 +1,6 @@
+# Testing refuse
+.coverage
+
 # ad hoc temp space
 temp/
 
