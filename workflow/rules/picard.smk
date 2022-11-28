@@ -28,7 +28,7 @@ rule create_sequence_dictionary:
 
 rule mark_duplicates:
     """
-    Use samtools markdups to mark duplicates on aligned reads
+    Use gatk/picard markdups to mark duplicates on aligned reads
     """
     input:
         bam=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bwa2a.bam"),
@@ -59,6 +59,24 @@ rule mark_duplicates:
         "-METRICS_FILE {output.score} "
         "--CREATE_INDEX false "
         "--TMP_DIR {params.tmpdir}"
+
+
+rule samtools_create_bai:
+    """
+    From a sorted bam file, create a bai-format index
+    """
+    input:
+        bam="{prefix}.sort.bam",
+    output:
+        bai="{prefix}.sort.bam.bai",
+    conda:
+        "../envs/samtools.yaml"
+    threads: 4
+    resources:
+        h_vmem="8000",
+        qname="small",
+    shell:
+        "samtools index -@ {threads} -b -o {output.bai} {input.bam}"
 
 
 rule picard_collectmultiplemetrics:
