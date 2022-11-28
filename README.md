@@ -88,9 +88,15 @@ Execute the workflow locally via
 
 using `$N` cores or run it in a cluster environment via
 
-    snakemake --use-conda --cluster qsub --jobs 100
+    snakemake --use-conda --profile --cluster sge-profile --jobs 100
 
 See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/executable.html) for further details.
+
+#### Cluster profiles
+
+Snakemake interfaces with job schedulers via _cluster profiles_. For running jobs on SGE, you can use
+the cookiecutter template [here](https://github.com/Snakemake-Profiles/sge). If there's interest in the group,
+I (@lightning.auriga) have a functional profile for clvr that I can post to this or its own repo for sharing.
 
 ### Step 5: Investigate results
 
@@ -138,3 +144,10 @@ git checkout -b your-new-branch
 
 Testing infrastructure for embedded python and R scripts is installed under `lib/` and `workflow/scripts/`. Additional testing
 coverage for the Snakemake infrastructure itself should be added once the workflow is more mature ([see here](https://github.com/lightning.auriga/snakemake-unit-tests)).
+
+The testing under `lib/` is currently functional. To run it, do the following (from top level):
+
+```bash
+mamba install pytest-cov
+pytest --cov=lib lib
+```
