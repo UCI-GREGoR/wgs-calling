@@ -173,3 +173,18 @@ def test_construct_sv_targets(standard_manifest):
     expected.sort()
     observed.sort()
     assert observed == expected
+
+
+def test_construct_somalier_extract_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_somalier_extract_targets can determine
+    the output files of the first (extract) step of somalier.
+    """
+    expected = [
+        "results/somalier/PROJ1/extract/{}.somalier".format(x) for x in ["SAM1", "SAM2", "SAM3"]
+    ]
+    observed = tc.construct_somalier_extract_targets(wildcards_without_lane, standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected

@@ -169,7 +169,7 @@ def construct_somalier_extract_targets(wildcards: Namedlist, manifest: pd.DataFr
         "results/somalier/{}/extract/{}.somalier".format(wildcards.projectid, x)
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
     ]
-    return result
+    return list(set(result))
 
 
 def construct_somalier_relate_targets(wildcards: Namedlist) -> list:
