@@ -1,15 +1,14 @@
 # Snakemake workflow: WGS Pipeline
 
-This is the template for a new Snakemake workflow. Replace this text with a comprehensive description covering the purpose and domain.
-Insert your code into the respective folders, i.e. `scripts`, `rules`, and `envs`. Define the entry point of the workflow in the `Snakefile` and the main configuration in the `config.yaml` file.
+This workflow is intended to be the R&D space for the PMGRC WGS analysis pipeline. It will first support existing functionality from variously [marigold](https://github.com/invitae-internal/marigold-pipes), [nextflow-pipelines](https://github.com/invitae-internal/nextflow-pipelines), and the descendants of `nextflow-pipelines` after splitting out into individual repositories. When that back compatibility is complete, additional features will be sandboxed and tested here.
+
+New global targets should be added in `workflow/Snakefile`. Content in `workflow/Snakefile` and the snakefiles in `workflow/rules` should be specifically _rules_; python infrastructure should be composed as subroutines under `lib/` and constructed in such a manner as to be testable with [pytest](https://docs.pytest.org/en/7.2.x/). Rules can call embedded scripts (in python or R/Rmd) from `workflow/scripts`; again, these should be constructed to be testable with pytest or [testthat](https://testthat.r-lib.org/).
 
 ## Authors
 
 * Lightning Auriga (@lightning.auriga)
 
 ## Usage
-
-If you use this workflow in a paper, don't forget to give credits to the authors by citing the URL of this (original) repository and, if available, its DOI (see above).
 
 ### Step 1: Obtain a copy of this workflow
 
@@ -18,9 +17,52 @@ If you use this workflow in a paper, don't forget to give credits to the authors
     git clone git@gitlab.com:lightning.auriga1/wgs-pipeline.git
 ```
 
+Note that this requires local git ssh key configuration; see [here](https://docs.gitlab.com/ee/user/ssh.html) for instructions as required.
+
 ### Step 2: Configure workflow
 
 Configure the workflow according to your needs via editing the files in the `config/` folder. Adjust `config.yaml` to configure the workflow execution, and `manifest.tsv` to specify your sample setup.
+
+The following settings are recognized in `config/config.yaml`. Note that each reference data option below exists under an arbitrary tag denoting desired reference genome build. This tag is completely arbitrary and will be used to recognize the requested build for the current pipeline run.
+
+- `manifest`: relative path to run manifest
+- `multiqc-config`: relative path to configuration settings for post-alignment multiQC report
+- `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
+- `behaviors`: user-configurable modifiers to how the pipeline will run
+  - `aligner`: which alignment tool to use. permitted values: `bwa-mem2`
+  - `snv-caller`: which calling tool to use for SNVs. permitted values: `octopus`
+  - `sv-callers`: which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`
+  - `outcome`: which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`
+  - `symlink-fastqs`: whether to copy (no) or symlink (yes) input fastqs into workspace. symlinking is faster and more memory-efficient, but
+    less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch.
+  - `trim-adapters-before-alignment`: whether to use adapter trimmed fastq output of `fastp` as input to aligner.
+    permitted values: `yes`, `no`, or `legacy`. legacy behavior for this option is to not use trimmed output for alignment.
+- `references`: human genome reference data applicable to multiple tools
+  - `fasta`: human sequence fasta file
+  - note that the other bwa-style index files attached to this fasta used to be imported by the nextflow workflow. however, presumably by accident,
+    these annotation files were getting pulled from various different directories in a way that suggested that they might be delinked from their
+	source fasta. in reality, the source reference fastas were probably the same; but to avoid any difficulties downstream, now only the fasta
+	itself is pulled in from remote, and the index files are regenerated. this also substantially cleans up the configuration.
+- `dnascope`: reference data files specific to [Sentieon DNAscope](https://support.sentieon.com/manual/DNAscope_usage/dnascope/)
+  - `model`: DNAscope model file
+  - `dbsnp-vcf-gz`: dbSNP backend vcf.gz file
+- `verifybamid2`: reference data files specific to [VerifyBamID2](https://github.com/Griffan/VerifyBamID)
+  - `db-V`: filename for assorted Verify annotation files
+  - `db-UD`: filename for assorted Verify annotation files
+  - `db-mu`: filename for assorted Verify annotation files
+  - `db-bed`: filename for assorted Verify annotation files
+- `octopus`: reference data files specific to [octopus](https://github.com/luntergroup/octopus)
+  - `forest-model`: forest model annotation file for `--forest-model` [note: this is independent of genome build (probably)]
+  - `error-model`: error model annotation file for `--sequence-error-model` [note: this is independent of genome build (probably)]
+  - `skip-regions`: region annotation for `--skip-regions-file`
+
+
+The following columns are expected in the run manifest, by default at `config/manifest.tsv`:
+- `projectid`: run ID, or other desired grouping of sequencing samples. this will be a subdirectory under individual tools in `results/`
+- `sampleid`: sequencing ID for sample
+- `r1`: R1 fastq.gz file for sample
+- `r2`: R2 fastq.gz file for sample
+- `lane`: (optional) sequencing lane code, with `L00` prefix. if not specified, will be assumed to be `L001`
 
 ### Step 3: Install Snakemake
 
@@ -46,11 +88,23 @@ Execute the workflow locally via
 
 using `$N` cores or run it in a cluster environment via
 
-    snakemake --use-conda --cluster qsub --jobs 100
+    snakemake --use-conda --profile --cluster sge-profile --jobs 100
 
 See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/executable.html) for further details.
 
+#### Cluster profiles
+
+Snakemake interfaces with job schedulers via _cluster profiles_. For running jobs on SGE, you can use
+the cookiecutter template [here](https://github.com/Snakemake-Profiles/sge). If there's interest in the group,
+I (@lightning.auriga) have a functional profile for clvr that I can post to this or its own repo for sharing.
+
 ### Step 5: Investigate results
+
+- the results of fastqc on input reads are stored in `results/multiqc`
+- the results of fastqc on post-alignment data are stored in `results/multiqc`
+- the results of SNV and SV variant calling are stored in `results/final`
+
+This will be expanded once it becomes clearer to me what the expectations of this pipeline truly are.
 
 ### Step 6: Commit changes
 
@@ -73,15 +127,28 @@ Whenever you want to synchronize your workflow copy with new developments from u
 
 ### Step 8: Contribute back
 
-In case you have also changed or added steps, please consider contributing them back to the original repository:
+In case you have also changed or added steps, please consider contributing them back to the original repository. This project follows git flow; feature branches off of dev are welcome.
 
-1. [Fork](https://help.github.com/en/articles/fork-a-repo) the original repo to a personal or lab account.
-2. [Clone](https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html) the fork to your local system, to a different place than where you ran your analysis.
-3. Copy the modified files from your analysis to the clone of your fork, e.g., `cp -r workflow path/to/fork`. Make sure to **not** accidentally copy config file contents or sample sheets. Instead, manually update the example config files if necessary.
-4. Commit and push your changes to your fork.
-5. Create a [merge request](https://docs.gitlab.com/ee/user/project/merge_requests/) against the original repository.
+1. [Clone](https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html) the fork to your local system, to a different place than where you ran your analysis.
+2. Check out a branch off of dev:
+```
+git fetch
+git checkout dev
+git checkout -b your-new-branch
+```
+3. Make whatever changes best please you to your feature branch.
+4. Commit and push your changes to your branch.
+5. Create a [merge request](https://docs.gitlab.com/ee/user/project/merge_requests/) against dev.
 
 ## Testing
 
 Testing infrastructure for embedded python and R scripts is installed under `lib/` and `workflow/scripts/`. Additional testing
 coverage for the Snakemake infrastructure itself should be added once the workflow is more mature ([see here](https://github.com/lightning.auriga/snakemake-unit-tests)).
+
+The testing under `lib/` is currently functional. Partial testing exists for the builtin scripts under `workflow/scripts`: the new utilities
+for this implementation are tested, but some code inherited from the legacy pipeline(s) is not yet covered. To run the tests, do the following (from top level):
+
+```bash
+mamba install pytest-cov
+pytest --cov=lib --cov=workflow/scripts lib workflow/scripts
+```

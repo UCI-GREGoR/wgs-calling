@@ -2,3 +2,43 @@
 # In case of sample based data, it should be complemented by a manifest file that contains
 # one row per sample. It can be parsed easily via pandas.
 manifest: "config/manifest.tsv"
+multiqc-config: "config/multiqc_config.yaml"
+genome-build: "grch37"
+
+behaviors:
+  aligner: "bwa-mem2"
+  snv-caller: "octopus"
+  sv-callers:
+    - "manta"
+    - "tiddit"
+  outcome: "fastqc"
+  symlink-fastqs: yes
+  trim-adapters-before-alignment: "legacy"
+
+
+
+references:
+  grch37:
+    fasta: "s3://invitae-health-chameleon-dev/reference_data/grch37/human_g1k_v37_modified/human_g1k_v37_modified.fasta"
+    reportable-regions: "s3://invitae-health-chameleon-dev/archive/wgs-validation/references/NA12878/NA12878_RR.intervals"
+dnascope:
+  grch37:
+    model: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/sentieon/SentieonDNAscopeModel1.1.model"
+    dbsnp-vcf-gz: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/sentieon/dbsnp_138.b37.vcf.gz"
+verifybamid2:
+  grch37:
+    db-V: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/verifybamid/VerifyBamID/resource/1000g.phase3.100k.b37.vcf.gz.dat.V"
+    db-UD: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/verifybamid/VerifyBamID/resource/1000g.phase3.100k.b37.vcf.gz.dat.UD"
+    db-mu: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/verifybamid/VerifyBamID/resource/1000g.phase3.100k.b37.vcf.gz.dat.mu"
+    db-bed: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/verifybamid/VerifyBamID/resource/1000g.phase3.100k.b37.vcf.gz.dat.bed"
+  grch38:
+    db-V: "https://raw.githubusercontent.com/Griffan/VerifyBamID/master/resource/1000g.phase3.100k.b38.vcf.gz.dat.V"
+    db-UD: "https://raw.githubusercontent.com/Griffan/VerifyBamID/master/resource/1000g.phase3.100k.b38.vcf.gz.dat.UD"
+    db-mu: "https://raw.githubusercontent.com/Griffan/VerifyBamID/master/resource/1000g.phase3.100k.b38.vcf.gz.dat.mu"
+    db-bed: "https://raw.githubusercontent.com/Griffan/VerifyBamID/master/resource/1000g.phase3.100k.b38.vcf.gz.dat.bed"
+octopus:
+  error-model: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/octopus/octopus_err_models/novaseq.4a38e55.model"
+  forest-model: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/octopus/forests/individual.v0.7.0.v2.forest"
+  grch37:
+    skip-regions: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/octopus/b37_all_gaps_octo.txt"
+    calling-ranges: "resources/octopus_calling_ranges.tsv"
