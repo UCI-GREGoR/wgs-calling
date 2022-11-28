@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - legacy support for tiddit, manta SV calling.
 - legacy support for duphold.
 - legacy support for merging tiddit/manta output.
+- test coverage for all snakemake lambda functions.
 
 ### Changed
 
