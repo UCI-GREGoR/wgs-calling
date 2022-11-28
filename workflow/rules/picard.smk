@@ -70,7 +70,7 @@ rule samtools_create_bai:
     output:
         bai="{prefix}.sort.bam.bai",
     conda:
-        "../envs/samtools.yaml"
+        "../envs/bwamem2.yaml"
     threads: 4
     resources:
         h_vmem="8000",
