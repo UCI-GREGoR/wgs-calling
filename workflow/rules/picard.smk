@@ -41,6 +41,9 @@ rule mark_duplicates:
         "results/performance_benchmarks/mark_duplicates/{projectid}/{sampleid}.tsv"
     params:
         tmpdir="temp",
+        bamlist=lambda wildcards: " -INPUT ".join(
+            tc.get_bams_by_lane(wildcards, config, manifest, "bwa2a.bam")
+        ),
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
     conda:
         "../envs/gatk4.yaml"
@@ -52,7 +55,7 @@ rule mark_duplicates:
     shell:
         "mkdir -p temp/ && "
         'gatk --java-options "{params.java_args}" MarkDuplicates '
-        "-INPUT {input.bam} "
+        "-INPUT {params.bamlist} "
         "-OUTPUT {output.bam} "
         "-METRICS_FILE {output.score} "
         "--CREATE_INDEX true "
