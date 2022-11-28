@@ -61,7 +61,7 @@ The following columns are expected in the run manifest, by default at `config/ma
 - `projectid`: run ID, or other desired grouping of sequencing samples. this will be a subdirectory under individual tools in `results/`
 - `sampleid`: sequencing ID for sample
 - `r1`: R1 fastq.gz file for sample
-- `r1`: R2 fastq.gz file for sample
+- `r2`: R2 fastq.gz file for sample
 - `lane`: (optional) sequencing lane code, with `L00` prefix. if not specified, will be assumed to be `L001`
 
 ### Step 3: Install Snakemake
@@ -97,6 +97,8 @@ See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/exe
 - the results of fastqc on input reads are stored in `results/multiqc`
 - the results of fastqc on post-alignment data are stored in `results/multiqc`
 - the results of SNV and SV variant calling are stored in `results/final`
+
+This will be expanded once it becomes clearer to me what the expectations of this pipeline truly are.
 
 ### Step 6: Commit changes
 
