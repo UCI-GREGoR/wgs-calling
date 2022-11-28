@@ -35,7 +35,6 @@ rule mark_duplicates:
         bai=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bwa2a.bam.bai"),
     output:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
-        bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
         score="results/markdups/{projectid}/{sampleid}.mrkdup.score.txt",
     benchmark:
         "results/performance_benchmarks/mark_duplicates/{projectid}/{sampleid}.tsv"
@@ -44,12 +43,12 @@ rule mark_duplicates:
         bamlist=lambda wildcards: " -INPUT ".join(
             tc.get_bams_by_lane(wildcards, config, manifest, "bwa2a.bam")
         ),
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
+        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx3000m",
     conda:
         "../envs/gatk4.yaml"
-    threads: 1
+    threads: 2
     resources:
-        h_vmem="10000",
+        h_vmem="12000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -58,9 +57,8 @@ rule mark_duplicates:
         "-INPUT {params.bamlist} "
         "-OUTPUT {output.bam} "
         "-METRICS_FILE {output.score} "
-        "--CREATE_INDEX true "
-        "--TMP_DIR {params.tmpdir} && "
-        "mv results/markdups/{wildcards.projectid}/{wildcards.sampleid}.mrkdup.sort.bai {output.bai}"
+        "--CREATE_INDEX false "
+        "--TMP_DIR {params.tmpdir}"
 
 
 rule picard_collectmultiplemetrics:
