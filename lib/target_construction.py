@@ -200,7 +200,7 @@ def construct_fastqc_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> li
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r2"].to_list()
     ]
     results_r1.extend(results_r2)
-    return results_r1
+    return list(set(results_r1))
 
 
 def construct_fastp_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:

@@ -61,7 +61,7 @@ def standard_manifest():
             "projectid": ["PROJ1", "PROJ1", "PROJ1", "PROJ1", "PROJ1", "PROJ1"],
             "sampleid": ["SAM1", "SAM1", "SAM2", "SAM2", "SAM3", "SAM3"],
             "lane": ["L001", "L002", "L001", "L002", "L001", "L002"],
-            "r1": ["fn{}_R1.fq.gz".format(x + 1) for x in range(6)],
-            "r2": ["fn{}_R2.fq.gz".format(x + 1) for x in range(6)],
+            "r1": ["fn{}_R1.fastq.gz".format(x + 1) for x in range(6)],
+            "r2": ["fn{}_R2.fastq.gz".format(x + 1) for x in range(6)],
         }
     )

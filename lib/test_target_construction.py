@@ -2,6 +2,7 @@ import os
 import pathlib
 
 import pytest
+from snakemake.io import expand
 
 from lib import target_construction as tc
 
@@ -25,7 +26,7 @@ def test_map_fastq_from_project_and_sample(
             wildcards_with_lane.lane, readname
         )
     else:
-        expected = "results/fastqs/PROJ1/fn4_{}.fq.gz".format(readname)
+        expected = "results/fastqs/PROJ1/fn4_{}.fastq.gz".format(readname)
     observed = tc.map_fastq_from_project_and_sample(
         wildcards_with_lane, config, standard_manifest, readname
     )
@@ -45,7 +46,7 @@ def test_map_fastqs_to_manifest(
     Test that map_fastqs_to_manifest can manage
     to link between wildcards and manifest entries.
     """
-    expected = "fn4_{}.fq.gz".format(readname)
+    expected = "fn4_{}.fastq.gz".format(readname)
     observed = tc.map_fastqs_to_manifest(wildcards_with_lane, standard_manifest, readname)
     assert observed == expected
 
@@ -197,6 +198,23 @@ def test_construct_somalier_relate_targets(wildcards_without_lane):
     """
     expected = ["results/somalier/PROJ1/relate/somalier.html"]
     observed = tc.construct_somalier_relate_targets(wildcards_without_lane)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
+
+
+def test_construct_fastqc_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_fastqc_targets can determine
+    the output files of fastqc on input R1/R2 fastq.gz files.
+    """
+    expected = expand(
+        "results/fastqc/PROJ1/fn{fnum}_{readname}_fastqc.zip",
+        fnum=[i + 1 for i in range(6)],
+        readname=["R1", "R2"],
+    )
+    observed = tc.construct_fastqc_targets(wildcards_without_lane, standard_manifest)
     ## this function is used for snakemake target population, so order is irrelevant
     expected.sort()
     observed.sort()
