@@ -157,7 +157,7 @@ def construct_sv_targets(manifest: pd.DataFrame) -> list:
         "results/final/{}/{}.sv.vcf.gz".format(x[0], x[1])
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
-    return result
+    return list(set(result))
 
 
 def construct_somalier_extract_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
