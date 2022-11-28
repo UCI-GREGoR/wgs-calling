@@ -145,7 +145,7 @@ def construct_octopus_targets(manifest: pd.DataFrame) -> list:
         "results/octopus/{}/{}.sorted.vcf.gz".format(x[0], x[1])
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
-    return result
+    return list(set(result))
 
 
 def construct_sv_targets(manifest: pd.DataFrame) -> list:

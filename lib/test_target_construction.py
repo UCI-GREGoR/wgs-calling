@@ -145,3 +145,18 @@ def test_construct_picard_qc_targets(wildcards_without_lane, standard_manifest):
     expected.sort()
     observed.sort()
     assert observed == expected
+
+
+def test_construct_octopus_targets(standard_manifest):
+    """
+    Test that construct_octopus_targets can determine
+    the output sortd vcf files of the octopus sub-dag.
+    """
+    expected = [
+        "results/octopus/PROJ1/{}.sorted.vcf.gz".format(x) for x in ["SAM1", "SAM2", "SAM3"]
+    ]
+    observed = tc.construct_octopus_targets(standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
