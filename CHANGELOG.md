@@ -3,7 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.0] - 2022-11-28
+
+Integration of initial implementation branch, so that default has things of interest for casual viewing.
+The initial high-burden test of the implementation is still running, so rapid and immediate changes
+are anticipated.
 
 ### Added
 
@@ -15,7 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - legacy support for tiddit, manta SV calling.
 - legacy support for duphold.
 - legacy support for merging tiddit/manta output.
-- test coverage for all snakemake lambda functions.
+- test coverage for all snakemake lambda functions (under `lib/`).
+- test coverage for all added internal python scripts (under `workflow/scripts/`).
 
 ### Changed
 
@@ -41,6 +46,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `duphold` is actually being applied now. previously, it was only, and somewhat wonkily,
   being applied to tiddit.
+
+
+## [Unreleased]
 
 [//]: # (- Added)
 [//]: # (- Changed)
