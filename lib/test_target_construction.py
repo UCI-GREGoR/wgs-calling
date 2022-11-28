@@ -219,3 +219,20 @@ def test_construct_fastqc_targets(wildcards_without_lane, standard_manifest):
     expected.sort()
     observed.sort()
     assert observed == expected
+
+
+def test_construct_fastp_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_fastp_targets can determine
+    the output files of fastp on input R1/R2 fastq.gz files.
+    """
+    expected = expand(
+        "results/fastp/PROJ1/fn{fnum}_{readname}_fastp.html",
+        fnum=[i + 1 for i in range(6)],
+        readname=["R1", "R2"],
+    )
+    observed = tc.construct_fastp_targets(wildcards_without_lane, standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
