@@ -20,6 +20,30 @@ def wildcards_without_lane():
 
 
 @pytest.fixture
+def wildcards_local_reference():
+    """
+    snakemake wildcards for testing a request for a reference file with a local source
+    """
+    return Namedlist(fromdict={"reference_file": "verifybamid2/grch100/ref.db-UD"})
+
+
+@pytest.fixture
+def wildcards_s3_reference():
+    """
+    snakemake wildcards for testing a request for a reference file on s3
+    """
+    return Namedlist(fromdict={"reference_file": "octopus/grch100/ref.skip-regions"})
+
+
+@pytest.fixture
+def wildcards_url_reference():
+    """
+    snakemake wildcards for testing a request for a reference file specified by a URL
+    """
+    return Namedlist(fromdict={"reference_file": "octopus/grch100/ref.calling-ranges"})
+
+
+@pytest.fixture
 def standard_config():
     """
     configuration settings imitating those of an actual workflow run
@@ -46,7 +70,10 @@ def standard_config():
         "octopus": {
             "error-model": "my.error-model",
             "forest-model": "my.forest-model",
-            "grch100": {"skip-regions": "my.skip-regions", "calling-ranges": "my.calling-ranges"},
+            "grch100": {
+                "skip-regions": "s3://my.skip-regions",
+                "calling-ranges": "https://my.calling-ranges",
+            },
         },
     }
 

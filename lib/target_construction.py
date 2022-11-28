@@ -242,10 +242,8 @@ def map_reference_file(wildcards: Namedlist, config: dict) -> str | AnnotatedStr
         current_lvl = current_lvl[query]
     ## The intention for this function was to distinguish between S3 file paths and others,
     ## and return wrapped objects related to the remote provider service when appropriate.
-    ## Unfortunately, there are assorted discrepancies with the S3 remote provider service
-    ## functionality that I've yet to work out, and so for the time being I'm going to fall
-    ## back to using awscli with bash conditional logic. But the actual functionality was
-    ## supposed to look like:
+    ## There have been periodic issues with the remote provider interface, but it seems
+    ## to be working, somewhat inefficiently but very conveniently, for the time being.
     if current_lvl.startswith("s3://"):
         return S3.remote(current_lvl)
     elif current_lvl.startswith("https://"):

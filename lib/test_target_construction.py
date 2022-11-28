@@ -2,9 +2,14 @@ import os
 import pathlib
 
 import pytest
-from snakemake.io import expand
+from snakemake.io import AnnotatedString, Namedlist, expand
+from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
+from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 
 from lib import target_construction as tc
+
+S3 = S3RemoteProvider()
+HTTP = HTTPRemoteProvider()
 
 
 @pytest.mark.parametrize(
@@ -235,4 +240,34 @@ def test_construct_fastp_targets(wildcards_without_lane, standard_manifest):
     ## this function is used for snakemake target population, so order is irrelevant
     expected.sort()
     observed.sort()
+    assert observed == expected
+
+
+def test_map_reference_file_localfile(wildcards_local_reference, standard_config):
+    """
+    Test that map_reference_file can successfully detect things that look
+    like local files.
+    """
+    expected = "my.UD"
+    observed = tc.map_reference_file(wildcards_local_reference, standard_config)
+    assert observed == expected
+
+
+def test_map_reference_file_s3(wildcards_s3_reference, standard_config):
+    """
+    Test that map_reference_file can successfully detect things that look
+    like they come from an s3 bucket
+    """
+    expected = S3.remote("s3://my.skip-regions")
+    observed = tc.map_reference_file(wildcards_s3_reference, standard_config)
+    assert observed == expected
+
+
+def test_map_reference_file_url(wildcards_url_reference, standard_config):
+    """
+    Test that map_reference_file can successfully detect things that look
+    like they come from a URL
+    """
+    expected = HTTP.remote("https://my.calling-ranges")
+    observed = tc.map_reference_file(wildcards_url_reference, standard_config)
     assert observed == expected
