@@ -178,7 +178,7 @@ def construct_somalier_relate_targets(wildcards: Namedlist) -> list:
     a run of somalier relate
     """
     result = ["results/somalier/{}/relate/somalier.html".format(wildcards.projectid)]
-    return result
+    return list(set(result))
 
 
 def construct_fastqc_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:

@@ -188,3 +188,16 @@ def test_construct_somalier_extract_targets(wildcards_without_lane, standard_man
     expected.sort()
     observed.sort()
     assert observed == expected
+
+
+def test_construct_somalier_relate_targets(wildcards_without_lane):
+    """
+    Test that construct_somalier_relate_targets can determine
+    the output files of the second (relate) step of somalier.
+    """
+    expected = ["results/somalier/PROJ1/relate/somalier.html"]
+    observed = tc.construct_somalier_relate_targets(wildcards_without_lane)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
