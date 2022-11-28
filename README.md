@@ -145,9 +145,10 @@ git checkout -b your-new-branch
 Testing infrastructure for embedded python and R scripts is installed under `lib/` and `workflow/scripts/`. Additional testing
 coverage for the Snakemake infrastructure itself should be added once the workflow is more mature ([see here](https://github.com/lightning.auriga/snakemake-unit-tests)).
 
-The testing under `lib/` is currently functional. To run it, do the following (from top level):
+The testing under `lib/` is currently functional. Partial testing exists for the builtin scripts under `workflow/scripts`: the new utilities
+for this implementation are tested, but some code inherited from the legacy pipeline(s) is not yet covered. To run the tests, do the following (from top level):
 
 ```bash
 mamba install pytest-cov
-pytest --cov=lib lib
+pytest --cov=lib --cov=workflow/scripts lib workflow/scripts
 ```
