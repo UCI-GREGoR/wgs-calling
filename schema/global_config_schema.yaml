@@ -1,0 +1,128 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: global configuration
+properties:
+  manifest:
+    type: string
+  multiqc-config:
+    type: string
+  genome-build:
+    type: string
+    pattern: "^grch[0-9]+$"
+  behaviors:
+    type: object
+    properties:
+      aligner:
+        type: string
+        pattern: "^bwa-mem2$"
+      snv-caller:
+        type: string
+        pattern: "^octopus$"
+      sv-callers:
+        type: array
+        items:
+          type: string
+          pattern: "^manta$|^tiddit$"
+      outcome:
+        type: string
+        pattern: "^fastqc$|^alignment$|^calling$"
+      symlink-fastqs:
+        type: boolean
+      trim-adapters-before-alignment:
+        oneOf:
+          - type: boolean
+          - type: string
+            pattern: "^legacy$"
+    required:
+      - aligner
+      - snv-caller
+      - outcome
+      - symlink-fastqs
+      - trim-adapters-before-alignment
+    additionalProperties: no
+  references:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          fasta:
+            type: string
+          reportable-regions:
+            type: string
+        required:
+          - fasta
+          - reportable-regions
+        additionalProperties: no
+    required:
+      - grch37
+  dnascope:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          model:
+            type: string
+          dbsnp-vcf-gz:
+            type: string
+        required:
+          - model
+          - dbsnp-vcf-gz
+        additionalProperties: no
+    required:
+      - grch37
+  verifybamid2:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          db-V:
+            type: string
+          db-UD:
+            type: string
+          db-mu:
+            type: string
+          db-bed:
+            type: string
+        required:
+          - db-V
+          - db-UD
+          - db-mu
+          - db-bed
+        additionalProperties: no
+    required:
+      - grch37
+  octopus:
+    type: object
+    properties:
+      forest-model:
+        type: string
+      error-model:
+        type: string
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          skip-regions:
+            type: string
+          calling-ranges:
+            type: string
+        required:
+          - skip-regions
+          - calling-ranges
+        additionalProperties: no
+    required:
+      - forest-model
+      - error-model
+      - grch37
+required:
+  - manifest
+  - multiqc-config
+  - genome-build
+  - behaviors
+  - references
+  - dnascope
+  - verifybamid2
+  - octopus
+additionalProperties: no

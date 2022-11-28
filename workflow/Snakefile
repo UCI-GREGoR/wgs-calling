@@ -1,12 +1,99 @@
 # The main entry point of your workflow.
 # After configuring, running snakemake -n in a clone of this repository should successfully execute a dry-run of the workflow.
 
+import os
+import pathlib
+import pandas as pd
+from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
+from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
+from snakemake.utils import validate
+
+S3 = S3RemoteProvider()
+
+sys.path.insert(0, ".")
+from lib import target_construction as tc
+
+shell.executable("/bin/bash")
+shell.prefix("set -euo pipefail; ")
+
+
+configfile: "config/config.yaml"
+
+
+validate(config, "../schema/global_config_schema.yaml")
+
+tempDir = "temp"
+manifest = config["manifest"]
+manifest = pd.read_csv(manifest, sep="\t")
+
+
+validate(manifest, "../schema/manifest_schema.yaml")
+
+reference_build = config["genome-build"]
+octopus_num_intervals = 20
+
+TARGETS = [
+    expand(
+        "results/multiqc/{projectid}/multiqc.{runtype}.html",
+        projectid=list(manifest["projectid"].unique()),
+        runtype="fastq",
+    ),
+]
+
+if config["behaviors"]["outcome"] != "fastqc":
+    TARGETS.append(
+        [
+            expand(
+                "results/multiqc/{projectid}/multiqc.{runtype}.html",
+                projectid=list(manifest["projectid"].unique()),
+                runtype="alignment",
+            )
+        ]
+    )
+
+if config["behaviors"]["outcome"] == "calling":
+    TARGETS.append(
+        [
+            tc.construct_octopus_targets(manifest),
+        ]
+    )
+    TARGETS.append(
+        [
+            tc.construct_sv_targets(manifest),
+        ]
+    )
+
+
+## To deal with the fact that s3 remote provider service is very slow
+## and sometimes buggy, while not interfering with a streamlined
+## reference file naming convention, I'll use a snakemake functionality
+## for resolving ambiguous rule determination that I really dislike otherwise.
+## This is flagged for possible better resolution in the future.
+ruleorder: samtools_index_fasta > download_reference_data
+ruleorder: index_vcf > download_reference_data
+ruleorder: create_sequence_dictionary > download_reference_data
+ruleorder: octopus_run_task > index_vcf
+ruleorder: manta_run > index_vcf
+
 
 rule all:
     input:
-        # The first rule should define the default target files
-        # Subsequent target rules can be specified below. They should start with all_*.
+        TARGETS,
 
 
-include: "rules/common.smk"
-include: "rules/other.smk"
+include: "rules/acquire_data.smk"
+include: "rules/alignstats.smk"
+include: "rules/bwamem2.smk"
+include: "rules/duphold.smk"
+include: "rules/fastp.smk"
+include: "rules/fastqc.smk"
+include: "rules/manta.smk"
+include: "rules/mosdepth.smk"
+include: "rules/multiqc.smk"
+
+include: "rules/picard.smk"
+include: "rules/references.smk"
+include: "rules/somalier.smk"
+include: "rules/svdb.smk"
+
+include: "rules/verifybamid2.smk"
