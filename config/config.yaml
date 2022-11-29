@@ -15,7 +15,10 @@ behaviors:
   symlink-fastqs: yes
   trim-adapters-before-alignment: "legacy"
 
-
+parameters:
+  octopus:
+    number-shards: 16
+    docker-version: "1.4.0"
 
 references:
   grch37:
