@@ -134,6 +134,19 @@ properties:
       - forest-model
       - error-model
       - grch37
+  deepvariant:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          calling-ranges:
+            type: string
+        required:
+          - calling-ranges
+        additionalProperties: no
+    required:
+      - grch37
 required:
   - manifest
   - multiqc-config
@@ -143,4 +156,5 @@ required:
   - dnascope
   - verifybamid2
   - octopus
+  - deepvariant
 additionalProperties: no

@@ -8,7 +8,7 @@ rule deepvariant_make_examples:
         bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
-        intervals="results/octopus/split_ranges/{splitnum}.ssv",
+        intervals="results/deepvariant/split_ranges/{splitnum}.ssv",
     output:
         expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",

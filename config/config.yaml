@@ -45,3 +45,6 @@ octopus:
   grch37:
     skip-regions: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/octopus/b37_all_gaps_octo.txt"
     calling-ranges: "resources/octopus_calling_ranges.tsv"
+deepvariant:
+  grch37:
+    calling-ranges: "resources/octopus_calling_ranges.tsv"
