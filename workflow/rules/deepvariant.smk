@@ -1,6 +1,6 @@
 rule deepvariant_make_examples:
     """
-    Run deepvariant make_examples in an
+    Run deepvariant make_examples in a hybrid
     embarrassingly parallel fashion.
     """
     input:
@@ -12,7 +12,7 @@ rule deepvariant_make_examples:
     output:
         expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",
-            shardnum=[i + 1 for i in range(config["parameters"]["deepvariant"]["number-shards"])],
+            shardnum=[i for i in range(config["parameters"]["deepvariant"]["number-shards"])],
             shardmax=config["parameters"]["deepvariant"]["number-shards"],
             suffix=["gz", "gz.run_info.pbtxt"],
         ),
@@ -21,19 +21,21 @@ rule deepvariant_make_examples:
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
             shardmax=config["parameters"]["deepvariant"]["number-shards"],
         ),
+        max_shards=config["parameters"]["deepvariant"]["number-shards"],
     container:
         "docker://google/deepvariant:{}".format(
             config["parameters"]["deepvariant"]["docker-version"]
         )
-    threads: 1
+    threads: config["parameters"]["deepvariant"]["number-shards"]
     resources:
-        h_vmem="2000",
+        h_vmem="{}".format(2000 * config["parameters"]["deepvariant"]["number-shards"]),
         qname="small",
     shell:
+        "seq 0 {params.max_shards} | parallel -j{threads} "
         "make_examples --mode calling "
         '--ref {input.fasta} --reads {input.bam} --regions "$(cat {input.intervals})" '
         "--examples {params.shard_string} --channels insert_size "
-        "--task {wildcards.shardnum}"
+        "--task {{}}"
 
 
 rule deepvariant_call_variants:
@@ -77,7 +79,9 @@ rule deepvariant_postprocess_variants:
     embarrassingly parallel fashion.
     """
     input:
-        "results/deepvariant/{projectid}/call_variants/{sampleid}.{splitnum}.tfrecord.gz",
+        gz="results/deepvariant/{projectid}/call_variants/{sampleid}.{splitnum}.tfrecord.gz",
+        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
+        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
         "results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.vcf.gz",
     container:
@@ -91,7 +95,7 @@ rule deepvariant_postprocess_variants:
     shell:
         "postprocess_variants "
         "--ref {input.fasta} "
-        "--infile {input} "
+        "--infile {input.gz} "
         "--outfile {output}"
 
 
