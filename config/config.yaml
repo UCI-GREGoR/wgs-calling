@@ -7,7 +7,7 @@ genome-build: "grch37"
 
 behaviors:
   aligner: "bwa-mem2"
-  snv-caller: "octopus"
+  snv-caller: "deepvariant"
   sv-callers:
     - "manta"
     - "tiddit"
@@ -16,7 +16,7 @@ behaviors:
   trim-adapters-before-alignment: "legacy"
 
 parameters:
-  octopus:
+  deepvariant:
     number-shards: 16
     docker-version: "1.4.0"
 

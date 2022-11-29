@@ -12,17 +12,19 @@ rule deepvariant_make_examples:
     output:
         expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",
-            shardnum=[i + 1 for i in range(config["deepvariant"]["number-shards"])],
-            shardmax=config["deepvariant"]["number-shards"],
+            shardnum=[i + 1 for i in range(config["parameters"]["deepvariant"]["number-shards"])],
+            shardmax=config["parameters"]["deepvariant"]["number-shards"],
             suffix=["gz", "gz.run_info.pbtxt"],
         ),
     params:
         shard_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
-            shardmax=config["deepvariant"]["number-shards"],
+            shardmax=config["parameters"]["deepvariant"]["number-shards"],
         ),
     container:
-        "docker://google/deepvariant:{}".format(config["deepvariant"]["docker-version"])
+        "docker://google/deepvariant:{}".format(
+            config["parameters"]["deepvariant"]["docker-version"]
+        )
     threads: 1
     resources:
         h_vmem="2000",
@@ -42,8 +44,8 @@ rule deepvariant_call_variants:
     input:
         expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",
-            shardnum=[i for i in range(config["deepvariant"]["number-shards"])],
-            shardmax=config["deepvariant"]["number-shards"],
+            shardnum=[i for i in range(config["parameters"]["deepvariant"]["number-shards"])],
+            shardmax=config["parameters"]["deepvariant"]["number-shards"],
             suffix=["gz", "gz.run_info.pbtxt"],
         ),
     output:
@@ -51,14 +53,16 @@ rule deepvariant_call_variants:
     params:
         shard_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
-            shardmax=config["deepvariant"]["number-shards"],
+            shardmax=config["parameters"]["deepvariant"]["number-shards"],
         ),
         docker_model="/opt/models/wgs/model.ckpt",
     container:
-        "docker://google/deepvariant:{}".format(config["deepvariant"]["docker-version"])
-    threads: config["deepvariant"]["number-shards"]
+        "docker://google/deepvariant:{}".format(
+            config["parameters"]["deepvariant"]["docker-version"]
+        )
+    threads: config["parameters"]["deepvariant"]["number-shards"]
     resources:
-        h_vmem="{}".format(config["deepvariant"]["number-shards"] * 4000),
+        h_vmem="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 4000),
         qname="small",
     shell:
         "call_variants "
@@ -77,7 +81,9 @@ rule deepvariant_postprocess_variants:
     output:
         "results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.vcf.gz",
     container:
-        "docker://google/deepvariant:{}".format(config["deepvariant"]["docker-version"])
+        "docker://google/deepvariant:{}".format(
+            config["parameters"]["deepvariant"]["docker-version"]
+        )
     threads: 1
     resources:
         h_vmem="32000",
