@@ -5,8 +5,14 @@ rule duphold_run:
     input:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
         bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
-        snv_vcf="results/octopus/{projectid}/{sampleid}.sorted.vcf.gz",
-        snv_tbi="results/octopus/{projectid}/{sampleid}.sorted.vcf.gz.tbi",
+        snv_vcf=expand(
+            "results/{caller}/{{projectid}}/{{sampleid}}.sorted.vcf.gz",
+            caller=config["behaviors"]["snv-caller"],
+        ),
+        snv_tbi=expand(
+            "results/{caller}/{{projectid}}/{{sampleid}}.sorted.vcf.gz.tbi",
+            caller=config["behaviors"]["snv-caller"],
+        ),
         sv_vcf="results/{toolname}/{projectid}/{sampleid}.{toolname}.vcf.gz",
         sv_tbi="results/{toolname}/{projectid}/{sampleid}.{toolname}.vcf.gz.tbi",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
