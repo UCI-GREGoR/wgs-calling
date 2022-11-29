@@ -106,7 +106,7 @@ rule deepvariant_combine_regions:
             splitnum=[i + 1 for i in range(octopus_num_intervals)],
         ),
     output:
-        "results/deepvariant/{projectid}/{sampleid}.vcf.gz",
+        "results/deepvariant/{projectid}/{sampleid}.sorted.vcf.gz",
     conda:
         "../envs/bcftools.yaml"
     threads: 4

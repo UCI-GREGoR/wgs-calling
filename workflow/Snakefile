@@ -54,7 +54,7 @@ if config["behaviors"]["outcome"] != "fastqc":
 if config["behaviors"]["outcome"] == "calling":
     TARGETS.append(
         [
-            tc.construct_octopus_targets(manifest),
+            tc.construct_snv_targets(config, manifest),
         ]
     )
     TARGETS.append(
