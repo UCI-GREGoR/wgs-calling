@@ -88,7 +88,7 @@ Execute the workflow locally via
 
 using `$N` cores or run it in a cluster environment via
 
-    snakemake --use-conda --profile --cluster sge-profile --jobs 100
+    snakemake --use-conda --profile sge-profile --jobs 100
 
 See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/executable.html) for further details.
 
