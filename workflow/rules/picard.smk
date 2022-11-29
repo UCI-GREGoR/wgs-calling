@@ -137,7 +137,8 @@ rule picard_collectmultiplemetrics:
         "-PROGRAM CollectSequencingArtifactMetrics "
         "-PROGRAM CollectQualityYieldMetrics "
         "-INCLUDE_UNPAIRED true "
-        "-OUTPUT {params.outprefix}"
+        "-OUTPUT {params.outprefix} "
+        "--TMP_DIR {params.tmpdir}"
 
 
 rule picard_collectgcbiasmetrics:
@@ -173,7 +174,8 @@ rule picard_collectgcbiasmetrics:
         "-REFERENCE_SEQUENCE {input.fasta} "
         "-OUTPUT {output.metrics} "
         "-SUMMARY_OUTPUT {output.summary} "
-        "-CHART_OUTPUT {output.pdf}"
+        "-CHART_OUTPUT {output.pdf} "
+        "--TMP_DIR {params.tmpdir}"
 
 
 rule picard_collectwgsmetrics:
@@ -193,12 +195,12 @@ rule picard_collectwgsmetrics:
         "results/performance_benchmarks/picard_collectwgsmetrics/{fileprefix}.tsv"
     params:
         tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx6000m",
+        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx10000m",
     conda:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        h_vmem="12000",
+        h_vmem="16000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -207,4 +209,5 @@ rule picard_collectwgsmetrics:
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "
         "-OUTPUT {output.txt} "
-        "-INTERVALS {input.intervals}"
+        "-INTERVALS {input.intervals} "
+        "--TMP_DIR {params.tmpdir}"
