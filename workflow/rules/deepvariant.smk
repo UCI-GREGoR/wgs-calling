@@ -12,9 +12,10 @@ rule deepvariant_make_examples:
     output:
         expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",
-            shardnum=str(
-                [i for i in range(config["parameters"]["deepvariant"]["number-shards"])]
-            ).rjust(5, "0"),
+            shardnum=[
+                str(i).rjust(5, "0")
+                for i in range(config["parameters"]["deepvariant"]["number-shards"])
+            ],
             shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
             suffix=["gz", "gz.run_info.pbtxt"],
         ),
