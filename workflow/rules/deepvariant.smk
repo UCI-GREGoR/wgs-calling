@@ -17,7 +17,7 @@ rule deepvariant_make_examples:
                 for i in range(config["parameters"]["deepvariant"]["number-shards"])
             ],
             shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
-            suffix=["gz", "gz.run_info.pbtxt"],
+            suffix=["gz", "gz.example_info.json"],
         ),
     params:
         shard_string=expand(
