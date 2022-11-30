@@ -33,7 +33,7 @@ rule deepvariant_make_examples:
         tmpdir="temp",
     shell:
         "mkdir -p temp && "
-        "seq 0 {params.max_shards} | parallel -j{threads} --tmpdir temp "
+        "seq 0 $(({params.max_shards}-1)) | parallel -j{threads} --tmpdir temp "
         "make_examples --mode calling "
         '--ref {input.fasta} --reads {input.bam} --regions "$(cat {input.intervals})" '
         "--examples {params.shard_string} --channels insert_size "
