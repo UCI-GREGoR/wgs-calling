@@ -1,3 +1,7 @@
+# deepvariant/parallel efflux
+.parallel
+.keras
+
 # Testing refuse
 .coverage
 
