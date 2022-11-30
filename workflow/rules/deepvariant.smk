@@ -10,14 +10,16 @@ rule deepvariant_make_examples:
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         intervals="results/deepvariant/split_ranges/{splitnum}.ssv",
     output:
-        expand(
-            "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",
-            shardnum=[
-                str(i).rjust(5, "0")
-                for i in range(config["parameters"]["deepvariant"]["number-shards"])
-            ],
-            shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
-            suffix=["gz", "gz.example_info.json"],
+        temp(
+            expand(
+                "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",
+                shardnum=[
+                    str(i).rjust(5, "0")
+                    for i in range(config["parameters"]["deepvariant"]["number-shards"])
+                ],
+                shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
+                suffix=["gz", "gz.example_info.json"],
+            )
         ),
     params:
         shard_string=expand(
@@ -59,7 +61,7 @@ rule deepvariant_call_variants:
             suffix=["gz", "gz.example_info.json"],
         ),
     output:
-        gz="results/deepvariant/{projectid}/call_variants/{sampleid}.{splitnum}.tfrecord.gz",
+        gz=temp("results/deepvariant/{projectid}/call_variants/{sampleid}.{splitnum}.tfrecord.gz"),
     params:
         shard_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
@@ -93,7 +95,13 @@ rule deepvariant_postprocess_variants:
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
-        "results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.vcf.gz",
+        vcf=temp(
+            "results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.vcf.gz"
+        ),
+        tbi=temp(
+            "results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.vcf.gz.tbi"
+        ),
+        html="results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.visual_report.html",
     container:
         "docker://google/deepvariant:{}".format(
             config["parameters"]["deepvariant"]["docker-version"]
@@ -108,7 +116,7 @@ rule deepvariant_postprocess_variants:
         "postprocess_variants "
         "--ref {input.fasta} "
         "--infile {input.gz} "
-        "--outfile {output}"
+        "--outfile {output.html}"
 
 
 rule deepvariant_combine_regions:
