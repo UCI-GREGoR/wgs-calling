@@ -118,7 +118,7 @@ rule deepvariant_combine_regions:
     input:
         expand(
             "results/deepvariant/{{projectid}}/postprocess_variants/{{sampleid}}.{splitnum}.vcf.gz",
-            splitnum=[i + 1 for i in range(octopus_num_intervals)],
+            splitnum=[i + 1 for i in range(caller_num_intervals)],
         ),
     output:
         "results/deepvariant/{projectid}/{sampleid}.sorted.vcf.gz",
