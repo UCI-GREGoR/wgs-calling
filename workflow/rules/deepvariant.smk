@@ -30,8 +30,10 @@ rule deepvariant_make_examples:
     resources:
         h_vmem="{}".format(2000 * config["parameters"]["deepvariant"]["number-shards"]),
         qname="small",
+        tmpdir="temp",
     shell:
-        "seq 0 {params.max_shards} | parallel -j{threads} "
+        "mkdir -p temp && "
+        "seq 0 {params.max_shards} | parallel -j{threads} --tmpdir temp "
         "make_examples --mode calling "
         '--ref {input.fasta} --reads {input.bam} --regions "$(cat {input.intervals})" '
         "--examples {params.shard_string} --channels insert_size "
@@ -66,7 +68,9 @@ rule deepvariant_call_variants:
     resources:
         h_vmem="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 4000),
         qname="small",
+        tmpdir="temp",
     shell:
+        "mkdir -p temp && "
         "call_variants "
         "--outfile {output.gz} "
         "--examples {params.shard_string} "
@@ -92,7 +96,9 @@ rule deepvariant_postprocess_variants:
     resources:
         h_vmem="32000",
         qname="small",
+        tmpdir="temp",
     shell:
+        "mkdir -p temp && "
         "postprocess_variants "
         "--ref {input.fasta} "
         "--infile {input.gz} "
