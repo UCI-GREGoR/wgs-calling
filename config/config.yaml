@@ -11,7 +11,7 @@ behaviors:
   sv-callers:
     - "manta"
     - "tiddit"
-  outcome: "fastqc"
+  outcome: "calling"
   symlink-fastqs: yes
   trim-adapters-before-alignment: "legacy"
 
@@ -47,4 +47,4 @@ octopus:
     calling-ranges: "resources/octopus_calling_ranges.tsv"
 deepvariant:
   grch37:
-    calling-ranges: "resources/octopus_calling_ranges.tsv"
+    calling-ranges: "resources/deepvariant_calling_ranges.tsv"
