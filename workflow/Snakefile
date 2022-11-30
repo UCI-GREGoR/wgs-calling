@@ -30,7 +30,7 @@ manifest = pd.read_csv(manifest, sep="\t")
 validate(manifest, "../schema/manifest_schema.yaml")
 
 reference_build = config["genome-build"]
-octopus_num_intervals = 20
+caller_num_intervals = tc.caller_interval_file_count(config)
 
 TARGETS = [
     expand(

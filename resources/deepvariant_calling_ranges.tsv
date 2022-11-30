@@ -16,5 +16,10 @@
 ../deepvariant-calling-ranges/chr16.tsv
 ../deepvariant-calling-ranges/chr17.tsv
 ../deepvariant-calling-ranges/chr18.tsv
-../deepvariant-calling-ranges/chr19-21.tsv
-../deepvariant-calling-ranges/chr22-MT.tsv
+../deepvariant-calling-ranges/chr19.tsv
+../deepvariant-calling-ranges/chr20.tsv
+../deepvariant-calling-ranges/chr21.tsv
+../deepvariant-calling-ranges/chr22.tsv
+../deepvariant-calling-ranges/chrX.tsv
+../deepvariant-calling-ranges/chrY.tsv
+../deepvariant-calling-ranges/chrMT.tsv

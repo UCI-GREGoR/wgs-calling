@@ -250,3 +250,15 @@ def map_reference_file(wildcards: Namedlist, config: dict) -> str | AnnotatedStr
     elif current_lvl.startswith("https://"):
         return HTTP.remote(current_lvl)
     return current_lvl
+
+
+def caller_interval_file_count(config: dict) -> int:
+    """
+    Get simple line count of a file; this is intended to
+    count a tiny text file containing <100 interval filenames.
+    """
+    fn = config[config["behaviors"]["snv-caller"]][config["genome-build"]]["calling-ranges"]
+    x = 0
+    with open(fn, "r") as f:
+        x = len(f.readlines())
+    return x
