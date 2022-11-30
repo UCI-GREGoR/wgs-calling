@@ -56,7 +56,7 @@ rule deepvariant_call_variants:
                 for i in range(config["parameters"]["deepvariant"]["number-shards"])
             ],
             shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
-            suffix=["gz", "gz.run_info.pbtxt"],
+            suffix=["gz", "gz.example_info.json"],
         ),
     output:
         gz="results/deepvariant/{projectid}/call_variants/{sampleid}.{splitnum}.tfrecord.gz",
