@@ -116,7 +116,7 @@ rule deepvariant_postprocess_variants:
         "postprocess_variants "
         "--ref {input.fasta} "
         "--infile {input.gz} "
-        "--outfile {output.html}"
+        "--outfile {output.vcf}"
 
 
 rule deepvariant_combine_regions:
