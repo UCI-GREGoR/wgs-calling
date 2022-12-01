@@ -21,6 +21,8 @@ rule deepvariant_make_examples:
                 suffix=["gz", "gz.example_info.json"],
             )
         ),
+    benchmark:
+        "results/performance_benchmarks/deepvariant/{projectid}/make_examples/{sampleid}.{splitnum}.tsv"
     params:
         shard_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
@@ -62,6 +64,8 @@ rule deepvariant_call_variants:
         ),
     output:
         gz=temp("results/deepvariant/{projectid}/call_variants/{sampleid}.{splitnum}.tfrecord.gz"),
+    benchmark:
+        "results/performance_benchmarks/deepvariant/{projectid}/call_variants/{sampleid}.{splitnum}.tsv"
     params:
         shard_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
@@ -102,6 +106,8 @@ rule deepvariant_postprocess_variants:
             "results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.vcf.gz.tbi"
         ),
         html="results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.visual_report.html",
+    benchmark:
+        "results/performance_benchmarks/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.tsv"
     container:
         "docker://google/deepvariant:{}".format(
             config["parameters"]["deepvariant"]["docker-version"]
@@ -131,6 +137,8 @@ rule deepvariant_combine_regions:
         ),
     output:
         "results/deepvariant/{projectid}/{sampleid}.sorted.vcf.gz",
+    benchmark:
+        "results/performance_benchmarks/deepvariant/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
     threads: 4

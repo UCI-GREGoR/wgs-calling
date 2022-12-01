@@ -66,9 +66,11 @@ rule samtools_create_bai:
     From a sorted bam file, create a bai-format index
     """
     input:
-        bam="{prefix}.sort.bam",
+        bam="results/{prefix}.sort.bam",
     output:
-        bai="{prefix}.sort.bam.bai",
+        bai="results/{prefix}.sort.bam.bai",
+    benchmark:
+        "results/performance_benchmarks/{prefix}.sort.tsv"
     conda:
         "../envs/bwamem2.yaml"
     threads: 4
