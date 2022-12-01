@@ -92,6 +92,7 @@ include: "rules/manta.smk"
 include: "rules/mosdepth.smk"
 include: "rules/multiqc.smk"
 
+include: "rules/performance_benchmarks.smk"
 include: "rules/picard.smk"
 include: "rules/references.smk"
 include: "rules/somalier.smk"

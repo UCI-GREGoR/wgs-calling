@@ -1,0 +1,82 @@
+---
+title: "Pipeline Resource Usage Report"
+output:
+  html_document:
+    code_folding: hide
+    md_extensions: "-fancy_lists -emoji"
+  highlight: tango
+  number_sections: no
+  theme: default
+  toc: yes
+  toc_depth: 3
+  toc_float:
+    collapsed: no
+    smooth_scroll: yes
+---
+
+```{r link.variables, eval=TRUE, echo=FALSE}
+#### Link input parameters to local variables
+parent.dir <- snakemake@params[["parent_dir"]]
+target.rules <- snakemake@params[["rules"]]
+source.file <- snakemake@input[["r_resources"]]
+```
+
+```{r load.packages, eval=TRUE, echo=FALSE}
+#### Load required R packages
+suppressPackageStartupMessages(library(ggplot2, quietly = TRUE))
+suppressPackageStartupMessages(library(RColorBrewer, quietly = TRUE))
+suppressPackageStartupMessages(library(knitr, quietly = TRUE))
+suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
+```
+
+***
+<br>
+
+```{r configure.ggplot2.theme, eval=TRUE, echo=FALSE}
+#### Configure default themes for plotting/tables
+my.theme <- theme_light() + theme(
+  plot.title = element_text(size = 16, hjust = 0.5),
+  axis.title = element_text(size = 14),
+  axis.text = element_text(size = 12),
+  strip.background = element_blank(),
+  strip.text = element_text(size = 14, colour = "black"),
+  legend.title = element_text(size = 14),
+  legend.text = element_text(size = 13)
+)
+```
+
+```{r load.source, eval=TRUE, echo=FALSE}
+#### Load source functions in separate, testable file
+source(source.file)
+```
+
+```{r aggregate.data, eval=TRUE, echo=FALSE}
+#### For each target rule, get a data frame of performance benchmark data
+benchmark.data <- list()
+for (rule in target.rules) {
+  benchmark.df <- aggregate.performance.metrics(parent.dir, rule)
+  benchmark.data[[rule]] <- benchmark.df
+}
+```
+
+```{r report.data, eval=TRUE, echo=FALSE}
+#### For each target rule's performance data, report something interesting?
+for (rule in names(benchmark.df)) {
+  benchmark.df <- benchmark.data[[rule]]
+}
+```
+
+
+
+***
+<br>
+
+#### Session Information
+
+<br>
+
+The following summarizes the loaded R configuration for the run that created this report.
+
+```{r session.info, eval=TRUE, echo=TRUE}
+sessionInfo()
+```
