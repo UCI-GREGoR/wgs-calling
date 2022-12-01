@@ -40,7 +40,10 @@ aggregate.performance.metrics <- function(parent.dir, rule) {
   ## cpu_time - CPU time summed for user and system
   res <- data.frame()
   for (benchmark.file in benchmark.files) {
-    df <- read.table(benchmark.file, comment.char = "", checkNames = FALSE, quote = "", stringsAsFactors = FALSE)
+    df <- read.table(benchmark.file,
+      comment.char = "", check.names = FALSE, quote = "",
+      stringsAsFactors = FALSE, header = TRUE
+    )
     if (nrow(res) == 0) {
       res <- df
     } else {
