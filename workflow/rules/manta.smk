@@ -61,9 +61,9 @@ rule manta_run:
         tmpdir="temp/manta_workdir/{projectid}/{sampleid}",
     conda:
         "../envs/manta.yaml"
-    threads: 4
+    threads: 24
     resources:
-        h_vmem="16000",
+        h_vmem="24000",
         qname="small",
         tmpdir=lambda wildcards: "temp/manta_workdir/{}/{}".format(
             wildcards.projectid, wildcards.sampleid
