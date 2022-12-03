@@ -100,10 +100,8 @@ cpu.div.walltime.plot <- function(benchmark.df, rule.name) {
 #'
 #' @param benchmark.df data.frame; input aggregated rule
 #' benchmarking plot from snakemake benchmark directive
-#' @param rule.name character vector; name of relevant
-#' rule corresponding to these metrics
 #' @return ggplot object
-memory.plot <- function(benchmark.df, rule.name) {
+memory.plot <- function(benchmark.df) {
   mem.types <- c("Max RMS", "Max VMS", "Max USS", "Max PSS")
   plot.data <- data.frame(
     x = rep(mem.types, each = nrow(benchmark.df)),
