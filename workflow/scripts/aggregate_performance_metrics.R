@@ -74,9 +74,11 @@ aggregate.performance.metrics <- function(parent.dir, rule) {
 walltime.plot <- function(benchmark.df, rule.name) {
   benchmark.df$rule.name <- rule.name
   benchmark.df$s <- benchmark.df$s / 3600
+  max.y <- max(benchmark.df$s) * 1.2
   my.plot <- ggplot(aes(x = rule.name, y = s), data = benchmark.df)
   my.plot <- my.plot + my.theme + geom_point(position = "jitter")
   my.plot <- my.plot + xlab("") + ylab("Walltime, in hours")
+  my.plot <- my.plot + scale_y_continuous(limits = c(0, max.y))
   my.plot
 }
 
@@ -90,9 +92,11 @@ walltime.plot <- function(benchmark.df, rule.name) {
 cpu.div.walltime.plot <- function(benchmark.df, rule.name) {
   benchmark.df$rule.name <- rule.name
   benchmark.df$cpu.walltime.ratio <- benchmark.df[, "cpu_time"] / benchmark.df$s
+  max.y <- max(benchmark.df$cpu.walltime.ratio) * 1.2
   my.plot <- ggplot(aes(x = rule.name, y = cpu.walltime.ratio), data = benchmark.df)
   my.plot <- my.plot + my.theme + geom_point(position = "jitter")
   my.plot <- my.plot + xlab("") + ylab("CPU/Walltime")
+  my.plot <- my.plot + scale_y_continuous(limits = c(0, max.y))
   my.plot
 }
 
