@@ -7,9 +7,15 @@
 ## on the inclusion of this file into the main workflow that is thoroughly antithetical
 ## to python. But I'm a C++ dev at heart, so eat it python.
 
-rule_threads = {}
-for rule in workflow.rules:
-    rule_threads[rule.name] = rule.resources["_cores"] if "_cores" in rule.resources else -1
+
+def get_rule_threads(target_workflow):
+    """
+    Aggregate a dict of thread data for all loaded rules
+    """
+    rule_threads = {}
+    for rule in target_workflow.rules:
+        rule_threads[rule.name] = rule.resources["_cores"] if "_cores" in rule.resources else -1
+    return rule_threads
 
 
 rule performance_benchmarks:
@@ -49,7 +55,7 @@ rule performance_benchmarks:
             "tiddit_run",
             "tiddit_sort_output",
         ],
-        rule_threads=rule_threads,
+        rule_threads=lambda wildcards: get_rule_threads(workflow),
     conda:
         "../envs/r.yaml"
     script:
