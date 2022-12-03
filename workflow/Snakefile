@@ -92,10 +92,14 @@ include: "rules/manta.smk"
 include: "rules/mosdepth.smk"
 include: "rules/multiqc.smk"
 
-include: "rules/performance_benchmarks.smk"
 include: "rules/picard.smk"
 include: "rules/references.smk"
 include: "rules/somalier.smk"
 include: "rules/svdb.smk"
 
 include: "rules/verifybamid2.smk"
+## new: in order to provide thread data to the benchmark report,
+## as currently implemented, this needs to be included *last*.
+## this requirement can probably be alleviated with lambdas,
+## but I'm just testing overall viability for the moment.
+include: "rules/performance_benchmarks.smk"

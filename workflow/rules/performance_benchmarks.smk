@@ -1,3 +1,17 @@
+## This file exists outside of the standard logic, at least for the time being.
+## As such, let's try out some interesting things with the environment.
+
+## For performance benchmarking, we'd like to know how many threads each rule
+## has configured for its run. But that information can be hard to keep track of.
+## We can *sort of* get it from the environment; but it introduces an order dependency
+## on the inclusion of this file into the main workflow that is thoroughly antithetical
+## to python. But I'm a C++ dev at heart, so eat it python.
+
+rule_threads = {}
+for rule in workflow.rules:
+    rule_threads[rule.name] = rule.resources["_cores"] if "_cores" in rule.resources else -1
+
+
 rule performance_benchmarks:
     """
     Combine performance benchmark data for various rules
@@ -36,6 +50,7 @@ rule performance_benchmarks:
             "tiddit_run",
             "tiddit_sort_output",
         ],
+        rule_threads=rule_threads,
     conda:
         "../envs/r.yaml"
     script:

@@ -19,6 +19,8 @@ output:
 parent.dir <- snakemake@params[["parent_dir"]]
 target.rules <- snakemake@params[["rules"]]
 source.file <- snakemake@input[["r_resources"]]
+rule.threads <- snakemake@params[["rule_threads"]]
+print(rule.threads)
 ```
 
 ```{r load.packages, eval=TRUE, echo=FALSE}
