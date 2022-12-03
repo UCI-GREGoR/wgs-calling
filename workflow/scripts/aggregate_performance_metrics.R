@@ -1,3 +1,14 @@
+#' For convenience, define a single ggplot theme/style
+my.theme <- theme_light() + theme(
+  plot.title = element_text(size = 16, hjust = 0.5),
+  axis.title = element_text(size = 14),
+  axis.text = element_text(size = 12),
+  strip.background = element_blank(),
+  strip.text = element_text(size = 14, colour = "black"),
+  legend.title = element_text(size = 14),
+  legend.text = element_text(size = 13)
+)
+
 #' For a rule, gather all available performance
 #' benchmark data in the workflow installation.
 #'
@@ -51,4 +62,99 @@ aggregate.performance.metrics <- function(parent.dir, rule) {
     }
   }
   res
+}
+
+#' Create plot of distribution of simple walltime in hours
+#'
+#' @param benchmark.df data.frame; input aggregated rule
+#' benchmarking plot from snakemake benchmark directive
+#' @param rule.name character vector; name of relevant
+#' rule corresponding to these metrics
+#' @return ggplot object
+walltime.plot <- function(benchmark.df, rule.name) {
+  benchmark.df$rule.name <- rule.name
+  benchmark.df$s <- benchmark.df$s / 3600
+  my.plot <- ggplot(aes(x = rule.name, y = s), data = benchmark.df)
+  my.plot <- my.plot + my.theme + geom_point(position = "jitter")
+  my.plot <- my.plot + xlab("") + ylab("Walltime, in hours")
+  my.plot
+}
+
+#' Create plot of distribution of CPU/walltime ratio
+#'
+#' @param benchmark.df data.frame; input aggregated rule
+#' benchmarking plot from snakemake benchmark directive
+#' @param rule.name character vector; name of relevant
+#' rule corresponding to these metrics
+#' @return ggplot object
+cpu.div.walltime.plot <- function(benchmark.df, rule.name) {
+  benchmark.df$rule.name <- rule.name
+  benchmark.df$cpu.walltime.ratio <- benchmark.df[, "cpu_time"] / benchmark.df$s
+  my.plot <- ggplot(aes(x = rule.name, y = cpu.walltime.ratio), data = benchmark.df)
+  my.plot <- my.plot + my.theme + geom_point(position = "jitter")
+  my.plot <- my.plot + xlab("") + ylab("CPU/Walltime")
+  my.plot
+}
+
+#' Create plot of distribution of memory allocation in MB
+#'
+#' @param benchmark.df data.frame; input aggregated rule
+#' benchmarking plot from snakemake benchmark directive
+#' @param rule.name character vector; name of relevant
+#' rule corresponding to these metrics
+#' @return ggplot object
+memory.plot <- function(benchmark.df, rule.name) {
+  mem.types <- c("Max RMS", "Max VMS", "Max USS", "Max PSS")
+  plot.data <- data.frame(
+    x = rep(mem.types, each = nrow(benchmark.df)),
+    y = c(
+      benchmark.df[, mem.types[1]],
+      benchmark.df[, mem.types[2]],
+      benchmark.df[, mem.types[3]],
+      benchmark.df[, mem.types[4]]
+    )
+  )
+  my.plot <- ggplot(aes(x = x, y = y), data = plot.data)
+  my.plot <- my.plot + my.theme + geom_point(position = "jitter")
+  my.plot <- my.plot + xlab("") + ylab("Memory Used, in MB")
+  my.plot
+}
+
+#' Get a human-readable description of the benchmarking
+#' walltime metric
+#'
+#' @return character vector; intended for emission in markdown
+#' with cat()
+get.walltime.description <- function() {
+  "\n\nWalltime represents the actual amount of time consumed by the entire job, end to end.\n\n"
+}
+
+#' Get a human-readable description of the benchmarking
+#' cpu/walltime metric
+#'
+#' @return character vector; intended for emission in markdown
+#' with cat()
+get.cpu.walltime.description <- function() {
+  paste("\n\nCPU/walltime is a representation of the amount of possible CPU activity that is ",
+    "actually achieved by a process. If a job is allocated N threads, a ratio of CPU/walltime = N ",
+    "means that all threads were saturated with tasks during runtime. Lower numbers mean that ",
+    "some bottleneck other than direct CPU processivity is blocking your job; often that is I/O speed, ",
+    "but it can also indicate large imbalances in how tasks are apportioned to threads.\n\n",
+    sep = ""
+  )
+}
+
+#' Get a human-readable description of the benchmarking
+#' memory metrics
+#'
+#' @return character vector; intended for emission in markdown
+#' with cat()
+get.memory.description <- function() {
+  paste("\n\nRSS, resident set size, is the amount of non-swapped physical memory a process has used. ",
+    "VMS, virtual memory size, is the total amount of virtual memory used by a process. ",
+    "USS, unique set size, is the amount of memory unique to a particular process. ",
+    "PSS, proportional set size, is the amount of memory shared with other processes, balanced across ",
+    "all processes. All metrics are presented as max values across the total process runtime.\n\n",
+    sep = ""
+  )
 }

@@ -32,19 +32,6 @@ suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
 ***
 <br>
 
-```{r configure.ggplot2.theme, eval=TRUE, echo=FALSE}
-#### Configure default themes for plotting/tables
-my.theme <- theme_light() + theme(
-  plot.title = element_text(size = 16, hjust = 0.5),
-  axis.title = element_text(size = 14),
-  axis.text = element_text(size = 12),
-  strip.background = element_blank(),
-  strip.text = element_text(size = 14, colour = "black"),
-  legend.title = element_text(size = 14),
-  legend.text = element_text(size = 13)
-)
-```
-
 ```{r load.source, eval=TRUE, echo=FALSE}
 #### Load source functions in separate, testable file
 source(source.file)
@@ -59,17 +46,24 @@ for (rule in target.rules) {
 }
 ```
 
+## Benchmarking Results, by Rule
+
+
 ```{r report.data, eval=TRUE, echo=FALSE}
 #### For each target rule's performance data, report something interesting?
-for (rule in names(benchmark.df)) {
+for (rule in names(benchmark.data)) {
   benchmark.df <- benchmark.data[[rule]]
+  cat("### ", rule, "\n", sep = "")
+  cat(get.walltime.description())
+  print(walltime.plot(benchmark.df))
+  cat(get.cpu.walltime.description())
+  print(cpu.div.walltime.plot(benchmark.df))
+  cat(get.memory.description())
+  print(memory.plot(benchmark.df))
+  cat("\n\n***\n\n<br>\n\n")
 }
 ```
 
-
-
-***
-<br>
 
 #### Session Information
 
