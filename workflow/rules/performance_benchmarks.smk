@@ -26,7 +26,6 @@ rule performance_benchmarks:
         rules=[
             "bwa_map_and_sort",
             "copy_fastqs",
-            "deepvariant",
             "duphold_apply",
             "duphold_run",
             "estimate_contamination",
