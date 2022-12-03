@@ -121,6 +121,7 @@ memory.plot <- function(benchmark.df) {
       benchmark.df[, names(mem.types)[4]]
     )
   )
+  plot.data$x <- factor(plot.data$x, levels = mem.types)
   max.y <- max(plot.data$y) * 1.2
   my.plot <- ggplot(aes(x = x, y = y), data = plot.data)
   my.plot <- my.plot + my.theme + geom_point(position = "jitter")
