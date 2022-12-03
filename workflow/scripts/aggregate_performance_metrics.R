@@ -102,14 +102,19 @@ cpu.div.walltime.plot <- function(benchmark.df, rule.name) {
 #' benchmarking plot from snakemake benchmark directive
 #' @return ggplot object
 memory.plot <- function(benchmark.df) {
-  mem.types <- c("Max RMS", "Max VMS", "Max USS", "Max PSS")
+  mem.types <- c(
+    "max_rss" = "Max RSS",
+    "max_vms" = "Max VMS",
+    "max_uss" = "Max USS",
+    "max_pss" = "Max PSS"
+  )
   plot.data <- data.frame(
     x = rep(mem.types, each = nrow(benchmark.df)),
     y = c(
-      benchmark.df[, mem.types[1]],
-      benchmark.df[, mem.types[2]],
-      benchmark.df[, mem.types[3]],
-      benchmark.df[, mem.types[4]]
+      benchmark.df[, names(mem.types)[1]],
+      benchmark.df[, names(mem.types)[2]],
+      benchmark.df[, names(mem.types)[3]],
+      benchmark.df[, names(mem.types)[4]]
     )
   )
   my.plot <- ggplot(aes(x = x, y = y), data = plot.data)
