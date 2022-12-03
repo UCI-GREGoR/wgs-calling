@@ -56,10 +56,17 @@ for (rule in names(benchmark.data)) {
   cat("### ", rule, "\n", sep = "")
   cat(get.walltime.description())
   print(walltime.plot(benchmark.df, rule))
-  cat(get.cpu.walltime.description())
-  print(cpu.div.walltime.plot(benchmark.df, rule))
-  cat(get.memory.description())
-  print(memory.plot(benchmark.df))
+  if (length(which(is.na(benchmark.df[, "max_rss"]))) != nrow(benchmark.df)) {
+    cat(get.cpu.walltime.description())
+    print(cpu.div.walltime.plot(benchmark.df, rule))
+    cat(get.memory.description())
+    print(memory.plot(benchmark.df))
+  } else {
+    cat("\n\n***\n\n<br>\n\nFor this rule, insufficiently long runtime renders the remaining ",
+      "performance metrics impossible to compute, so they will be skipped.",
+      sep = ""
+    )
+  }
   cat("\n\n***\n\n<br>\n\n")
 }
 ```
