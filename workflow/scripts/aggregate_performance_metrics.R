@@ -88,15 +88,21 @@ walltime.plot <- function(benchmark.df, rule.name) {
 #' benchmarking plot from snakemake benchmark directive
 #' @param rule.name character vector; name of relevant
 #' rule corresponding to these metrics
+#' @param provided.threads integer; number of threads
+#' configured for the particular rule, which should technically
+#' be the theoretical maximum of the computed ratio
 #' @return ggplot object
-cpu.div.walltime.plot <- function(benchmark.df, rule.name) {
+cpu.div.walltime.plot <- function(benchmark.df, rule.name, provided.threads) {
   benchmark.df$rule.name <- rule.name
   benchmark.df$cpu.walltime.ratio <- benchmark.df[, "cpu_time"] / benchmark.df$s
-  max.y <- max(benchmark.df$cpu.walltime.ratio) * 1.2
+  max.y <- max(c(benchmark.df$cpu.walltime.ratio, provided.threads)) * 1.2
   my.plot <- ggplot(aes(x = rule.name, y = cpu.walltime.ratio), data = benchmark.df)
   my.plot <- my.plot + my.theme + geom_point(position = "jitter")
   my.plot <- my.plot + xlab("") + ylab("CPU/Walltime")
   my.plot <- my.plot + scale_y_continuous(limits = c(0, max.y))
+  if (!is.na(provided.threads)) {
+    my.plot <- my.plot + geom_hline(yintercept = provided.threads, lty = 2)
+  }
   my.plot
 }
 

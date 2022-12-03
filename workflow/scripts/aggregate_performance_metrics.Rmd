@@ -20,7 +20,6 @@ parent.dir <- snakemake@params[["parent_dir"]]
 target.rules <- snakemake@params[["rules"]]
 source.file <- snakemake@input[["r_resources"]]
 rule.threads <- snakemake@params[["rule_threads"]]
-print(rule.threads)
 ```
 
 ```{r load.packages, eval=TRUE, echo=FALSE}
@@ -60,7 +59,7 @@ for (rule in names(benchmark.data)) {
   print(walltime.plot(benchmark.df, rule))
   if (length(which(is.na(benchmark.df[, "max_rss"]))) != nrow(benchmark.df)) {
     cat(get.cpu.walltime.description())
-    print(cpu.div.walltime.plot(benchmark.df, rule))
+    print(cpu.div.walltime.plot(benchmark.df, rule, ifelse(rule %in% names(rule.threads), rule.threads[[rule]], NA)))
     cat(get.memory.description())
     print(memory.plot(benchmark.df))
     cat(get.io.description())
