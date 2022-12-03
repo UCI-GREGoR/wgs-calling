@@ -49,7 +49,7 @@ for (rule in target.rules) {
 ## Benchmarking Results, by Rule
 
 
-```{r report.data, eval=TRUE, echo=FALSE}
+```{r report.data, eval=TRUE, echo=FALSE, results="asis"}
 #### For each target rule's performance data, report something interesting?
 for (rule in names(benchmark.data)) {
   benchmark.df <- benchmark.data[[rule]]
