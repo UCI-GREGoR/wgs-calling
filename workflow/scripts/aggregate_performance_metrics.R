@@ -130,6 +130,32 @@ memory.plot <- function(benchmark.df) {
   my.plot
 }
 
+#' Create plot of I/O totals for tasks
+#'
+#' @param benchmark.df data.frame; input aggregated rule
+#' benchmarking plot from snakemake benchmark directive
+#' @return ggplot object
+io.plot <- function(benchmark.df) {
+  io.types <- c(
+    "io_in" = "Input",
+    "io_out" = "Output"
+  )
+  plot.data <- data.frame(
+    x = rep(io.types, each = nrow(benchmark.df)),
+    y = c(
+      benchmark.df[, names(io.types)[1]],
+      benchmark.df[, names(io.types)[2]]
+    )
+  )
+  plot.data$x <- factor(plot.data$x, levels = io.types)
+  max.y <- max(plot.data$y) * 1.2
+  my.plot <- ggplot(aes(x = x, y = y), data = plot.data)
+  my.plot <- my.plot + my.theme + geom_point(position = "jitter")
+  my.plot <- my.plot + xlab("") + ylab("Data Transferred, in MB")
+  my.plot <- my.plot + scale_y_continuous(limits = c(0, max.y))
+  my.plot
+}
+
 #' Get a human-readable description of the benchmarking
 #' walltime metric
 #'
@@ -165,6 +191,20 @@ get.memory.description <- function() {
     "USS, unique set size, is the amount of memory unique to a particular process. ",
     "PSS, proportional set size, is the amount of memory shared with other processes, balanced across ",
     "all processes. All metrics are presented as max values across the total process runtime.\n\n",
+    sep = ""
+  )
+}
+
+#' Get a human-readable description of the benchmarking
+#' I/O metrics
+#'
+#' @return character vector; intended for emission in markdown
+#' with cat()
+get.io.description <- function() {
+  paste("\n\nInput and output represents the amount of data transferred from disk or network ",
+    "by a process. Large I/O values combined with a CPU/walltime ratio less than N(threads) ",
+    "may suggest potential for optimization by transferring a task to a system with ",
+    "network optimization.\n\n",
     sep = ""
   )
 }

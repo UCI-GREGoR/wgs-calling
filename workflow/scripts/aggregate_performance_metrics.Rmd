@@ -61,6 +61,8 @@ for (rule in names(benchmark.data)) {
     print(cpu.div.walltime.plot(benchmark.df, rule))
     cat(get.memory.description())
     print(memory.plot(benchmark.df))
+    cat(get.io.description())
+    print(io.plot(benchmark.df))
   } else {
     cat("\n\n***\n\n<br>\n\nFor this rule, insufficiently long runtime renders the remaining ",
       "performance metrics impossible to compute, so they will be skipped.",
