@@ -117,9 +117,11 @@ memory.plot <- function(benchmark.df) {
       benchmark.df[, names(mem.types)[4]]
     )
   )
+  max.y <- max(plot.data$y) * 1.2
   my.plot <- ggplot(aes(x = x, y = y), data = plot.data)
   my.plot <- my.plot + my.theme + geom_point(position = "jitter")
   my.plot <- my.plot + xlab("") + ylab("Memory Used, in MB")
+  my.plot <- my.plot + scale_y_continuous(limits = c(0, max.y))
   my.plot
 }
 
