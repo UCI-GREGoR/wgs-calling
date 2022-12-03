@@ -12,11 +12,17 @@ rule performance_benchmarks:
         rules=[
             "bwa_map_and_sort",
             "copy_fastqs",
+            "deepvariant",
+            "duphold_apply",
+            "duphold_run",
             "estimate_contamination",
+            "index_vcf",
             "manta_configure",
             "manta_run",
+            "manta_sort_output",
             "mark_duplicates",
             "merge_alignstats",
+            "merge_sv_vcfs",
             "picard_collectgcbiasmetrics",
             "picard_collectmultiplemetrics",
             "picard_collectwgsmetrics",
@@ -28,6 +34,7 @@ rule performance_benchmarks:
             "somalier_extract",
             "somalier_relate",
             "tiddit_run",
+            "tiddit_sort_output",
         ],
     conda:
         "../envs/r.yaml"
