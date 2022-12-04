@@ -32,6 +32,10 @@ rule performance_benchmarks:
         rules=[
             "bwa_map_and_sort",
             "copy_fastqs",
+            "deepvariant_make_examples",
+            "deepvariant_call_variants",
+            "deepvariant_postprocess_variants",
+            "deepvariant_combine_regions",
             "duphold_apply",
             "duphold_run",
             "estimate_contamination",
