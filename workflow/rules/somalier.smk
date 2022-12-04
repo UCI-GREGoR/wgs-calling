@@ -60,7 +60,7 @@ rule somalier_build_pedfile:
     output:
         "results/somalier/{projectid}/relate/somalier.ped",
     benchmark:
-        "results/performance_benchmarks/somalier/{projectid}/relate/somalier.tsv"
+        "results/performance_benchmarks/somalier_build_pedfile/{projectid}/somalier.tsv"
     params:
         subjectids=lambda wildcards: manifest.loc[
             manifest["projectid"] == wildcards.projectid, "sampleid"

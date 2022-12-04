@@ -70,7 +70,7 @@ rule samtools_create_bai:
     output:
         bai="results/{prefix}.sort.bam.bai",
     benchmark:
-        "results/performance_benchmarks/{prefix}.sort.tsv"
+        "results/performance_benchmarks/samtools_create_bai/{prefix}.sort.tsv"
     conda:
         "../envs/bwamem2.yaml"
     threads: 4
