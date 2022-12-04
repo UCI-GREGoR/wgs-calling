@@ -24,7 +24,6 @@ rule run_fastp:
     threads: 2
     resources:
         mem_mb="8000",
-        mem_mb="8000",
         qname="small",
     shell:
         "fastp -i {input.r1} -I {input.r2} "
