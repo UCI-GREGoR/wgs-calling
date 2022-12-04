@@ -25,7 +25,7 @@ rule duphold_run:
         "../envs/duphold.yaml"
     threads: 4
     resources:
-        h_vmem="8000",
+        mem_mb="8000",
         qname="small",
     shell:
         "duphold -s {input.snv_vcf} -t {threads} -v {input.sv_vcf} -b {input.bam} -f {input.fasta} -o {output.bcf}"
@@ -45,7 +45,7 @@ rule duphold_apply:
         "../envs/bcftools.yaml"
     threads: 4
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         'bcftools view -i \'(SVTYPE = "DEL" & FMT/DHFFC[0] < 0.7) | (SVTYPE = "DUP" & FMT/DHBFC[0] > 1.3)\' '

@@ -34,7 +34,7 @@ rule run_mosdepth:
         "../envs/mosdepth.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         "mosdepth --threads {threads} "

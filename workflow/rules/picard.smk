@@ -15,7 +15,7 @@ rule create_sequence_dictionary:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        h_vmem="10000",
+        mem_mb="10000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -48,7 +48,7 @@ rule mark_duplicates:
         "../envs/gatk4.yaml"
     threads: 2
     resources:
-        h_vmem="12000",
+        mem_mb="12000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -75,7 +75,7 @@ rule samtools_create_bai:
         "../envs/bwamem2.yaml"
     threads: 4
     resources:
-        h_vmem="8000",
+        mem_mb="8000",
         qname="small",
     shell:
         "samtools index -@ {threads} -b -o {output.bai} {input.bam}"
@@ -120,7 +120,7 @@ rule picard_collectmultiplemetrics:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        h_vmem="10000",
+        mem_mb="10000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -166,7 +166,7 @@ rule picard_collectgcbiasmetrics:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        h_vmem="10000",
+        mem_mb="10000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -202,7 +202,7 @@ rule picard_collectwgsmetrics:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        h_vmem="16000",
+        mem_mb="16000",
         qname="small",
         tmpdir="temp",
     shell:

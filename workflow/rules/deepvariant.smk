@@ -35,7 +35,7 @@ rule deepvariant_make_examples:
         )
     threads: config["parameters"]["deepvariant"]["number-shards"]
     resources:
-        h_vmem="{}".format(2000 * config["parameters"]["deepvariant"]["number-shards"]),
+        mem_mb="{}".format(2000 * config["parameters"]["deepvariant"]["number-shards"]),
         qname="small",
         tmpdir="temp",
     shell:
@@ -78,7 +78,7 @@ rule deepvariant_call_variants:
         )
     threads: config["parameters"]["deepvariant"]["number-shards"]
     resources:
-        h_vmem="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 4000),
+        mem_mb="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 4000),
         qname="small",
         tmpdir="temp",
     shell:
@@ -114,7 +114,7 @@ rule deepvariant_postprocess_variants:
         )
     threads: 1
     resources:
-        h_vmem="32000",
+        mem_mb="32000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -143,7 +143,7 @@ rule deepvariant_combine_regions:
         "../envs/bcftools.yaml"
     threads: 4
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         "bcftools concat --threads {threads} -O z -o {output} {input}"

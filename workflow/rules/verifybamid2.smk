@@ -23,7 +23,7 @@ rule estimate_contamination:
         "../envs/verifybamid2.yaml"
     threads: 4
     resources:
-        h_vmem="8000",
+        mem_mb="8000",
         qname="small",
     shell:
         "verifybamid2 "

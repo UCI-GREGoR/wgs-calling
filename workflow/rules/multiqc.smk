@@ -23,7 +23,7 @@ rule run_multiqc_fastq:
         "../envs/multiqc.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         "multiqc {params.target_dirs} "
@@ -73,7 +73,7 @@ rule run_multiqc_alignment:
         "../envs/multiqc.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         "multiqc {params.target_dirs} "
