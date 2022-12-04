@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-snakemake -j50 --profile ../sge-profile -p --rerun-incomplete --rerun-triggers mtime --use-conda --use-singularity
+snakemake -j50 --profile ../sge-profile -p --rerun-incomplete --rerun-triggers mtime --use-conda --use-singularity --cluster-config config/cluster.yaml
