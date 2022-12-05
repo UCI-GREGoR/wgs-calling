@@ -1,7 +1,7 @@
-def compute_octopus_mem_mb(wildcards, input, threads, attempts) -> int:
+def compute_octopus_mem_mb(wildcards, input, threads, attempt) -> int:
     """
     Compute scaling RAM requirements for octopus_run_task with each resubmission
     to the compute controller
     """
     octopus_scaling_ram = 30000
-    return int(threads * octopus_scaling_ram * (1 + (attempts - 1) * 0.1))
+    return int(threads * octopus_scaling_ram * (1 + (attempt - 1) * 0.1))
