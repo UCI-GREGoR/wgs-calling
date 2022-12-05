@@ -43,7 +43,9 @@ source(source.file)
 benchmark.data <- list()
 for (rule in target.rules) {
   benchmark.df <- aggregate.performance.metrics(parent.dir, rule)
-  benchmark.data[[rule]] <- benchmark.df
+  if (!is.null(benchmark.df)) {
+    benchmark.data[[rule]] <- benchmark.df
+  }
 }
 ```
 

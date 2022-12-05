@@ -1,3 +1,5 @@
+library(ggplot2)
+
 #' For convenience, define a single ggplot theme/style
 my.theme <- theme_light() + theme(
   plot.title = element_text(size = 16, hjust = 0.5),
@@ -28,7 +30,10 @@ aggregate.performance.metrics <- function(parent.dir, rule) {
   stopifnot(length(rule) == 1)
   stopifnot(dir.exists(parent.dir))
   rule.dir <- file.path(parent.dir, rule)
-  stopifnot(dir.exists(rule.dir))
+  if (!dir.exists(rule.dir)) {
+    ## new: if rule is absent, just return NULL
+    return(NULL)
+  }
 
   ## aggregate all available performance metrics for a rule.
   ## note that artifacts from prior runs will persist, and so

@@ -54,7 +54,7 @@ test_that("aggregate.performance.metrics can load data from multiple metrics fil
 })
 
 test_that("aggregate.performance.metrics understands when a specified rule does not exist", {
-  expect_error(aggregate.performance.metrics(tmpdir(), "rule1"))
+  expect_null(aggregate.performance.metrics(tempdir(), "rule1"))
 })
 
 test_that("aggregate.performance.metrics understands when the benchmark parent directory does not exist", {
