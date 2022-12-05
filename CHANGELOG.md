@@ -3,6 +3,22 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - DeepVariant
+
+First support for DeepVariant. High burden tests are still running, and the UGE HPC profile
+is very recently changed to more strictly enforce resource requests, so everything is in flux.
+
+### Added
+
+- support for DeepVariant
+  - specify with `config/config.yaml` `snv-caller: deepvariant`
+- automatically record performance benchmark data
+  - stored under `results/performance_benchmarks`
+- optionally create performance benchmark report for review during optimization
+  - the report is not created by default, and requires substantially more work
+    before it's really ready for primetime
+  - to create the report, run `snakemake -j1 --use-conda performance_benchmarks`
+
 ## [0.1.0] - 2022-11-28
 
 Integration of initial implementation branch, so that default has things of interest for casual viewing.
@@ -48,7 +64,7 @@ are anticipated.
   being applied to tiddit.
 
 
-## [Unreleased]
+[//]: # [Unreleased]
 
 [//]: # (- Added)
 [//]: # (- Changed)
