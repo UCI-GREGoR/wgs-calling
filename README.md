@@ -88,15 +88,16 @@ Execute the workflow locally via
 
 using `$N` cores or run it in a cluster environment via
 
-    snakemake --use-conda --profile sge-profile --jobs 100
+    snakemake --use-conda --profile sge-profile --cluster-config config/cluster.yaml --jobs 100
 
 See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/executable.html) for further details.
 
 #### Cluster profiles
 
 Snakemake interfaces with job schedulers via _cluster profiles_. For running jobs on SGE, you can use
-the cookiecutter template [here](https://github.com/Snakemake-Profiles/sge). If there's interest in the group,
-I (@lightning.auriga) have a functional profile for clvr that I can post to this or its own repo for sharing.
+the cookiecutter template [here](https://github.com/Snakemake-Profiles/sge).
+
+
 
 ### Step 5: Investigate results
 
@@ -119,10 +120,10 @@ Whenever you want to synchronize your workflow copy with new developments from u
 
 1. Once, register the upstream repository in your local copy: `git remote add -f upstream git@gitlab.com:lightning.auriga1/wgs-pipeline.git` or `upstream https://gitlab.com/lightning.auriga1/wgs-pipeline.git` if you do not have setup ssh keys.
 2. Update the upstream version: `git fetch upstream`.
-3. Create a diff with the current version: `git diff HEAD upstream/master workflow > upstream-changes.diff`.
+3. Create a diff with the current version: `git diff HEAD upstream/default workflow > upstream-changes.diff`.
 4. Investigate the changes: `vim upstream-changes.diff`.
 5. Apply the modified diff via: `git apply upstream-changes.diff`.
-6. Carefully check whether you need to update the config files: `git diff HEAD upstream/master config`. If so, do it manually, and only where necessary, since you would otherwise likely overwrite your settings and samples.
+6. Carefully check whether you need to update the config files: `git diff HEAD upstream/default config`. If so, do it manually, and only where necessary, since you would otherwise likely overwrite your settings and samples.
 
 
 ### Step 8: Contribute back
