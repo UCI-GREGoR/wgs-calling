@@ -60,3 +60,30 @@ test_that("aggregate.performance.metrics understands when a specified rule does 
 test_that("aggregate.performance.metrics understands when the benchmark parent directory does not exist", {
   expect_error(aggregate.performance.metrics("FAKE_DIRNAME", "rule1"))
 })
+
+test_that("get.io.description returns a seemingly-relevant character vector", {
+  output <- get.io.description()
+  expect_true(stringr::str_detect(output, stringr::regex("^\n\nInput and output represent.*\n\n$", dotall = TRUE)))
+})
+
+test_that("get.memory.description returns a seemingly-relevant character vector", {
+  output <- get.memory.description()
+  expect_true(stringr::str_detect(output, stringr::regex(paste("^\n\nRSS, resident set size.*",
+    "VMS, virtual memory size.*",
+    "USS, unique set size.*",
+    "PSS, proportional set size.*\n\n$",
+    sep = ""
+  ), dotall = TRUE)))
+})
+
+test_that("get.cpu.walltime.description returns a seemingly-relevant character vector", {
+  output <- get.cpu.walltime.description()
+  expect_true(stringr::str_detect(output, stringr::regex("^\n\nCPU/walltime is a representation.*\n\n$",
+    dotall = TRUE
+  )))
+})
+
+test_that("get.walltime.description returns a seemingly-relevant character vector", {
+  output <- get.walltime.description()
+  expect_true(stringr::str_detect(output, stringr::regex("^\n\nWalltime represents.*\n\n$", dotall = TRUE)))
+})
