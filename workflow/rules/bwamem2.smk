@@ -40,7 +40,7 @@ rule bwa_index:
         mem_mb="20000",
         qname="small",
     shell:
-        "bwa index {input.fasta}"
+        "bwa-mem2 index {input.fasta}"
 
 
 rule bwa_map_and_sort:
