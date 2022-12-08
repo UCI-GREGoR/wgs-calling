@@ -37,7 +37,7 @@ rule bwa_index:
         "../envs/bwamem2.yaml"
     threads: 1
     resources:
-        mem_mb="20000",
+        mem_mb="64000",
         qname="small",
     shell:
         "bwa-mem2 index {input.fasta}"
