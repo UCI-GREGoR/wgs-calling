@@ -3,10 +3,9 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - DeepVariant
+## [0.2.0] - DeepVariant
 
-First support for DeepVariant. High burden tests are still running, and the UGE HPC profile
-is very recently changed to more strictly enforce resource requests, so everything is in flux.
+First support for DeepVariant.
 
 ### Added
 
@@ -18,6 +17,23 @@ is very recently changed to more strictly enforce resource requests, so everythi
   - the report is not created by default, and requires substantially more work
     before it's really ready for primetime
   - to create the report, run `snakemake -j1 --use-conda performance_benchmarks`
+
+### Fixed
+
+- many, many changes to resource allocation, to compensate for the fact that the original
+  settings were based on random cloud pipeline allocations that did not actually inspect or
+  enforce their own usage. the result is some extremely chunky rules, but much more accurate
+  representations of the footprints of the rules
+- alignment multiQC report more closely matches format of legacy, and also is prettier than before
+- random, assorted bugfixes to various foolishness from the rapid initial implementation. note
+  that SV steps are _still_ completely untested and should be considered dubious at best
+
+## Deprecated
+
+- Octopus. the project is orphaned, and the runs themselves are unstable and unreliable. I'm
+  not fully removing it for the time being,
+  but it's on notice. I'll do some testing outside of this workflow
+  to see if I can find a path to even remotely trusting its output
 
 ## [0.1.0] - 2022-11-28
 
