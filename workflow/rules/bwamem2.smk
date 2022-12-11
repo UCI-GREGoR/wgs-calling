@@ -77,7 +77,7 @@ rule bwa_map_and_sort:
         "../envs/bwamem2.yaml"
     threads: 4
     resources:
-        mem_mb="32000",
+        mem_mb="64000",
         qname="small",
         tmpdir="temp",
     shell:
