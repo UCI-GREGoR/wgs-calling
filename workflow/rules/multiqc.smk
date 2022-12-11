@@ -65,6 +65,8 @@ rule run_multiqc_alignment:
                         "collectwgsmetrics",
                         "somalier",
                         "mosdepth",
+                        "contamination",
+                        "alignstats",
                     ],
                 )
             )
