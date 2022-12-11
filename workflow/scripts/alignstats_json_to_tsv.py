@@ -17,6 +17,7 @@ def run_alignstats_json_to_tsv(infiles, outfile):
             with open(align_json, "r") as in_j:
                 d = json.load(in_j)
                 samp = d["InputFileName"].split("/")[-1].split(".")[0]
+                d["InputFileName"] = d["InputFileName"].split("/")[-1]
                 if FIRST:
                     # Write header
                     w.writerow(["# id: 'Alignstats'"])
