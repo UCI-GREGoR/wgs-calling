@@ -17,7 +17,7 @@ rule download_reference_data:
         "../envs/awscli.yaml"
     threads: 1
     resources:
-        h_vmem="2000",
+        mem_mb="2000",
         qname="small",
         tmpdir="temp/",
     shell:
@@ -44,7 +44,7 @@ rule index_vcf:
         "../envs/bcftools.yaml"
     threads: 1
     resources:
-        h_vmem="2000",
+        mem_mb="2000",
         qname="small",
     shell:
         "tabix -p vcf {input}"

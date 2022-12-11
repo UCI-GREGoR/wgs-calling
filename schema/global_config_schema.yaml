@@ -16,7 +16,7 @@ properties:
         pattern: "^bwa-mem2$"
       snv-caller:
         type: string
-        pattern: "^octopus$"
+        pattern: "^octopus$|^deepvariant$"
       sv-callers:
         type: array
         items:
@@ -38,6 +38,24 @@ properties:
       - outcome
       - symlink-fastqs
       - trim-adapters-before-alignment
+    additionalProperties: no
+  parameters:
+    type: object
+    properties:
+      deepvariant:
+        type: object
+        properties:
+          number-shards:
+            type: integer
+            min: 1
+          docker-version:
+            type: string
+        required:
+          - number-shards
+          - docker-version
+        additionalProperties: no
+    required:
+      - deepvariant
     additionalProperties: no
   references:
     type: object
@@ -116,6 +134,19 @@ properties:
       - forest-model
       - error-model
       - grch37
+  deepvariant:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          calling-ranges:
+            type: string
+        required:
+          - calling-ranges
+        additionalProperties: no
+    required:
+      - grch37
 required:
   - manifest
   - multiqc-config
@@ -125,4 +156,5 @@ required:
   - dnascope
   - verifybamid2
   - octopus
+  - deepvariant
 additionalProperties: no

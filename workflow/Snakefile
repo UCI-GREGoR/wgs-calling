@@ -11,6 +11,7 @@ from snakemake.utils import validate
 S3 = S3RemoteProvider()
 
 sys.path.insert(0, ".")
+from lib import resource_calculator as rc
 from lib import target_construction as tc
 
 shell.executable("/bin/bash")
@@ -30,7 +31,7 @@ manifest = pd.read_csv(manifest, sep="\t")
 validate(manifest, "../schema/manifest_schema.yaml")
 
 reference_build = config["genome-build"]
-octopus_num_intervals = 20
+caller_num_intervals = tc.caller_interval_file_count(config)
 
 TARGETS = [
     expand(
@@ -54,7 +55,7 @@ if config["behaviors"]["outcome"] != "fastqc":
 if config["behaviors"]["outcome"] == "calling":
     TARGETS.append(
         [
-            tc.construct_octopus_targets(manifest),
+            tc.construct_snv_targets(config, manifest),
         ]
     )
     TARGETS.append(
@@ -84,6 +85,7 @@ rule all:
 include: "rules/acquire_data.smk"
 include: "rules/alignstats.smk"
 include: "rules/bwamem2.smk"
+include: "rules/deepvariant.smk"
 include: "rules/duphold.smk"
 include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
@@ -91,6 +93,7 @@ include: "rules/manta.smk"
 include: "rules/mosdepth.smk"
 include: "rules/multiqc.smk"
 
+include: "rules/performance_benchmarks.smk"
 include: "rules/picard.smk"
 include: "rules/references.smk"
 include: "rules/somalier.smk"

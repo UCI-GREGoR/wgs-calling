@@ -15,7 +15,7 @@ rule run_alignstats:
         "../envs/alignstats.yaml"
     threads: 4
     resources:
-        h_vmem="8000",
+        mem_mb="8000",
         qname="small",
     shell:
         "alignstats -C -U "
@@ -38,7 +38,7 @@ rule merge_alignstats:
         "results/performance_benchmarks/merge_alignstats/{projectid}/alignstats_summary_mqc.tsv"
     threads: 1
     resources:
-        h_vmem="2000",
+        mem_mb="2000",
         qname="small",
     script:
         "../scripts/alignstats_json_to_tsv.py"

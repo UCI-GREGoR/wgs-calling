@@ -14,7 +14,7 @@ rule copy_fastqs:
         "results/performance_benchmarks/copy_fastqs/{projectid}/{sampleid}_{lane}_{suffix}.fastq.tsv"
     threads: 1
     resources:
-        h_vmem="500",
+        mem_mb="500",
         qname="small",
     shell:
         'if [[ "{params.symlink_target}" == "True" ]] ; then '

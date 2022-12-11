@@ -17,7 +17,7 @@ rule somalier_extract:
         "../envs/somalier.yaml"
     threads: 1
     resources:
-        h_vmem="2000",
+        mem_mb="2000",
         qname="small",
     shell:
         "somalier extract -d {params.extract_dir} "
@@ -45,7 +45,7 @@ rule somalier_relate:
         "../envs/somalier.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         "somalier relate --ped {input.ped} -o {params.outprefix} {input.somalier}"
@@ -59,6 +59,8 @@ rule somalier_build_pedfile:
     """
     output:
         "results/somalier/{projectid}/relate/somalier.ped",
+    benchmark:
+        "results/performance_benchmarks/somalier_build_pedfile/{projectid}/somalier.tsv"
     params:
         subjectids=lambda wildcards: manifest.loc[
             manifest["projectid"] == wildcards.projectid, "sampleid"

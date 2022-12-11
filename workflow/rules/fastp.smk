@@ -23,7 +23,6 @@ rule run_fastp:
         "../envs/fastp.yaml"
     threads: 2
     resources:
-        h_vmem="8000",
         mem_mb="8000",
         qname="small",
     shell:

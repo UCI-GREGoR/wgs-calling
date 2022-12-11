@@ -12,7 +12,7 @@ rule samtools_index_fasta:
         "../envs/bwamem2.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         "samtools faidx {input}"
@@ -37,10 +37,10 @@ rule bwa_index:
         "../envs/bwamem2.yaml"
     threads: 1
     resources:
-        h_vmem="20000",
+        mem_mb="64000",
         qname="small",
     shell:
-        "bwa index {input.fasta}"
+        "bwa-mem2 index {input.fasta}"
 
 
 rule bwa_map_and_sort:
@@ -77,7 +77,7 @@ rule bwa_map_and_sort:
         "../envs/bwamem2.yaml"
     threads: 4
     resources:
-        h_vmem="32000",
+        mem_mb="64000",
         qname="small",
         tmpdir="temp",
     shell:

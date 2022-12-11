@@ -15,7 +15,7 @@ rule create_sequence_dictionary:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        h_vmem="10000",
+        mem_mb="10000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -48,7 +48,7 @@ rule mark_duplicates:
         "../envs/gatk4.yaml"
     threads: 2
     resources:
-        h_vmem="12000",
+        mem_mb="12000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -66,14 +66,16 @@ rule samtools_create_bai:
     From a sorted bam file, create a bai-format index
     """
     input:
-        bam="{prefix}.sort.bam",
+        bam="results/{prefix}.sort.bam",
     output:
-        bai="{prefix}.sort.bam.bai",
+        bai="results/{prefix}.sort.bam.bai",
+    benchmark:
+        "results/performance_benchmarks/samtools_create_bai/{prefix}.sort.tsv"
     conda:
         "../envs/bwamem2.yaml"
     threads: 4
     resources:
-        h_vmem="8000",
+        mem_mb="8000",
         qname="small",
     shell:
         "samtools index -@ {threads} -b -o {output.bai} {input.bam}"
@@ -118,7 +120,7 @@ rule picard_collectmultiplemetrics:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        h_vmem="10000",
+        mem_mb="10000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -137,7 +139,8 @@ rule picard_collectmultiplemetrics:
         "-PROGRAM CollectSequencingArtifactMetrics "
         "-PROGRAM CollectQualityYieldMetrics "
         "-INCLUDE_UNPAIRED true "
-        "-OUTPUT {params.outprefix}"
+        "-OUTPUT {params.outprefix} "
+        "--TMP_DIR {params.tmpdir}"
 
 
 rule picard_collectgcbiasmetrics:
@@ -163,7 +166,7 @@ rule picard_collectgcbiasmetrics:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        h_vmem="10000",
+        mem_mb="10000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -173,7 +176,8 @@ rule picard_collectgcbiasmetrics:
         "-REFERENCE_SEQUENCE {input.fasta} "
         "-OUTPUT {output.metrics} "
         "-SUMMARY_OUTPUT {output.summary} "
-        "-CHART_OUTPUT {output.pdf}"
+        "-CHART_OUTPUT {output.pdf} "
+        "--TMP_DIR {params.tmpdir}"
 
 
 rule picard_collectwgsmetrics:
@@ -193,12 +197,12 @@ rule picard_collectwgsmetrics:
         "results/performance_benchmarks/picard_collectwgsmetrics/{fileprefix}.tsv"
     params:
         tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx6000m",
+        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx10000m",
     conda:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        h_vmem="12000",
+        mem_mb="16000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -207,4 +211,5 @@ rule picard_collectwgsmetrics:
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "
         "-OUTPUT {output.txt} "
-        "-INTERVALS {input.intervals}"
+        "-INTERVALS {input.intervals} "
+        "--TMP_DIR {params.tmpdir}"

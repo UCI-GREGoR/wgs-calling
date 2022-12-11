@@ -88,10 +88,13 @@ def test_standard_request(standard_snakemake_object):
         init_globals={"snakemake": standard_snakemake_object},
     )
     assert pathlib.Path(standard_snakemake_object.output[0]).is_file()
+    ## due to upstream sorting issues, this requires terrible lexical sort
+    subjectids = standard_snakemake_object.params["subjectids"]
+    subjectids.sort()
     expected = pandas.DataFrame(
         {
-            "FID": standard_snakemake_object.params["subjectids"],
-            "Sample": standard_snakemake_object.params["subjectids"],
+            "FID": subjectids,
+            "Sample": subjectids,
             "Pat": [0 for i in range(10)],
             "Mat": [0 for i in range(10)],
             "Sex": [0 for i in range(10)],

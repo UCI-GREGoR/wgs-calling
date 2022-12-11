@@ -7,15 +7,18 @@ genome-build: "grch37"
 
 behaviors:
   aligner: "bwa-mem2"
-  snv-caller: "octopus"
+  snv-caller: "deepvariant"
   sv-callers:
     - "manta"
     - "tiddit"
-  outcome: "fastqc"
+  outcome: "calling"
   symlink-fastqs: yes
   trim-adapters-before-alignment: "legacy"
 
-
+parameters:
+  deepvariant:
+    number-shards: 16
+    docker-version: "1.4.0"
 
 references:
   grch37:
@@ -42,3 +45,6 @@ octopus:
   grch37:
     skip-regions: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/octopus/b37_all_gaps_octo.txt"
     calling-ranges: "resources/octopus_calling_ranges.tsv"
+deepvariant:
+  grch37:
+    calling-ranges: "resources/deepvariant_calling_ranges.tsv"

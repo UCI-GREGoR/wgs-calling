@@ -15,7 +15,7 @@ rule merge_sv_vcfs:
         "../envs/svdb.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         "svdb merge --vcf {input} | "

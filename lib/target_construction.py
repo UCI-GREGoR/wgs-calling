@@ -136,13 +136,14 @@ def construct_picard_qc_targets(wildcards: Namedlist, manifest: pd.DataFrame) ->
     return list(set(result))
 
 
-def construct_octopus_targets(manifest: pd.DataFrame) -> list:
+def construct_snv_targets(config: dict, manifest: pd.DataFrame) -> list:
     """
-    From basic input manifest entries, construct output targets for
-    octopus caller, after scattergather is complete
+    From basic input configuration and manifest entries,
+    construct output targets for selected caller, after
+    scattergather is complete
     """
     result = [
-        "results/octopus/{}/{}.sorted.vcf.gz".format(x[0], x[1])
+        "results/{}/{}/{}.sorted.vcf.gz".format(config["behaviors"]["snv-caller"], x[0], x[1])
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
     return list(set(result))
@@ -249,3 +250,15 @@ def map_reference_file(wildcards: Namedlist, config: dict) -> str | AnnotatedStr
     elif current_lvl.startswith("https://"):
         return HTTP.remote(current_lvl)
     return current_lvl
+
+
+def caller_interval_file_count(config: dict) -> int:
+    """
+    Get simple line count of a file; this is intended to
+    count a tiny text file containing <100 interval filenames.
+    """
+    fn = config[config["behaviors"]["snv-caller"]][config["genome-build"]]["calling-ranges"]
+    x = 0
+    with open(fn, "r") as f:
+        x = len(f.readlines())
+    return x
