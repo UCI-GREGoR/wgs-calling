@@ -204,6 +204,28 @@ def construct_fastqc_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> li
     return list(set(results_r1))
 
 
+def construct_fastqc_posttrimming_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    a run of fastQC, for fastqs after trimming
+    """
+    results_prefix = "results/fastqc_posttrimming"
+    results_r1 = [
+        "{}/{}/{}_fastp_fastqc.zip".format(
+            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix(".fastq.gz")
+        )
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r1"].to_list()
+    ]
+    results_r2 = [
+        "{}/{}/{}_fastp_fastqc.zip".format(
+            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix(".fastq.gz")
+        )
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r2"].to_list()
+    ]
+    results_r1.extend(results_r2)
+    return list(set(results_r1))
+
+
 def construct_fastp_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
