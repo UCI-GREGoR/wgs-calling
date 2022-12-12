@@ -18,7 +18,6 @@ rule run_fastp:
     params:
         outprefix="results/fastp/{projectid}/{sampleid}_{lane}",
         quality=10,
-        dup_calc_accuracy=3,
     conda:
         "../envs/fastp.yaml"
     threads: 2
@@ -30,15 +29,11 @@ rule run_fastp:
         "-o {output.r1_fastq} -O {output.r2_fastq} "
         "--unpaired1 {output.r1_unp_fastq} --unpaired2 {output.r2_unp_fastq} "
         "--failed_out {output.failed_fastq} "
-        "--detect_adapter_for_pe "
-        "-q {params.quality} -u 60 "
+        "-q {params.quality} "
         "--trim_poly_g "
         "--verbose "
-        "-D --overrepresentation_analysis "
+        "--overrepresentation_analysis "
         "--overrepresentation_sampling 100 "
-        "--low_complexity_filter "
-        "--reads_to_process 100000000 "
-        "--dup_calc_accuracy {params.dup_calc_accuracy} "
-        "--trim_tail1=1 "
+        "-5 -3 "
         "-j {output.json} -h {output.html} "
         "-w {threads} -z 1"
