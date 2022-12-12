@@ -212,13 +212,13 @@ def construct_fastqc_posttrimming_targets(wildcards: Namedlist, manifest: pd.Dat
     results_prefix = "results/fastqc_posttrimming"
     results_r1 = [
         "{}/{}/{}_fastp_fastqc.zip".format(
-            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix(".fastq.gz")
+            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix("_001.fastq.gz")
         )
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r1"].to_list()
     ]
     results_r2 = [
         "{}/{}/{}_fastp_fastqc.zip".format(
-            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix(".fastq.gz")
+            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix("_001.fastq.gz")
         )
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r2"].to_list()
     ]
