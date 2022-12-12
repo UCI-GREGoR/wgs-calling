@@ -28,19 +28,18 @@ rule deepvariant_make_examples:
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
             shardmax=config["parameters"]["deepvariant"]["number-shards"],
         ),
-        max_shards=config["parameters"]["deepvariant"]["number-shards"],
     container:
         "docker://google/deepvariant:{}".format(
             config["parameters"]["deepvariant"]["docker-version"]
         )
     threads: config["parameters"]["deepvariant"]["number-shards"]
     resources:
-        mem_mb="{}".format(2000 * config["parameters"]["deepvariant"]["number-shards"]),
+        mem_mb="{}".format(8000 * config["parameters"]["deepvariant"]["number-shards"]),
         qname="small",
         tmpdir="temp",
     shell:
         "mkdir -p temp && "
-        "seq 0 $(({params.max_shards}-1)) | parallel -j{threads} --tmpdir temp "
+        "seq 0 $(({threads}-1)) | parallel -j{threads} --tmpdir temp "
         "make_examples --mode calling "
         '--ref {input.fasta} --reads {input.bam} --regions "$(cat {input.intervals})" '
         "--examples {params.shard_string} --channels insert_size "
@@ -78,7 +77,7 @@ rule deepvariant_call_variants:
         )
     threads: config["parameters"]["deepvariant"]["number-shards"]
     resources:
-        mem_mb="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 4000),
+        mem_mb="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 8000),
         qname="small",
         tmpdir="temp",
     shell:
