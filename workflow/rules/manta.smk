@@ -61,7 +61,7 @@ rule manta_run:
         tmpdir="temp/manta_workdir/{projectid}/{sampleid}",
     conda:
         "../envs/manta.yaml"
-    threads: 24
+    threads: 4
     resources:
         mem_mb="24000",
         qname="small",
