@@ -17,7 +17,7 @@ def map_fastq_from_project_and_sample(
     """
     ## New: allow rewiring of the DAG to provide adapter-trimmed fastqs directly to aligner
     if config["behaviors"]["trim-adapters-before-alignment"] is True:
-        return "results/fastp/{}/{}_{}_{}_fastp.fastq".format(
+        return "results/fastp/{}/{}_{}_{}_fastp.fastq.gz".format(
             wildcards.projectid, wildcards.sampleid, wildcards.lane, rp
         )
 

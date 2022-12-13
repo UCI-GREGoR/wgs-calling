@@ -29,8 +29,8 @@ rule run_fastqc_posttrimming:
     Run fastQC on a paired end library, after trimming
     """
     input:
-        r1="results/fastp/{projectid}/{sampleid}_{lane}_R1_fastp.fastq",
-        r2="results/fastp/{projectid}/{sampleid}_{lane}_R2_fastp.fastq",
+        r1="results/fastp/{projectid}/{sampleid}_{lane}_R1_fastp.fastq.gz",
+        r2="results/fastp/{projectid}/{sampleid}_{lane}_R2_fastp.fastq.gz",
     output:
         r1_zip="results/fastqc_posttrimming/{projectid}/{sampleid}_{lane}_R1_fastp_fastqc.zip",
         r2_zip="results/fastqc_posttrimming/{projectid}/{sampleid}_{lane}_R2_fastp_fastqc.zip",
