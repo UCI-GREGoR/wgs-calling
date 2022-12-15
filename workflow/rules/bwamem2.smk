@@ -75,14 +75,14 @@ rule bwa_map_and_sort:
         tmpdir="temp",
     conda:
         "../envs/bwamem2.yaml"
-    threads: 4
+    threads: 15
     resources:
-        mem_mb="64000",
-        qname="small",
+        mem_mb="500000",
+        qname="large",
         tmpdir="temp",
     shell:
         "mkdir -p {params.tmpdir} && "
-        'bwa-mem2 mem -t {threads} -K {params.K} -k {params.k} -Y -R "{params.readgroup}" {params.softclip_alts} '
+        'bwa-mem2 mem -t {threads} -Y -R "{params.readgroup}" {params.softclip_alts} '
         "{input.bwa_fasta} {input.fastq1} {input.fastq2} | "
         "samtools fixmate -@ {threads} -u -m - - | "
-        "samtools sort -l 1 -m 2G -@ {threads} -T {params.tmpdir} -O BAM --write-index -o {output.bam}##idx##{output.bai}"
+        "samtools sort -l 1 -m 4G -@ {threads} -T ${{TMPDIR}} -O BAM --write-index -o {output.bam}##idx##{output.bai}"
