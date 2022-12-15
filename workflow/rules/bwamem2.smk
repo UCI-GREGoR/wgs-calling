@@ -75,7 +75,7 @@ rule bwa_map_and_sort:
         tmpdir="temp",
     conda:
         "../envs/bwamem2.yaml"
-    threads: 15
+    threads: 12
     resources:
         mem_mb="500000",
         qname="large",
