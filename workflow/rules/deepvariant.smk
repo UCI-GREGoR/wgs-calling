@@ -34,12 +34,12 @@ rule deepvariant_make_examples:
         )
     threads: config["parameters"]["deepvariant"]["number-shards"]
     resources:
-        mem_mb="{}".format(8000 * config["parameters"]["deepvariant"]["number-shards"]),
-        qname="small",
+        mem_mb="{}".format(12000 * config["parameters"]["deepvariant"]["number-shards"]),
+        qname="large",
         tmpdir="temp",
     shell:
         "mkdir -p temp && "
-        "seq 0 $(({threads}-1)) | parallel -j{threads} --tmpdir temp "
+        "seq 0 $(({threads}-1)) | parallel -j{threads} --tmpdir ${{TMPDIR}} "
         "make_examples --mode calling "
         '--ref {input.fasta} --reads {input.bam} --regions "$(cat {input.intervals})" '
         "--examples {params.shard_string} --channels insert_size "
@@ -77,11 +77,9 @@ rule deepvariant_call_variants:
         )
     threads: config["parameters"]["deepvariant"]["number-shards"]
     resources:
-        mem_mb="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 8000),
-        qname="small",
-        tmpdir="temp",
+        mem_mb="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 30000),
+        qname="large",
     shell:
-        "mkdir -p temp && "
         "call_variants "
         "--outfile {output.gz} "
         "--examples {params.shard_string} "
@@ -114,10 +112,8 @@ rule deepvariant_postprocess_variants:
     threads: 1
     resources:
         mem_mb="32000",
-        qname="small",
-        tmpdir="temp",
+        qname="large",
     shell:
-        "mkdir -p temp && "
         "postprocess_variants "
         "--ref {input.fasta} "
         "--infile {input.gz} "
