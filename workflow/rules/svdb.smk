@@ -18,7 +18,7 @@ rule merge_sv_vcfs:
         mem_mb="4000",
         qname="small",
     shell:
-        "svdb merge --vcf {input} | "
+        "svdb --merge --vcf {input} | "
         "sed 's/ID=PL,Number=G,Type=Integer/ID=PL,Number=G,Type=Float/' | "
         "sed 's/ID=GQ,Number=1,Type=Integer/ID=GQ,Number=1,Type=String/' | "
         "bgzip -c > {output}"
