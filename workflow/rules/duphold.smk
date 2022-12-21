@@ -48,5 +48,5 @@ rule duphold_apply:
         mem_mb="4000",
         qname="small",
     shell:
-        'bcftools view -i \'(SVTYPE = "DEL" & FMT/DHFFC[0] < 0.7) | (SVTYPE = "DUP" & FMT/DHBFC[0] > 1.3)\' '
+        'bcftools view -i \'FILTER = "PASS" & (SVTYPE = "DEL" & FMT/DHFFC[0] < 0.7) | (SVTYPE = "DUP" & FMT/DHBFC[0] > 1.3)\' '
         "--threads {threads} -O z -o {output.vcf} {input.bcf}"

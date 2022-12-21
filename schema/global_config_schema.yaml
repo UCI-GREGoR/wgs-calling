@@ -3,7 +3,9 @@ description: global configuration
 properties:
   manifest:
     type: string
-  multiqc-config:
+  multiqc-read-config:
+    type: string
+  multiqc-alignment-config:
     type: string
   genome-build:
     type: string
@@ -149,7 +151,8 @@ properties:
       - grch37
 required:
   - manifest
-  - multiqc-config
+  - multiqc-read-config
+  - multiqc-alignment-config
   - genome-build
   - behaviors
   - references
