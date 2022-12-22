@@ -17,7 +17,10 @@ rule svaba_run:
         discordants="results/svaba/{projectid}/{sampleid}.svaba.discordants.txt.gz",
         log="results/svaba/{projectid}/{sampleid}.svaba.log",
         alignments="results/svaba/{projectid}/{sampleid}.svaba.alignments.txt.gz",
-        vcf="results/svaba/{projectid}/{sampleid}.svaba.vcf",
+        vcf_indel_unfiltered="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.indel.vcf",
+        vcf_sv_unfiltered="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.sv.vcf",
+        vcf_indel_filtered="results/svaba/{projectid}/{sampleid}.svaba.indel.vcf",
+        vcf_sv_filtered="results/svaba/{projectid}/{sampleid}.svaba.sv.vcf",
     benchmark:
         "results/performance_benchmarks/svaba/{projectid}/{sampleid}.svaba.log"
     params:
