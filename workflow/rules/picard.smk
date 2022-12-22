@@ -29,12 +29,27 @@ rule create_sequence_dictionary:
 rule mark_duplicates:
     """
     Use gatk/picard markdups to mark duplicates on aligned reads
+
+    Note that the following tools are confirmed OK with marked but
+    non-deduped reads:
+    - deepvariant
+    - octopus
+    - manta
+    - tiddit (? https://github.com/SciLifeLab/TIDDIT/blob/2bd94921ef2df4b08967e8f76fb10bc94730715d/tiddit/tiddit_signal.pyx#L160)
+    - svaba
+
+    Note that the following tools require deduping prior to use:
+    - Sentieon DNAscope
+
+    We are removing dups here, to save space and compute, and enable
+    broader tool selection.  Keep an eye on this moving forward
+    in case we ever want to change this around.
     """
     input:
         bam=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bwa2a.bam"),
         bai=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bwa2a.bam.bai"),
     output:
-        bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
+        bam="results/markdups/{projectid}/{sampleid}.mrkdup.bam",
         score="results/markdups/{projectid}/{sampleid}.mrkdup.score.txt",
     benchmark:
         "results/performance_benchmarks/mark_duplicates/{projectid}/{sampleid}.tsv"
@@ -56,9 +71,27 @@ rule mark_duplicates:
         'gatk --java-options "{params.java_args}" MarkDuplicates '
         "-INPUT {params.bamlist} "
         "-OUTPUT {output.bam} "
+        "-REMOVE_DUPLICATES true "
         "-METRICS_FILE {output.score} "
         "--CREATE_INDEX false "
         "--TMP_DIR {params.tmpdir}"
+
+
+rule sort_bam:
+    input:
+        bam="{prefix}.bam",
+    output:
+        bam="{prefix}.sort.bam",
+    benchmark:
+        "results/performance_benchmarks/sort_bam/{prefix}.sort.bam"
+    conda:
+        "../envs/bwamem2.yaml"
+    threads: 4
+    resources:
+        mem_mb="8000",
+        qname="small",
+    shell:
+        "samtools sort -@ {threads} -o {output.bam} -O bam {input.bam}"
 
 
 rule samtools_create_bai:
