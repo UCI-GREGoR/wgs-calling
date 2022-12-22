@@ -22,7 +22,7 @@ rule svaba_run:
         vcf_indel_filtered="results/svaba/{projectid}/{sampleid}.svaba.indel.vcf",
         vcf_sv_filtered="results/svaba/{projectid}/{sampleid}.svaba.sv.vcf",
     benchmark:
-        "results/performance_benchmarks/svaba/{projectid}/{sampleid}.svaba.log"
+        "results/performance_benchmarks/svaba_run/{projectid}/{sampleid}.svaba.tsv"
     params:
         outprefix="results/svaba/{projectid}/{sampleid}.svaba",
     conda:
@@ -33,3 +33,26 @@ rule svaba_run:
         qname="large",
     shell:
         "svaba run -p {threads} -G {input.bwa_fasta} -I -L 6 -t {input.bam} -a {params.outprefix}"
+
+
+rule svaba_select_output_variants:
+    """
+    svaba emits filtered and unfiltered variant sets, split by svs and indels.
+    this will probably have to wait until there's actual output files to be
+    certain how this should be handled
+    """
+    input:
+        "results/svaba/{projectid}/{sampleid}.svaba.unfiltered.sv.vcf",
+    output:
+        "results/svaba/{projectid}/{sampleid}.svaba.vcf.gz",
+    params:
+        tmpdir="temp",
+    benchmark:
+        "results/performance_benchmarks/svaba_select_output_variants/{projectid}/{sampleid}.svaba.tsv"
+    threads: 4
+    resources:
+        mem_mb="16000",
+        qname="small",
+    shell:
+        "mkdir -p {params.tmpdir} && "
+        "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf}"
