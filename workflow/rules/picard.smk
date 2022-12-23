@@ -86,8 +86,8 @@ rule picard_collectmultiplemetrics:
     Run gatk version of picard CollectMultipleMetrics
     """
     input:
-        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/bqsr/{fileprefix}.bam",
+        bai="results/bqsr/{fileprefix}.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
@@ -148,8 +148,8 @@ rule picard_collectgcbiasmetrics:
     Run gatk version of picard CollectGcBiasMetrics
     """
     input:
-        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/bqsr/{fileprefix}.bam",
+        bai="results/bqsr/{fileprefix}.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
@@ -185,8 +185,8 @@ rule picard_collectwgsmetrics:
     Run gatk version of picard CollectWgsMetrics
     """
     input:
-        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/bqsr/{fileprefix}.bam",
+        bai="results/bqsr/{fileprefix}.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),

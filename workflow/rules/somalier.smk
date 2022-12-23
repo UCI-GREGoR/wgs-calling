@@ -3,8 +3,8 @@ rule somalier_extract:
     Run somalier extract on a single bam.
     """
     input:
-        bam="results/markdups/{projectid}/{fileprefix}.mrkdup.sort.bam",
-        bai="results/markdups/{projectid}/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/bqsr/{projectid}/{fileprefix}.bam",
+        bai="results/bqsr/{projectid}/{fileprefix}.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
