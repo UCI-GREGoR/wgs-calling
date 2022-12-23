@@ -29,7 +29,7 @@ rule bwa_index:
         index_files=expand(
             "reference_data/references/{genome}/ref.fasta.{suffix}",
             genome=reference_build,
-            suffix=["amb", "ann", "bwt.2bit.64", "pac"],
+            suffix=bwa_ref_suffixes,
         ),
     params:
         exec_name=config["behaviors"]["aligner"],
@@ -62,7 +62,7 @@ rule bwa_map_and_sort:
         bwa_other_files=expand(
             "reference_data/references/{genome}/ref.fasta.{suffix}",
             genome=reference_build,
-            suffix=["ann", "amb", "bwt.2bit.64", "fai", "pac"],
+            suffix=bwa_ref_suffixes + ["fai"],
         ),
     output:
         bam="results/aligned/{projectid}/{sampleid}_{lane}.bam",

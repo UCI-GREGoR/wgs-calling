@@ -4,12 +4,12 @@ rule svaba_run:
     """
     input:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
-        bai="results/bwa-mem2/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
+        bai="results/aligned/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
         bwa_fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         bwa_other_files=expand(
             "reference_data/references/{genome}/ref.fasta.{suffix}",
             genome=reference_build,
-            suffix=["ann", "amb", "bwt.2bit.64", "fai", "pac", "sa", "dict"],
+            suffix=bwa_ref_suffixes + ["fai", "sa", "dict"],
         ),
     output:
         bps="results/svaba/{projectid}/{sampleid}.svaba.bps.txt.gz",

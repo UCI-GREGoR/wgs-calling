@@ -31,6 +31,12 @@ manifest = pd.read_csv(manifest, sep="\t")
 validate(manifest, "../schema/manifest_schema.yaml")
 
 reference_build = config["genome-build"]
+bwa_ref_suffixes = ["ann", "amb", "pac"]
+if config["behaviors"]["aligner"] == "bwa-mem2":
+    bwa_ref_suffixes.append("bwt.2bit.64")
+else:
+    bwa_ref_suffixes.append("bwt")
+
 caller_num_intervals = tc.caller_interval_file_count(config)
 
 TARGETS = [
