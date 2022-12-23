@@ -75,6 +75,26 @@ properties:
         additionalProperties: no
     required:
       - grch37
+  bqsr:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          known-indels-vcf-gz:
+            type: string
+          known-indels-tbi:
+            type: string
+          dbsnp138-vcf:
+            type: string
+          dbsnp138-vcf-idx:
+            type: string
+        required:
+          - known-indels-vcf-gz
+          - known-indels-tbi
+          - dbsnp138-vcf
+          - dbsnp138-vcf-idx
+        additionalProperties: no
   dnascope:
     type: object
     patternProperties:
@@ -156,6 +176,7 @@ required:
   - genome-build
   - behaviors
   - references
+  - bqsr
   - dnascope
   - verifybamid2
   - octopus
