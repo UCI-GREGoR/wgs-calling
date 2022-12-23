@@ -46,8 +46,8 @@ rule mark_duplicates:
     in case we ever want to change this around.
     """
     input:
-        bam=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bwa2a.bam"),
-        bai=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bwa2a.bam.bai"),
+        bam=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bam"),
+        bai=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bam.bai"),
     output:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.bam",
         score="results/markdups/{projectid}/{sampleid}.mrkdup.score.txt",
@@ -56,7 +56,7 @@ rule mark_duplicates:
     params:
         tmpdir="temp",
         bamlist=lambda wildcards: " -INPUT ".join(
-            tc.get_bams_by_lane(wildcards, config, manifest, "bwa2a.bam")
+            tc.get_bams_by_lane(wildcards, config, manifest, "bam")
         ),
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx3000m",
     conda:

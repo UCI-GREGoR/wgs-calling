@@ -15,7 +15,7 @@ properties:
     properties:
       aligner:
         type: string
-        pattern: "^bwa-mem2$"
+        pattern: "^bwa-mem2$|^bwa$"
       snv-caller:
         type: string
         pattern: "^octopus$|^deepvariant$"
