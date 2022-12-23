@@ -84,6 +84,7 @@ rule all:
 
 include: "rules/acquire_data.smk"
 include: "rules/alignstats.smk"
+include: "rules/bqsr.smk"
 include: "rules/bwamem2.smk"
 include: "rules/deepvariant.smk"
 include: "rules/duphold.smk"
