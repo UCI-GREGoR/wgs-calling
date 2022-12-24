@@ -66,7 +66,7 @@ def test_get_bams_by_lane(wildcards_without_lane, standard_config, standard_mani
     to acquire all lane-specific files for a sample
     based on manifest fastq entries.
     """
-    expected = ["results/bwa-mem2/PROJ1/SAM2_{}.{}".format(x, suffix) for x in ["L001", "L002"]]
+    expected = ["results/aligned/PROJ1/SAM2_{}.{}".format(x, suffix) for x in ["L001", "L002"]]
     observed = tc.get_bams_by_lane(
         wildcards_without_lane, standard_config, standard_manifest, suffix
     )
@@ -110,8 +110,7 @@ def test_construct_alignstats_targets(wildcards_without_lane, standard_manifest)
     the output files of alignstats.
     """
     expected = [
-        "results/alignstats/PROJ1/{}.bwa2a.alignstats.json".format(x)
-        for x in ["SAM1", "SAM2", "SAM3"]
+        "results/alignstats/PROJ1/{}.alignstats.json".format(x) for x in ["SAM1", "SAM2", "SAM3"]
     ]
     observed = tc.construct_alignstats_targets(wildcards_without_lane, standard_manifest)
     ## this function is used for snakemake target population, so order is irrelevant

@@ -7,13 +7,14 @@ multiqc-alignment-config: "config/multiqc_alignment_config.yaml"
 genome-build: "grch37"
 
 behaviors:
-  aligner: "bwa-mem2"
+  aligner: "bwa"
   snv-caller: "deepvariant"
   sv-callers:
     - "manta"
     - "tiddit"
+    - "svaba"
   outcome: "calling"
-  symlink-fastqs: yes
+  symlink-fastqs: no
   trim-adapters-before-alignment: "legacy"
 
 parameters:

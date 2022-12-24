@@ -15,7 +15,7 @@ properties:
     properties:
       aligner:
         type: string
-        pattern: "^bwa-mem2$"
+        pattern: "^bwa-mem2$|^bwa$"
       snv-caller:
         type: string
         pattern: "^octopus$|^deepvariant$"
@@ -23,7 +23,7 @@ properties:
         type: array
         items:
           type: string
-          pattern: "^manta$|^tiddit$"
+          pattern: "^manta$|^tiddit$|^svaba$"
       outcome:
         type: string
         pattern: "^fastqc$|^alignment$|^calling$"

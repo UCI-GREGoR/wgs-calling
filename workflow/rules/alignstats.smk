@@ -6,7 +6,7 @@ rule run_alignstats:
         bam="results/bqsr/{fileprefix}.bam",
         bai="results/bqsr/{fileprefix}.bam.bai",
     output:
-        json="results/alignstats/{fileprefix}.bwa2a.alignstats.json",
+        json="results/alignstats/{fileprefix}.alignstats.json",
     benchmark:
         "results/performance_benchmarks/run_alignstats/{fileprefix}.tsv"
     params:
