@@ -103,6 +103,7 @@ include: "rules/performance_benchmarks.smk"
 include: "rules/picard.smk"
 include: "rules/references.smk"
 include: "rules/somalier.smk"
+include: "rules/svaba.smk"
 include: "rules/svdb.smk"
 
 include: "rules/verifybamid2.smk"
