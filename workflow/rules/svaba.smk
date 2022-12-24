@@ -29,7 +29,7 @@ rule svaba_run:
         "../envs/svaba.yaml"
     threads: 8
     resources:
-        mem_mb="16000",
+        mem_mb="32000",
         qname="large",
     shell:
         "svaba run -p {threads} -G {input.bwa_fasta} -I -L 6 -t {input.bam} -a {params.outprefix}"
