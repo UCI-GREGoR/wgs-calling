@@ -4,7 +4,7 @@ rule duphold_run:
     """
     input:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bam.bai",
+        bai="results/bqsr/{projectid}/{sampleid}.bai",
         snv_vcf=expand(
             "results/{caller}/{{projectid}}/{{sampleid}}.sorted.vcf.gz",
             caller=config["behaviors"]["snv-caller"],

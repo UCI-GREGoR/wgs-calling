@@ -4,7 +4,7 @@ rule run_alignstats:
     """
     input:
         bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bam.bai",
+        bai="results/bqsr/{fileprefix}.bai",
     output:
         json="results/alignstats/{fileprefix}.bwa2a.alignstats.json",
     benchmark:

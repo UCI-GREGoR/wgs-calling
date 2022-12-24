@@ -5,7 +5,7 @@ rule deepvariant_make_examples:
     """
     input:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bam.bai",
+        bai="results/bqsr/{projectid}/{sampleid}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         intervals="results/deepvariant/split_ranges/{splitnum}.ssv",

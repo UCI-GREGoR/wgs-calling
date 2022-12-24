@@ -87,7 +87,7 @@ rule picard_collectmultiplemetrics:
     """
     input:
         bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bam.bai",
+        bai="results/bqsr/{fileprefix}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
@@ -149,7 +149,7 @@ rule picard_collectgcbiasmetrics:
     """
     input:
         bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bam.bai",
+        bai="results/bqsr/{fileprefix}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
@@ -186,7 +186,7 @@ rule picard_collectwgsmetrics:
     """
     input:
         bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bam.bai",
+        bai="results/bqsr/{fileprefix}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),

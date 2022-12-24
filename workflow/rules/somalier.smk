@@ -4,7 +4,7 @@ rule somalier_extract:
     """
     input:
         bam="results/bqsr/{projectid}/{fileprefix}.bam",
-        bai="results/bqsr/{projectid}/{fileprefix}.bam.bai",
+        bai="results/bqsr/{projectid}/{fileprefix}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
