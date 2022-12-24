@@ -4,7 +4,7 @@ rule svaba_run:
     """
     input:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
-        bai="results/aligned/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
+        bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
         bwa_fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         bwa_other_files=expand(
             "reference_data/references/{genome}/ref.fasta.{suffix}",
@@ -42,9 +42,9 @@ rule svaba_select_output_variants:
     certain how this should be handled
     """
     input:
-        "results/svaba/{projectid}/{sampleid}.svaba.unfiltered.sv.vcf",
+        vcf="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.sv.vcf",
     output:
-        "results/svaba/{projectid}/{sampleid}.svaba.vcf.gz",
+        vcf="results/svaba/{projectid}/{sampleid}.svaba.vcf.gz",
     params:
         tmpdir="temp",
     benchmark:
@@ -55,4 +55,4 @@ rule svaba_select_output_variants:
         qname="small",
     shell:
         "mkdir -p {params.tmpdir} && "
-        "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf}"
+        "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf} {input.vcf}"
