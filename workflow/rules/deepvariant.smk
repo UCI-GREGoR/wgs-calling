@@ -4,8 +4,8 @@ rule deepvariant_make_examples:
     embarrassingly parallel fashion.
     """
     input:
-        bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
-        bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
+        bam="results/bqsr/{projectid}/{sampleid}.bam",
+        bai="results/bqsr/{projectid}/{sampleid}.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         intervals="results/deepvariant/split_ranges/{splitnum}.ssv",
