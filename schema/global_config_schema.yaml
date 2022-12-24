@@ -24,6 +24,9 @@ properties:
         items:
           type: string
           pattern: "^manta$|^tiddit$"
+      sv-ensemble-min-count:
+        type: integer
+        min: 1
       outcome:
         type: string
         pattern: "^fastqc$|^alignment$|^calling$"
@@ -37,6 +40,8 @@ properties:
     required:
       - aligner
       - snv-caller
+      - sv-callers
+      - sv-ensemble-min-count
       - outcome
       - symlink-fastqs
       - trim-adapters-before-alignment
