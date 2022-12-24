@@ -35,9 +35,14 @@ rule ensemble_sv_vcf:
     output:
         "results/final/{projectid}/{sampleid}.sv.vcf.gz",
     params:
-        bcftools_filter="|".join(
-            [".*" for i in range(config["behaviors"]["sv-ensemble-min-count"])]
-        ),
+        bcftools_filter_count="INFO/svdb_origin ~ '"
+        + "|".join([".*" for i in range(config["behaviors"]["sv-ensemble"]["min-count"])])
+        + "'",
+        bcftools_filter_sources=" & INFO/svdb_origin ~ '"
+        + "' & INFO/svdb_origin ~ '".join(config["behaviors"]["sv-ensemble"]["required-callers"])
+        + "'"
+        if "required-callers" in config["behaviors"]["sv-ensemble"]
+        else "",
     benchmark:
         "results/performance_benchmarks/ensemble_sv_vcf/{projectid}/{sampleid}.tsv"
     conda:
@@ -47,4 +52,4 @@ rule ensemble_sv_vcf:
         mem_mb="2000",
         qname="small",
     shell:
-        "bcftools filter -i \"INFO/svdb_origin ~ '{params.bcftools_filter}' \" -O z -o {output} {input}"
+        'bcftools filter -i "{params.bcftools_filter_count} {params.bcftools_filter_sources}" -O z -o {output} {input}'
