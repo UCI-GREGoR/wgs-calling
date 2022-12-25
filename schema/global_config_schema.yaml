@@ -23,7 +23,7 @@ properties:
         type: array
         items:
           type: string
-          pattern: "^delly$|^manta$|^tiddit$|^svaba$"
+          pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
       sv-ensemble:
         type: object
         properties:
@@ -34,7 +34,7 @@ properties:
             type: array
             items:
               type: string
-              pattern: "^delly$|^manta$|^tiddit$|^svaba$"
+              pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
         required:
           - min-count
         additionalProperties: no
@@ -185,6 +185,17 @@ properties:
         additionalProperties: no
     required:
       - grch37
+  lumpy:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          exclude-bed:
+            type: string
+        required:
+          - exclude-bed
+        additionalProperties: no
 required:
   - manifest
   - multiqc-read-config
@@ -197,4 +208,5 @@ required:
   - verifybamid2
   - octopus
   - deepvariant
+  - lumpy
 additionalProperties: no

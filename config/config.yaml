@@ -11,6 +11,7 @@ behaviors:
   snv-caller: "deepvariant"
   sv-callers:
     - "delly"
+    - "lumpy"
     - "manta"
     - "tiddit"
     - "svaba"
@@ -61,3 +62,8 @@ octopus:
 deepvariant:
   grch37:
     calling-ranges: "resources/deepvariant_calling_ranges.tsv"
+lumpy:
+  grch37:
+    exclude-bed: "https://github.com/hall-lab/speedseq/blob/master/annotations/ceph18.b37.lumpy.exclude.2014-01-15.bed"
+  grch38:
+    exclude-bed: "https://github.com/hall-lab/speedseq/blob/master/annotations/exclude.cnvnator_100bp.GRCh38.20170403.bed"
