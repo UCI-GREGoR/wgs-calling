@@ -8,7 +8,7 @@ rule delly_run:
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
-        vcf="results/delly/{projectid}/{sampleid}.vcf.gz",
+        vcf="results/delly/{projectid}/{sampleid}.delly.vcf.gz",
     conda:
         "../envs/delly.smk"
     benchmark:
