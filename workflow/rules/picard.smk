@@ -1,11 +1,15 @@
 rule create_sequence_dictionary:
     """
     For a reference fasta, create a sequence dictionary (.dict extension)
+
+    Because GATK/bqsr is ridiculous, make two copies of the dict, so it's always available
+    no matter how the downstream tool thinks it should be named.
     """
     input:
         "{prefix}fasta",
     output:
-        "{prefix}fasta.dict",
+        standard="{prefix}fasta.dict",
+        modified="{prefix}dict",
     benchmark:
         "results/performance_benchmarks/create_sequence_dictionary/{prefix}fasta.tsv"
     params:
@@ -22,8 +26,9 @@ rule create_sequence_dictionary:
         "mkdir -p temp/ && "
         'gatk --java-options "{params.java_args}" CreateSequenceDictionary '
         "-REFERENCE {input} "
-        "-OUTPUT {output} "
-        "--TMP_DIR {params.tmpdir}"
+        "-OUTPUT {output.standard} "
+        "--TMP_DIR {params.tmpdir} && "
+        "cp {output.standard} {output.modified}"
 
 
 rule mark_duplicates:
@@ -120,7 +125,7 @@ rule picard_collectmultiplemetrics:
     """
     input:
         bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bam.bai",
+        bai="results/bqsr/{fileprefix}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
@@ -182,7 +187,7 @@ rule picard_collectgcbiasmetrics:
     """
     input:
         bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bam.bai",
+        bai="results/bqsr/{fileprefix}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
@@ -219,7 +224,7 @@ rule picard_collectwgsmetrics:
     """
     input:
         bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bam.bai",
+        bai="results/bqsr/{fileprefix}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),

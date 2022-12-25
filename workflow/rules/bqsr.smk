@@ -7,26 +7,28 @@ rule bqsr_base_recalibrator:
         bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         index_files=expand(
-            "reference_data/references/{genome}/ref.fasta.{suffix}",
+            "reference_data/references/{genome}/ref.{suffix}",
             genome=reference_build,
-            suffix=["dict", "fai"],
+            suffix=["dict", "fasta.fai"],
         ),
         known_indels="reference_data/bqsr/{}/ref.known.indels.vcf.gz".format(reference_build),
-        known_indels_tbi="reference_data/bqsr/{}/ref.known.indels.tbi".format(reference_build),
+        known_indels_tbi="reference_data/bqsr/{}/ref.known.indels.vcf.gz.tbi".format(
+            reference_build
+        ),
         dbsnp138="reference_data/bqsr/{}/ref.dbsnp138.vcf".format(reference_build),
         dbsnp138_idx="reference_data/bqsr/{}/ref.dbsnp138.vcf.idx".format(reference_build),
     output:
         table="results/bqsr/{projectid}/{sampleid}.recal_table",
     params:
         tmpdir="temp",
-        java_args="-Xmx4000m -XX:+UseParallelGC -XX:ParallelGCThreads=16",
+        java_args="-Xmx8000m -XX:+UseParallelGC -XX:ParallelGCThreads=2",
     benchmark:
         "results/performance_benchmarks/bqsr_base_recalibrator/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/gatk4.yaml"
-    threads: 20
+    threads: 2
     resources:
-        mem_mb="8000",
+        mem_mb="16000",
         qname="large",
     shell:
         "mkdir -p {params.tmpdir} && "
@@ -73,5 +75,5 @@ rule bqsr_apply_bqsr:
         "--tmp-dir {params.tmpdir} "
         "-R {input.fasta} "
         "-I {input.bam} "
-        "--bqsr-recal-table {input.table} "
+        "--bqsr-recal-file {input.table} "
         "-O {output.bam}"
