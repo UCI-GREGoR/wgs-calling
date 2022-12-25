@@ -3,10 +3,10 @@ rule run_alignstats:
     Run alignstats utility on post-markdups bams
     """
     input:
-        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/bqsr/{fileprefix}.bam",
+        bai="results/bqsr/{fileprefix}.bai",
     output:
-        json="results/alignstats/{fileprefix}.bwa2a.alignstats.json",
+        json="results/alignstats/{fileprefix}.alignstats.json",
     benchmark:
         "results/performance_benchmarks/run_alignstats/{fileprefix}.tsv"
     params:

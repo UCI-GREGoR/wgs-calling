@@ -15,7 +15,7 @@ properties:
     properties:
       aligner:
         type: string
-        pattern: "^bwa-mem2$"
+        pattern: "^bwa-mem2$|^bwa$"
       snv-caller:
         type: string
         pattern: "^octopus$|^deepvariant$"
@@ -23,7 +23,7 @@ properties:
         type: array
         items:
           type: string
-          pattern: "^manta$|^tiddit$"
+          pattern: "^manta$|^tiddit$|^svaba$"
       sv-ensemble:
         type: object
         properties:
@@ -34,7 +34,7 @@ properties:
             type: array
             items:
               type: string
-              pattern: "^manta$|^tiddit$"
+              pattern: "^manta$|^tiddit$|^svaba$"
         required:
           - min-count
         additionalProperties: no
@@ -91,6 +91,26 @@ properties:
         additionalProperties: no
     required:
       - grch37
+  bqsr:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          known-indels-vcf-gz:
+            type: string
+          known-indels-vcf-gz-tbi:
+            type: string
+          dbsnp138-vcf:
+            type: string
+          dbsnp138-vcf-idx:
+            type: string
+        required:
+          - known-indels-vcf-gz
+          - known-indels-vcf-gz-tbi
+          - dbsnp138-vcf
+          - dbsnp138-vcf-idx
+        additionalProperties: no
   dnascope:
     type: object
     patternProperties:
@@ -172,6 +192,7 @@ required:
   - genome-build
   - behaviors
   - references
+  - bqsr
   - dnascope
   - verifybamid2
   - octopus

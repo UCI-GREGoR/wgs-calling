@@ -3,8 +3,8 @@ rule estimate_contamination:
     Use verifybamid2 to estimate contamination in samples
     """
     input:
-        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/bqsr/{fileprefix}.bam",
+        bai="results/bqsr/{fileprefix}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         db_files=expand(
             "reference_data/verifybamid2/{genome}/ref.db.{suffix}",

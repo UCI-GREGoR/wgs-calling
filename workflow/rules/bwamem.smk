@@ -29,18 +29,22 @@ rule bwa_index:
         index_files=expand(
             "reference_data/references/{genome}/ref.fasta.{suffix}",
             genome=reference_build,
-            suffix=["amb", "ann", "bwt.2bit.64", "pac"],
+            suffix=bwa_ref_suffixes,
         ),
+    params:
+        exec_name=config["behaviors"]["aligner"],
     benchmark:
         "results/performance_benchmarks/bwa_index/{}/ref.fasta.tsv".format(reference_build)
     conda:
-        "../envs/bwamem2.yaml"
+        "../envs/bwamem2.yaml" if (
+        config["behaviors"]["aligner"] == "bwa-mem2"
+        ) else "../envs/bwamem.yaml"
     threads: 1
     resources:
         mem_mb="64000",
         qname="small",
     shell:
-        "bwa-mem2 index {input.fasta}"
+        "{params.exec_name} index {input.fasta}"
 
 
 rule bwa_map_and_sort:
@@ -58,23 +62,24 @@ rule bwa_map_and_sort:
         bwa_other_files=expand(
             "reference_data/references/{genome}/ref.fasta.{suffix}",
             genome=reference_build,
-            suffix=["ann", "amb", "bwt.2bit.64", "fai", "pac"],
+            suffix=bwa_ref_suffixes + ["fai"],
         ),
     output:
-        bam="results/bwa-mem2/{projectid}/{sampleid}_{lane}.bwa2a.bam",
-        bai="results/bwa-mem2/{projectid}/{sampleid}_{lane}.bwa2a.bam.bai",
+        bam="results/aligned/{projectid}/{sampleid}_{lane}.bam",
+        bai="results/aligned/{projectid}/{sampleid}_{lane}.bam.bai",
     benchmark:
         "results/performance_benchmarks/bwa_map_and_sort/{projectid}/{sampleid}_{lane}.tsv"
     params:
+        exec_name=config["behaviors"]["aligner"],
         K="1000000",
-        k="19",
-        softclip_alts="",
         readgroup=lambda wildcards: "@RG\\tID:{}\\tSM:{}\\tLB:{}\\tPL:{}\\tPU:{}".format(
             "RG1", wildcards.sampleid, wildcards.sampleid, "Illumina", wildcards.sampleid
         ),
         tmpdir="temp",
     conda:
-        "../envs/bwamem2.yaml"
+        "../envs/bwamem2.yaml" if (
+        config["behaviors"]["aligner"] == "bwa-mem2"
+        ) else "../envs/bwamem.yaml"
     threads: 12
     resources:
         mem_mb="500000",
@@ -82,7 +87,6 @@ rule bwa_map_and_sort:
         tmpdir="temp",
     shell:
         "mkdir -p {params.tmpdir} && "
-        'bwa-mem2 mem -t {threads} -Y -R "{params.readgroup}" {params.softclip_alts} '
+        '{params.exec_name} mem -t {threads} -Y -R "{params.readgroup}" -K {params.K} '
         "{input.bwa_fasta} {input.fastq1} {input.fastq2} | "
-        "samtools fixmate -@ {threads} -u -m - - | "
         "samtools sort -l 1 -m 4G -@ {threads} -T ${{TMPDIR}} -O BAM --write-index -o {output.bam}##idx##{output.bai}"
