@@ -83,7 +83,7 @@ properties:
         properties:
           known-indels-vcf-gz:
             type: string
-          known-indels-tbi:
+          known-indels-vcf-gz-tbi:
             type: string
           dbsnp138-vcf:
             type: string
@@ -91,7 +91,7 @@ properties:
             type: string
         required:
           - known-indels-vcf-gz
-          - known-indels-tbi
+          - known-indels-vcf-gz-tbi
           - dbsnp138-vcf
           - dbsnp138-vcf-idx
         additionalProperties: no
