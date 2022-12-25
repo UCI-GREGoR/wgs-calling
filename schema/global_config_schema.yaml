@@ -23,7 +23,7 @@ properties:
         type: array
         items:
           type: string
-          pattern: "^manta$|^tiddit$|^svaba$"
+          pattern: "^delly$|^manta$|^tiddit$|^svaba$"
       sv-ensemble:
         type: object
         properties:
@@ -34,7 +34,7 @@ properties:
             type: array
             items:
               type: string
-              pattern: "^manta$|^tiddit$|^svaba$"
+              pattern: "^delly$|^manta$|^tiddit$|^svaba$"
         required:
           - min-count
         additionalProperties: no

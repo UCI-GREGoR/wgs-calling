@@ -10,6 +10,7 @@ behaviors:
   aligner: "bwa"
   snv-caller: "deepvariant"
   sv-callers:
+    - "delly"
     - "manta"
     - "tiddit"
     - "svaba"
