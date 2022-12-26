@@ -7,6 +7,7 @@ rule manta_configure:
         bai="results/bqsr/{projectid}/{sampleid}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
+        manta_config=config["parameters"]["manta"]["config-ini"],
     output:
         temp("temp/manta_workdir/{projectid}/{sampleid}/runWorkflow.py"),
     benchmark:
@@ -23,7 +24,7 @@ rule manta_configure:
             wildcards.projectid, wildcards.sampleid
         ),
     shell:
-        "configManta.py --bam {input.bam} --reference {input.fasta} --runDir {params.tmpdir}"
+        "configManta.py --config {input.manta_config} --bam {input.bam} --reference {input.fasta} --runDir {params.tmpdir}"
 
 
 rule manta_run:

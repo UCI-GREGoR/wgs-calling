@@ -20,6 +20,8 @@ parameters:
   deepvariant:
     number-shards: 16
     docker-version: "1.4.0"
+  manta:
+    config-ini: "config/configManta.py.ini"
 
 references:
   grch37:
