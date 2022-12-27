@@ -69,6 +69,12 @@ if config["behaviors"]["outcome"] == "calling":
             tc.construct_sv_targets(manifest),
         ]
     )
+    TARGETS.append(
+        expand(
+            "results/reports/{projectid}/sv_caller_comparison.html",
+            projectid=list(set(manifest["projectid"])),
+        )
+    )
 
 
 ## To deal with the fact that s3 remote provider service is very slow
@@ -95,6 +101,7 @@ include: "rules/bwamem.smk"
 include: "rules/deepvariant.smk"
 include: "rules/delly.smk"
 include: "rules/duphold.smk"
+include: "rules/ensemble_sv_calling.smk"
 include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
 include: "rules/lumpy.smk"
