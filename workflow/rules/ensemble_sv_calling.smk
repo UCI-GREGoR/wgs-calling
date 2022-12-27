@@ -19,6 +19,8 @@ rule compare_sv_callers:
         r_resources="workflow/scripts/compare_sv_callers.R",
     output:
         "results/reports/{projectid}/sv_caller_comparison.html",
+    params:
+        sv_callers=config["behaviors"]["sv-callers"],
     conda:
         "../envs/r.yaml"
     threads: 1

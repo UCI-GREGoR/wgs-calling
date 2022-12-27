@@ -16,7 +16,9 @@ output:
 
 ```{r link.variables, eval=TRUE, echo=FALSE}
 #### Link input parameters to local variables
+sv.source.data <- snakemake@input[["sv_source_data"]]
 source.file <- snakemake@input[["r_resources"]]
+sv.callers <- snakemake@params[["sv_callers"]]
 ```
 
 ```{r load.packages, eval=TRUE, echo=FALSE}
@@ -25,6 +27,7 @@ suppressPackageStartupMessages(library(ggplot2, quietly = TRUE))
 suppressPackageStartupMessages(library(RColorBrewer, quietly = TRUE))
 suppressPackageStartupMessages(library(knitr, quietly = TRUE))
 suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
+suppressPackageStartupMessages(library(UpSetR, quietly = TRUE))
 ```
 
 ***
@@ -35,13 +38,19 @@ suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
 source(source.file)
 ```
 
-```{r aggregate.data, eval=TRUE, echo=FALSE}
+```{r load.data, eval=TRUE, echo=FALSE}
+sv.data <- load.data(sv.source.data, sv.callers)
 ```
 
-## Benchmarking Results, by Rule
+```{r get.upset.list, eval=TRUE, echo=FALSE}
+upset.list <- generate.upset.list(sv.data, sv.callers)
+```
+
+## SV Calling Overlap
 
 
-```{r report.data, eval=TRUE, echo=FALSE, results="asis"}
+```{r plot.upset, eval=TRUE, echo=FALSE, results="asis"}
+upset(fromList(upset.list), order.by = "freq")
 ```
 
 
