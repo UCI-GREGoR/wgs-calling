@@ -1,0 +1,14 @@
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - smoove
+  - lumpy-sv
+  - bcftools
+  - samtools
+  - gsort
+  - tabix
+  - svtyper
+  - svtools
+  - mosdepth
+  - duphold
