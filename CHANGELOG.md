@@ -3,6 +3,16 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- support for [delly](https://github.com/dellytools/delly)
+- support for [lumpy](https://github.com/arq5x/lumpy-sv)
+  - lumpy's own repo recommends using [smoove](https://github.com/brentp/smoove) to actually run lumpy, and so that's recapitulated here
+- ensemble SV calling
+  - variants are still merged with svdb, but additional filters are applied to select out subsets of variants based on how many/which callers detected them
+
 ## [0.2.0] - DeepVariant
 
 First support for DeepVariant.
