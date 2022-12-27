@@ -4,7 +4,7 @@ rule duphold_run:
     """
     input:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bam.bai",
+        bai="results/bqsr/{projectid}/{sampleid}.bai",
         snv_vcf=expand(
             "results/{caller}/{{projectid}}/{{sampleid}}.sorted.vcf.gz",
             caller=config["behaviors"]["snv-caller"],
@@ -18,7 +18,7 @@ rule duphold_run:
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
-        bcf=temp("results/{toolname}/{projectid}/{sampleid}.duphold-annotated.bcf"),
+        bcf=temp("results/{toolname}/{projectid}/{sampleid}.{toolname}.duphold-annotated.bcf"),
     benchmark:
         "results/performance_benchmarks/duphold_run/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
@@ -36,9 +36,9 @@ rule duphold_apply:
     After running duphold, actually use the filters to get a (hopefully) cleaner dataset
     """
     input:
-        bcf="results/{toolname}/{projectid}/{sampleid}.duphold-annotated.bcf",
+        bcf="results/{toolname}/{projectid}/{sampleid}.{toolname}.duphold-annotated.bcf",
     output:
-        vcf="results/{toolname}/{projectid}/{sampleid}.duphold-filtered.vcf.gz",
+        vcf="results/{toolname}/{projectid}/{sampleid}.{toolname}.duphold-filtered.vcf.gz",
     benchmark:
         "results/performance_benchmarks/duphold_apply/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
@@ -48,5 +48,8 @@ rule duphold_apply:
         mem_mb="4000",
         qname="small",
     shell:
-        'bcftools view -i \'FILTER = "PASS" & (SVTYPE = "DEL" & FMT/DHFFC[0] < 0.7) | (SVTYPE = "DUP" & FMT/DHBFC[0] > 1.3)\' '
+        'bcftools view -i \'FILTER = "PASS" & '
+        '((FMT/DHFFC[0] = ".") | '
+        ' (SVTYPE = "DEL" & FMT/DHFFC[0] < 0.7) | '
+        ' (SVTYPE != "DEL" & FMT/DHBFC[0] > 1.3)) \' '
         "--threads {threads} -O z -o {output.vcf} {input.bcf}"

@@ -27,7 +27,7 @@ def test_map_fastq_from_project_and_sample(
     config["behaviors"]["trim-adapters-before-alignment"] = use_trimmed
     ## with trimming, the target should be fastp output; otherwise, it's the fastq input symlink or copy
     if use_trimmed is True:
-        expected = "results/fastp/PROJ1/SAM2_{}_{}_fastp.fastq".format(
+        expected = "results/fastp/PROJ1/SAM2_{}_{}_fastp.fastq.gz".format(
             wildcards_with_lane.lane, readname
         )
     else:

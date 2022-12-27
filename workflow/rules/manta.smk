@@ -4,7 +4,7 @@ rule manta_configure:
     """
     input:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bam.bai",
+        bai="results/bqsr/{projectid}/{sampleid}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
@@ -32,7 +32,7 @@ rule manta_run:
     """
     input:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bam.bai",
+        bai="results/bqsr/{projectid}/{sampleid}.bai",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         script="temp/manta_workdir/{projectid}/{sampleid}/runWorkflow.py",

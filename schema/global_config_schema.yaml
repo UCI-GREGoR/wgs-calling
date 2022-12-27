@@ -23,7 +23,21 @@ properties:
         type: array
         items:
           type: string
-          pattern: "^manta$|^tiddit$|^svaba$"
+          pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
+      sv-ensemble:
+        type: object
+        properties:
+          min-count:
+            type: integer
+            min: 1
+          required-callers:
+            type: array
+            items:
+              type: string
+              pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
+        required:
+          - min-count
+        additionalProperties: no
       outcome:
         type: string
         pattern: "^fastqc$|^alignment$|^calling$"
@@ -37,6 +51,8 @@ properties:
     required:
       - aligner
       - snv-caller
+      - sv-callers
+      - sv-ensemble
       - outcome
       - symlink-fastqs
       - trim-adapters-before-alignment
@@ -83,7 +99,7 @@ properties:
         properties:
           known-indels-vcf-gz:
             type: string
-          known-indels-tbi:
+          known-indels-vcf-gz-tbi:
             type: string
           dbsnp138-vcf:
             type: string
@@ -91,7 +107,7 @@ properties:
             type: string
         required:
           - known-indels-vcf-gz
-          - known-indels-tbi
+          - known-indels-vcf-gz-tbi
           - dbsnp138-vcf
           - dbsnp138-vcf-idx
         additionalProperties: no
@@ -169,6 +185,17 @@ properties:
         additionalProperties: no
     required:
       - grch37
+  lumpy:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          exclude-bed:
+            type: string
+        required:
+          - exclude-bed
+        additionalProperties: no
 required:
   - manifest
   - multiqc-read-config
@@ -181,4 +208,5 @@ required:
   - verifybamid2
   - octopus
   - deepvariant
+  - lumpy
 additionalProperties: no

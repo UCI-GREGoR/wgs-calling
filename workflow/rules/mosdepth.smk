@@ -7,7 +7,7 @@ rule run_mosdepth:
     """
     input:
         bam="results/bqsr/{projectid}/{prefix}.bam",
-        bai="results/bqsr/{projectid}/{prefix}.bam.bai",
+        bai="results/bqsr/{projectid}/{prefix}.bai",
     output:
         assorted_files=expand(
             "results/mosdepth/{{projectid}}/{{prefix}}.{suffix}",
