@@ -1,0 +1,56 @@
+---
+title: "SV Caller Consistency Report"
+output:
+  html_document:
+    code_folding: hide
+    md_extensions: "-fancy_lists -emoji"
+    highlight: tango
+    number_sections: no
+    theme: default
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+
+```{r link.variables, eval=TRUE, echo=FALSE}
+#### Link input parameters to local variables
+source.file <- snakemake@input[["r_resources"]]
+```
+
+```{r load.packages, eval=TRUE, echo=FALSE}
+#### Load required R packages
+suppressPackageStartupMessages(library(ggplot2, quietly = TRUE))
+suppressPackageStartupMessages(library(RColorBrewer, quietly = TRUE))
+suppressPackageStartupMessages(library(knitr, quietly = TRUE))
+suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
+```
+
+***
+<br>
+
+```{r load.source, eval=TRUE, echo=FALSE}
+#### Load source functions in separate, testable file
+source(source.file)
+```
+
+```{r aggregate.data, eval=TRUE, echo=FALSE}
+```
+
+## Benchmarking Results, by Rule
+
+
+```{r report.data, eval=TRUE, echo=FALSE, results="asis"}
+```
+
+
+#### Session Information
+
+<br>
+
+The following summarizes the loaded R configuration for the run that created this report.
+
+```{r session.info, eval=TRUE, echo=TRUE}
+sessionInfo()
+```
