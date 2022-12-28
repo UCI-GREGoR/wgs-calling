@@ -8,3 +8,4 @@ dependencies:
   - r-rcolorbrewer
   - r-rmarkdown
   - r-kableextra
+  - r-upsetr
