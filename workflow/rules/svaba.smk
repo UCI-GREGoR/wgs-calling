@@ -14,7 +14,7 @@ rule svaba_run:
     output:
         bps="results/svaba/{projectid}/{sampleid}.svaba.bps.txt.gz",
         contigs="results/svaba/{projectid}/{sampleid}.svaba.contigs.bam",
-        discordants="results/svaba/{projectid}/{sampleid}.svaba.discordants.txt.gz",
+        discordants="results/svaba/{projectid}/{sampleid}.discordant.txt.gz",
         log="results/svaba/{projectid}/{sampleid}.svaba.log",
         alignments="results/svaba/{projectid}/{sampleid}.svaba.alignments.txt.gz",
         vcf_indel_unfiltered="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.indel.vcf",
@@ -24,7 +24,7 @@ rule svaba_run:
     benchmark:
         "results/performance_benchmarks/svaba_run/{projectid}/{sampleid}.svaba.tsv"
     params:
-        outprefix="results/svaba/{projectid}/{sampleid}.svaba",
+        outprefix="results/svaba/{projectid}/{sampleid}",
     conda:
         "../envs/svaba.yaml"
     threads: 8
