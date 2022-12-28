@@ -19,7 +19,7 @@ rule lumpy_run:
     threads: 2
     resources:
         mem_mb="16000",
-        qname="dev",
+        qname="large",
     shell:
         "smoove call --outdir {params.outdir} --exclude {input.bed} --name {wildcards.sampleid} --fasta {input.fasta} -p 1 --genotype {input.bam} && "
         "mv {params.outdir}/{wildcards.sampleid}-smoove.genotyped.vcf.gz {output.vcf}"
