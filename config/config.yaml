@@ -7,14 +7,21 @@ multiqc-alignment-config: "config/multiqc_alignment_config.yaml"
 genome-build: "grch37"
 
 behaviors:
-  aligner: "bwa-mem2"
+  aligner: "bwa"
   snv-caller: "deepvariant"
   sv-callers:
+    - "delly"
+    - "lumpy"
     - "manta"
     - "tiddit"
+    - "svaba"
+  sv-ensemble:
+    min-count: 2
+    required-callers:
+      - "manta"
   outcome: "calling"
   symlink-fastqs: yes
-  trim-adapters-before-alignment: "legacy"
+  trim-adapters-before-alignment: no
 
 parameters:
   deepvariant:
@@ -57,3 +64,8 @@ octopus:
 deepvariant:
   grch37:
     calling-ranges: "resources/deepvariant_calling_ranges.tsv"
+lumpy:
+  grch37:
+    exclude-bed: "https://github.com/hall-lab/speedseq/blob/master/annotations/ceph18.b37.lumpy.exclude.2014-01-15.bed"
+  grch38:
+    exclude-bed: "https://github.com/hall-lab/speedseq/blob/master/annotations/exclude.cnvnator_100bp.GRCh38.20170403.bed"

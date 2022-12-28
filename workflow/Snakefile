@@ -31,6 +31,12 @@ manifest = pd.read_csv(manifest, sep="\t")
 validate(manifest, "../schema/manifest_schema.yaml")
 
 reference_build = config["genome-build"]
+bwa_ref_suffixes = ["ann", "amb", "pac", "sa"]
+if config["behaviors"]["aligner"] == "bwa-mem2":
+    bwa_ref_suffixes.append("bwt.2bit.64")
+else:
+    bwa_ref_suffixes.append("bwt")
+
 caller_num_intervals = tc.caller_interval_file_count(config)
 
 TARGETS = [
@@ -85,11 +91,13 @@ rule all:
 include: "rules/acquire_data.smk"
 include: "rules/alignstats.smk"
 include: "rules/bqsr.smk"
-include: "rules/bwamem2.smk"
+include: "rules/bwamem.smk"
 include: "rules/deepvariant.smk"
+include: "rules/delly.smk"
 include: "rules/duphold.smk"
 include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
+include: "rules/lumpy.smk"
 include: "rules/manta.smk"
 include: "rules/mosdepth.smk"
 include: "rules/multiqc.smk"
@@ -98,6 +106,7 @@ include: "rules/performance_benchmarks.smk"
 include: "rules/picard.smk"
 include: "rules/references.smk"
 include: "rules/somalier.smk"
+include: "rules/svaba.smk"
 include: "rules/svdb.smk"
 
 include: "rules/verifybamid2.smk"

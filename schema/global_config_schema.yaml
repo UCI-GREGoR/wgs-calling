@@ -15,7 +15,7 @@ properties:
     properties:
       aligner:
         type: string
-        pattern: "^bwa-mem2$"
+        pattern: "^bwa-mem2$|^bwa$"
       snv-caller:
         type: string
         pattern: "^octopus$|^deepvariant$"
@@ -23,7 +23,21 @@ properties:
         type: array
         items:
           type: string
-          pattern: "^manta$|^tiddit$"
+          pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
+      sv-ensemble:
+        type: object
+        properties:
+          min-count:
+            type: integer
+            min: 1
+          required-callers:
+            type: array
+            items:
+              type: string
+              pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
+        required:
+          - min-count
+        additionalProperties: no
       outcome:
         type: string
         pattern: "^fastqc$|^alignment$|^calling$"
@@ -37,6 +51,8 @@ properties:
     required:
       - aligner
       - snv-caller
+      - sv-callers
+      - sv-ensemble
       - outcome
       - symlink-fastqs
       - trim-adapters-before-alignment
@@ -178,6 +194,17 @@ properties:
         additionalProperties: no
     required:
       - grch37
+  lumpy:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          exclude-bed:
+            type: string
+        required:
+          - exclude-bed
+        additionalProperties: no
 required:
   - manifest
   - multiqc-read-config
@@ -190,4 +217,5 @@ required:
   - verifybamid2
   - octopus
   - deepvariant
+  - lumpy
 additionalProperties: no

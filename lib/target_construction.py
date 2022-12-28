@@ -53,9 +53,7 @@ def get_bams_by_lane(
     result = manifest.query(query)
     available_lanes = result["lane"]
     result = [
-        "results/{}/{}/{}_{}.{}".format(
-            config["behaviors"]["aligner"], wildcards.projectid, wildcards.sampleid, x, suffix
-        )
+        "results/aligned/{}/{}_{}.{}".format(wildcards.projectid, wildcards.sampleid, x, suffix)
         for x in available_lanes
     ]
     return result
@@ -91,7 +89,7 @@ def construct_alignstats_targets(wildcards: Namedlist, manifest: pd.DataFrame) -
     a run of alignstats
     """
     result = [
-        "results/alignstats/{}/{}.bwa2a.alignstats.json".format(wildcards.projectid, x)
+        "results/alignstats/{}/{}.alignstats.json".format(wildcards.projectid, x)
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
     ]
     return list(set(result))
