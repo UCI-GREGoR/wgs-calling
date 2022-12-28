@@ -72,8 +72,17 @@ properties:
           - number-shards
           - docker-version
         additionalProperties: no
+      manta:
+        type: object
+        properties:
+          config-ini:
+            type: string
+        required:
+          - config-ini
+        additionalProperties: no
     required:
       - deepvariant
+      - manta
     additionalProperties: no
   references:
     type: object
