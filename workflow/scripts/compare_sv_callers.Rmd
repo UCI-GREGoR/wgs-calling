@@ -53,8 +53,24 @@ upset.list <- generate.upset.list(sv.data, sv.callers)
 upset(fromList(upset.list), order.by = "freq")
 ```
 
+***
+<br>
 
-#### Session Information
+## SV Data by Tool
+
+```{r emit.tool.specific.data, eval=TRUE, echo=FALSE, results="asis"}
+barplot.input <- generate.barplot.input(sv.data, sv.callers)
+for (sv.caller in sv.callers) {
+  cat("\n\n### ", sv.caller, "\n\n", sep = "")
+  print(get.tool.variant.barplot(barplot.input, sv.caller))
+  cat("\n\n***\n<br>\n\n")
+}
+```
+
+***
+<br>
+
+## Session Information
 
 <br>
 
