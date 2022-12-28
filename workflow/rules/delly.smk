@@ -10,7 +10,7 @@ rule delly_run:
     output:
         vcf="results/delly/{projectid}/{sampleid}.delly.vcf.gz",
     conda:
-        "../envs/delly.smk"
+        "../envs/delly.yaml"
     benchmark:
         "results/performance_benchmarks/delly_run/{projectid}/{sampleid}.tsv"
     threads: 1
