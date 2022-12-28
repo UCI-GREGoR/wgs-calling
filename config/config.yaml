@@ -66,6 +66,6 @@ deepvariant:
     calling-ranges: "resources/deepvariant_calling_ranges.tsv"
 lumpy:
   grch37:
-    exclude-bed: "https://github.com/hall-lab/speedseq/blob/master/annotations/ceph18.b37.lumpy.exclude.2014-01-15.bed"
+    exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/ceph18.b37.lumpy.exclude.2014-01-15.bed"
   grch38:
-    exclude-bed: "https://github.com/hall-lab/speedseq/blob/master/annotations/exclude.cnvnator_100bp.GRCh38.20170403.bed"
+    exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/exclude.cnvnator_100bp.GRCh38.20170403.bed"
