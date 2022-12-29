@@ -48,7 +48,7 @@ rule duphold_apply:
         mem_mb="4000",
         qname="small",
     shell:
-        'bcftools view -i \'FILTER = "PASS" & '
+        'bcftools view -i \'(FILTER = "PASS" | FILTER = ".") & '
         '((FMT/DHFFC[0] = ".") | '
         ' (SVTYPE = "DEL" & FMT/DHFFC[0] < 0.7) | '
         ' (SVTYPE != "DEL" & FMT/DHBFC[0] > 1.3)) \' '
