@@ -49,6 +49,8 @@ rule svaba_select_output_variants:
         tmpdir="temp",
     benchmark:
         "results/performance_benchmarks/svaba_select_output_variants/{projectid}/{sampleid}.svaba.tsv"
+    conda:
+        "../envs/bcftools.yaml"
     threads: 4
     resources:
         mem_mb="16000",
