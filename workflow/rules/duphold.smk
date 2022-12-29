@@ -28,7 +28,7 @@ rule duphold_run:
         mem_mb="8000",
         qname="small",
     shell:
-        "duphold -s {input.snv_vcf} -t {threads} -v {input.sv_vcf} -b {input.bam} -f {input.fasta} -o {output.bcf}"
+        "DUPHOLD_SAMPLE_NAME={wildcards.sampleid} duphold -s {input.snv_vcf} -t {threads} -v {input.sv_vcf} -b {input.bam} -f {input.fasta} -o {output.bcf}"
 
 
 rule duphold_apply:
