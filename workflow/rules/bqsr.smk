@@ -5,9 +5,12 @@ rule bqsr_base_recalibrator:
     input:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
         bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
         index_files=expand(
-            "reference_data/references/{genome}/ref.{suffix}",
+            "reference_data/{aligner}/{genome}/ref.{suffix}",
+            aligner=config["behaviors"]["aligner"],
             genome=reference_build,
             suffix=["dict", "fasta.fai"],
         ),
@@ -48,9 +51,12 @@ rule bqsr_apply_bqsr:
     input:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
         bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
         index_files=expand(
-            "reference_data/references/{genome}/ref.fasta.{suffix}",
+            "reference_data/{aligner}/{genome}/ref.fasta.{suffix}",
+            aligner=config["behaviors"]["aligner"],
             genome=reference_build,
             suffix=["dict", "fai"],
         ),

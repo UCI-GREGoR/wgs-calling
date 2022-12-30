@@ -6,8 +6,12 @@ rule deepvariant_make_examples:
     input:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
         bai="results/bqsr/{projectid}/{sampleid}.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
         intervals="results/deepvariant/split_ranges/{splitnum}.ssv",
     output:
         temp(
@@ -93,8 +97,12 @@ rule deepvariant_postprocess_variants:
     """
     input:
         gz="results/deepvariant/{projectid}/call_variants/{sampleid}.{splitnum}.tfrecord.gz",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
     output:
         vcf=temp(
             "results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.vcf.gz"

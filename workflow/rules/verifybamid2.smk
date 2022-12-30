@@ -5,7 +5,9 @@ rule estimate_contamination:
     input:
         bam="results/bqsr/{fileprefix}.bam",
         bai="results/bqsr/{fileprefix}.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
         db_files=expand(
             "reference_data/verifybamid2/{genome}/ref.db.{suffix}",
             genome=reference_build,

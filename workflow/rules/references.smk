@@ -48,3 +48,21 @@ rule index_vcf:
         qname="small",
     shell:
         "tabix -p vcf {input}"
+
+
+rule adjust_fasta_formatting:
+    """
+    exclusively because of idiosyncrasies in tiddit>=3, the fasta description lines can only
+    contain the ">" character as the first character of the description line. any other instances
+    of that character will cause tiddit>=3 to crash with a very cryptic error about list indices
+    """
+    input:
+        "reference_data/references/{}/ref.fasta".format(reference_build),
+    output:
+        "reference_data/{{aligner}}/{}/ref.fasta".format(reference_build),
+    threads: 1
+    resources:
+        mem_mb="1000",
+        qname="small",
+    shell:
+        "sed 's/>/_/g' {input} | sed 's/^_/>/' > {output}"

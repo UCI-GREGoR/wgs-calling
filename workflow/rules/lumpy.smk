@@ -5,8 +5,12 @@ rule lumpy_run:
     input:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
         bai="results/bqsr/{projectid}/{sampleid}.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
         bed="reference_data/lumpy/{}/ref.exclude.bed".format(reference_build),
     output:
         vcf="results/lumpy/{projectid}/{sampleid}.lumpy.vcf.gz",
