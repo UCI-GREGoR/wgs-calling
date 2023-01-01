@@ -286,8 +286,8 @@ def describe_tiddit(config: dict) -> str:
         res = (
             "  - TIDDIT features local realignment of reads, and for this purpose calls bwa. "
             "By default,, the reference fasta has indices that are expected by bwa-mem2, specifically the "
-            "modified *.bwt.2bit.64 file, which differs from the older *.bwt file expected by traditional bwa. When the *.bwt file is absent, "
-            "TIDDIT >=3 fails with a cryptic error. Based on this observation, the *.bwt file is separately prepared whenever TIDDIT >=3 is "
+            "modified `*.bwt.2bit.64` file, which differs from the older `*.bwt` file expected by traditional bwa. When the `*.bwt` file is absent, "
+            "TIDDIT >=3 fails with a cryptic error. Based on this observation, the `*.bwt` file is separately prepared whenever TIDDIT >=3 is "
             "invoked in this version of the workflow."
         )
         all_lines.append(res)
