@@ -48,8 +48,10 @@ rule svaba_select_output_variants:
         vcf="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.sv.vcf",
     output:
         vcf="results/svaba/{projectid}/{sampleid}.svaba.vcf.gz",
+        linker=temp("results/svaba/{projectid}/{sampleid}.svaba.reheader_linker.tsv"),
     params:
         tmpdir="temp",
+        bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
     benchmark:
         "results/performance_benchmarks/svaba_select_output_variants/{projectid}/{sampleid}.svaba.tsv"
     conda:
@@ -60,4 +62,6 @@ rule svaba_select_output_variants:
         qname="small",
     shell:
         "mkdir -p {params.tmpdir} && "
-        "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf} {input.vcf}"
+        "echo -e '{params.bam}\\t{wildcards.sampleid}' > {output.linker} && "
+        "bcftools reheader -O u -s {output.linker} {input.vcf} | "
+        "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf}"
