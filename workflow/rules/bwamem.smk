@@ -9,7 +9,7 @@ rule samtools_index_fasta:
     benchmark:
         "results/performance_benchmarks/samtools_index_fasta/{prefix}fasta.fai.tsv"
     conda:
-        "../envs/bwamem2.yaml"
+        "../envs/samtools.yaml"
     threads: 1
     resources:
         mem_mb="4000",

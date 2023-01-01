@@ -90,7 +90,7 @@ rule sort_bam:
     benchmark:
         "results/performance_benchmarks/sort_bam/{prefix}.sort.bam"
     conda:
-        "../envs/bwamem2.yaml"
+        "../envs/samtools.yaml"
     threads: 4
     resources:
         mem_mb="8000",
@@ -110,7 +110,7 @@ rule samtools_create_bai:
     benchmark:
         "results/performance_benchmarks/samtools_create_bai/{prefix}.sort.tsv"
     conda:
-        "../envs/bwamem2.yaml"
+        "../envs/samtools.yaml"
     threads: 4
     resources:
         mem_mb="8000",
