@@ -105,6 +105,7 @@ include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
 include: "rules/lumpy.smk"
 include: "rules/manta.smk"
+include: "rules/methods.smk"
 include: "rules/mosdepth.smk"
 include: "rules/multiqc.smk"
 
