@@ -49,7 +49,11 @@ def get_conda_version_string(pkgname: str, require_first: bool = False):
                     os.listdir("{}/conda-meta".format(env_prefix)),
                 )
             ]
-            assert len(targets) == 1
+            ## let's make the dangerous assumption that the first such result is the one we want.
+            ## there are instances of packages with identical prefix strings (e.g. lumpy-sv- and
+            ## lumpy-sv-minimal-). in that particular instance, the actual version number is the same;
+            ## and while in such instances we'd often expect the version numbers to be the same,
+            ## there's no easy guarantee of that
             pkg_tag = os.path.basename(targets[0]).removeprefix(pkgname + "-").removesuffix(".json")
             return pkg_tag.split("-")[0]
     return "{not found in installed conda environments}"
