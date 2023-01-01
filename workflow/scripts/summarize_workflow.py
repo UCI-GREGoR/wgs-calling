@@ -105,7 +105,7 @@ def describe_alignment(config: dict) -> list:
     gatk_version = get_conda_version_string("gatk4")
     alignstats_version = get_conda_version_string("alignstats")
     verify_version = get_conda_version_string("verifybamid2")
-    somalier_version = get_conda_version_string("somalier_version")
+    somalier_version = get_conda_version_string("somalier")
     all_lines = ["## Read Alignment"]
     res = "Reads are aligned to human reference genome {} with {}.".format(
         config["genome-build"], config["behaviors"]["aligner"]
