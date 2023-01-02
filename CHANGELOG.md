@@ -21,6 +21,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 	- the version data of all pertinent packages installed from conda
 	- descriptions of the most prominent user configuration settings and commentary on the impact of important settings therein
 
+### Changed
+
+- [TIDDIT](https://github.com/SciLifeLab/TIDDIT) is no longer pinned to <3
+- duplicates are now removed, instead of just marked
+
+### Removed
+
+- inexplicable old change of TIDDIT output DUP variants to INS
+
 ## [0.2.0] - DeepVariant
 
 First support for DeepVariant.
