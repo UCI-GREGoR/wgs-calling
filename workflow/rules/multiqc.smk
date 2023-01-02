@@ -44,9 +44,9 @@ rule run_multiqc_alignment:
     Run multiqc on all steps up to but not including variant calling
     """
     input:
-        fastqc=lambda wildcards: tc.construct_fastqc_targets(wildcards, manifest),
+        fastqc=lambda wildcards: tc.construct_fastqc_combined_targets(wildcards, manifest),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
-        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_targets(
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_combined_targets(
             wildcards, manifest
         ),
         verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
@@ -66,8 +66,8 @@ rule run_multiqc_alignment:
                 expand(
                     "results/{toolname}/{{projectid}}",
                     toolname=[
-                        "fastqc",
-                        "fastqc_posttrimming",
+                        "fastqc_combined",
+                        "fastqc_posttrimming_combined",
                         "fastp",
                         "collectmultiplemetrics",
                         "collectgcbiasmetrics",
