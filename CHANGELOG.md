@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - [TIDDIT](https://github.com/SciLifeLab/TIDDIT) is no longer pinned to <3
+- due to TIDDIT update, manual conversion of `TDUP` variants is no longer relevant,
+  as these were harmonized away to standardized SV types between <3 and current
 - duplicates are now removed, instead of just marked
 
 ### Removed
