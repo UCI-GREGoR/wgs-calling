@@ -15,8 +15,12 @@ rule duphold_run:
         ),
         sv_vcf="results/{toolname}/{projectid}/{sampleid}.{toolname}.vcf.gz",
         sv_tbi="results/{toolname}/{projectid}/{sampleid}.{toolname}.vcf.gz.tbi",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
     output:
         bcf=temp("results/{toolname}/{projectid}/{sampleid}.{toolname}.duphold-annotated.bcf"),
     benchmark:
@@ -48,7 +52,7 @@ rule duphold_apply:
         mem_mb="4000",
         qname="small",
     shell:
-        'bcftools view -i \'FILTER = "PASS" & '
+        'bcftools view -i \'(FILTER = "PASS" | FILTER = ".") & '
         '((FMT/DHFFC[0] = ".") | '
         ' (SVTYPE = "DEL" & FMT/DHFFC[0] < 0.7) | '
         ' (SVTYPE != "DEL" & FMT/DHBFC[0] > 1.3)) \' '

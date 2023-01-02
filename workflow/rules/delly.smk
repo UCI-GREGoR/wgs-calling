@@ -5,12 +5,16 @@ rule delly_run:
     input:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
         bai="results/bqsr/{projectid}/{sampleid}.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
     output:
         vcf="results/delly/{projectid}/{sampleid}.delly.vcf.gz",
     conda:
-        "../envs/delly.smk"
+        "../envs/delly.yaml"
     benchmark:
         "results/performance_benchmarks/delly_run/{projectid}/{sampleid}.tsv"
     threads: 1

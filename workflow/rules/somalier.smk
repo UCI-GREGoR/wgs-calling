@@ -5,8 +5,12 @@ rule somalier_extract:
     input:
         bam="results/bqsr/{projectid}/{fileprefix}.bam",
         bai="results/bqsr/{projectid}/{fileprefix}.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
     output:
         "results/somalier/{projectid}/extract/{fileprefix}.somalier",
     benchmark:

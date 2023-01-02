@@ -35,9 +35,9 @@ rule ensemble_sv_vcf:
     output:
         "results/final/{projectid}/{sampleid}.sv.vcf.gz",
     params:
-        bcftools_filter_count="INFO/svdb_origin ~ '"
-        + "|".join([".*" for i in range(config["behaviors"]["sv-ensemble"]["min-count"])])
-        + "'",
+        bcftools_filter_count="INFO/FOUNDBY = {}".format(
+            config["behaviors"]["sv-ensemble"]["min-count"]
+        ),
         bcftools_filter_sources=" & INFO/svdb_origin ~ '"
         + "' & INFO/svdb_origin ~ '".join(config["behaviors"]["sv-ensemble"]["required-callers"])
         + "'"
@@ -53,3 +53,24 @@ rule ensemble_sv_vcf:
         qname="small",
     shell:
         'bcftools filter -i "{params.bcftools_filter_count} {params.bcftools_filter_sources}" -O z -o {output} {input}'
+
+
+rule summarize_sv_variant_sources:
+    """
+    For a raw merge output from svdb, use bcftools to extract reasonable summary information about
+    the variant from its info content, with the goal of getting this information into an Rmd report
+    """
+    input:
+        "results/final/{projectid}/{sampleid}.sv.svdb-raw.vcf.gz",
+    output:
+        "results/reports/sv_data/{projectid}/{sampleid}.sv.svdb-raw.tsv",
+    benchmark:
+        "results/performance_benchmarks/summarisze_sv_variant_sources/{projectid}/{sampleid}.tsv"
+    conda:
+        "../envs/bcftools.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    shell:
+        "bcftools query -f '%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO/SVTYPE\\t%INFO/svdb_origin\\n' {input} > {output}"

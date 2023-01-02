@@ -5,18 +5,21 @@ rule svaba_run:
     input:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
         bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
-        bwa_fasta="reference_data/references/{}/ref.fasta".format(reference_build),
+        bwa_fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
         bwa_other_files=expand(
-            "reference_data/references/{genome}/ref.fasta.{suffix}",
+            "reference_data/{aligner}/{genome}/ref.fasta.{suffix}",
+            aligner=config["behaviors"]["aligner"],
             genome=reference_build,
-            suffix=bwa_ref_suffixes + ["fai", "sa", "dict"],
+            suffix=aligner_index_suffixes[config["behaviors"]["aligner"]] + ["fai", "dict"],
         ),
     output:
-        bps="results/svaba/{projectid}/{sampleid}.svaba.bps.txt.gz",
-        contigs="results/svaba/{projectid}/{sampleid}.svaba.contigs.bam",
-        discordants="results/svaba/{projectid}/{sampleid}.svaba.discordants.txt.gz",
-        log="results/svaba/{projectid}/{sampleid}.svaba.log",
-        alignments="results/svaba/{projectid}/{sampleid}.svaba.alignments.txt.gz",
+        bps="results/svaba/{projectid}/{sampleid}.bps.txt.gz",
+        contigs="results/svaba/{projectid}/{sampleid}.contigs.bam",
+        discordants="results/svaba/{projectid}/{sampleid}.discordant.txt.gz",
+        log="results/svaba/{projectid}/{sampleid}.log",
+        alignments="results/svaba/{projectid}/{sampleid}.alignments.txt.gz",
         vcf_indel_unfiltered="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.indel.vcf",
         vcf_sv_unfiltered="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.sv.vcf",
         vcf_indel_filtered="results/svaba/{projectid}/{sampleid}.svaba.indel.vcf",
@@ -24,7 +27,7 @@ rule svaba_run:
     benchmark:
         "results/performance_benchmarks/svaba_run/{projectid}/{sampleid}.svaba.tsv"
     params:
-        outprefix="results/svaba/{projectid}/{sampleid}.svaba",
+        outprefix="results/svaba/{projectid}/{sampleid}",
     conda:
         "../envs/svaba.yaml"
     threads: 8
@@ -45,14 +48,20 @@ rule svaba_select_output_variants:
         vcf="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.sv.vcf",
     output:
         vcf="results/svaba/{projectid}/{sampleid}.svaba.vcf.gz",
+        linker=temp("results/svaba/{projectid}/{sampleid}.svaba.reheader_linker.tsv"),
     params:
         tmpdir="temp",
+        bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
     benchmark:
         "results/performance_benchmarks/svaba_select_output_variants/{projectid}/{sampleid}.svaba.tsv"
+    conda:
+        "../envs/bcftools.yaml"
     threads: 4
     resources:
         mem_mb="16000",
         qname="small",
     shell:
         "mkdir -p {params.tmpdir} && "
-        "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf} {input.vcf}"
+        "echo -e '{params.bam}\\t{wildcards.sampleid}' > {output.linker} && "
+        "bcftools reheader -s {output.linker} {input.vcf} | "
+        "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf}"

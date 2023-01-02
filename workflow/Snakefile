@@ -31,11 +31,9 @@ manifest = pd.read_csv(manifest, sep="\t")
 validate(manifest, "../schema/manifest_schema.yaml")
 
 reference_build = config["genome-build"]
-bwa_ref_suffixes = ["ann", "amb", "pac", "sa"]
-if config["behaviors"]["aligner"] == "bwa-mem2":
-    bwa_ref_suffixes.append("bwt.2bit.64")
-else:
-    bwa_ref_suffixes.append("bwt")
+aligner_index_suffixes = {}
+aligner_index_suffixes["bwa"] = ["ann", "amb", "bwt", "pac", "sa"]
+aligner_index_suffixes["bwa-mem2"] = ["ann", "amb", "bwt.2bit.64", "pac", "sa"]
 
 caller_num_intervals = tc.caller_interval_file_count(config)
 
@@ -69,6 +67,12 @@ if config["behaviors"]["outcome"] == "calling":
             tc.construct_sv_targets(manifest),
         ]
     )
+    TARGETS.append(
+        expand(
+            "results/reports/{projectid}/sv_caller_comparison.html",
+            projectid=list(set(manifest["projectid"])),
+        )
+    )
 
 
 ## To deal with the fact that s3 remote provider service is very slow
@@ -79,6 +83,7 @@ if config["behaviors"]["outcome"] == "calling":
 ruleorder: samtools_index_fasta > download_reference_data
 ruleorder: index_vcf > download_reference_data
 ruleorder: create_sequence_dictionary > download_reference_data
+ruleorder: adjust_fasta_formatting > download_reference_data
 ruleorder: octopus_run_task > index_vcf
 ruleorder: manta_run > index_vcf
 
@@ -95,10 +100,12 @@ include: "rules/bwamem.smk"
 include: "rules/deepvariant.smk"
 include: "rules/delly.smk"
 include: "rules/duphold.smk"
+include: "rules/ensemble_sv_calling.smk"
 include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
 include: "rules/lumpy.smk"
 include: "rules/manta.smk"
+include: "rules/methods.smk"
 include: "rules/mosdepth.smk"
 include: "rules/multiqc.smk"
 

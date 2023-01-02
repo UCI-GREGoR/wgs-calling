@@ -90,7 +90,7 @@ rule sort_bam:
     benchmark:
         "results/performance_benchmarks/sort_bam/{prefix}.sort.bam"
     conda:
-        "../envs/bwamem2.yaml"
+        "../envs/samtools.yaml"
     threads: 4
     resources:
         mem_mb="8000",
@@ -110,7 +110,7 @@ rule samtools_create_bai:
     benchmark:
         "results/performance_benchmarks/samtools_create_bai/{prefix}.sort.tsv"
     conda:
-        "../envs/bwamem2.yaml"
+        "../envs/samtools.yaml"
     threads: 4
     resources:
         mem_mb="8000",
@@ -126,9 +126,15 @@ rule picard_collectmultiplemetrics:
     input:
         bam="results/bqsr/{fileprefix}.bam",
         bai="results/bqsr/{fileprefix}.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
-        dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        dic="reference_data/{}/{}/ref.fasta.dict".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
     output:
         expand(
             "results/collectmultiplemetrics/{{fileprefix}}.picard.{suffix}",
@@ -188,9 +194,15 @@ rule picard_collectgcbiasmetrics:
     input:
         bam="results/bqsr/{fileprefix}.bam",
         bai="results/bqsr/{fileprefix}.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
-        dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        dic="reference_data/{}/{}/ref.fasta.dict".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
     output:
         metrics="results/collectgcbiasmetrics/{fileprefix}.picard.gc_bias_metrics.txt",
         summary="results/collectgcbiasmetrics/{fileprefix}.picard.gc_bias_metrics_summary.txt",
@@ -225,10 +237,18 @@ rule picard_collectwgsmetrics:
     input:
         bam="results/bqsr/{fileprefix}.bam",
         bai="results/bqsr/{fileprefix}.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
-        dic="reference_data/references/{}/ref.fasta.dict".format(reference_build),
-        intervals="reference_data/references/{}/ref.reportable-regions".format(reference_build),
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        dic="reference_data/{}/{}/ref.fasta.dict".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        intervals="reference_data/collectwgsmetrics/{}/ref.reportable-regions".format(
+            reference_build
+        ),
     output:
         txt="results/collectwgsmetrics/{fileprefix}.picard.collect_wgs_metrics.txt",
     benchmark:
