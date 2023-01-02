@@ -25,11 +25,25 @@ rule deepvariant_make_examples:
                 suffix=["gz", "gz.example_info.json"],
             )
         ),
+        temp(
+            expand(
+                "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord-{shardnum}-of-{shardmax}.gz",
+                shardnum=[
+                    str(i).rjust(5, "0")
+                    for i in range(config["parameters"]["deepvariant"]["number-shards"])
+                ],
+                shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
+            )
+        ),
     benchmark:
         "results/performance_benchmarks/deepvariant_make_examples/{projectid}/{sampleid}.{splitnum}.tsv"
     params:
         shard_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
+            shardmax=config["parameters"]["deepvariant"]["number-shards"],
+        ),
+        gvcf_string=expand(
+            "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord@{shardmax}.gz",
             shardmax=config["parameters"]["deepvariant"]["number-shards"],
         ),
     container:
@@ -47,6 +61,7 @@ rule deepvariant_make_examples:
         "make_examples --mode calling "
         '--ref {input.fasta} --reads {input.bam} --regions "$(cat {input.intervals})" '
         "--examples {params.shard_string} --channels insert_size "
+        "--gvcf {params.gvcf_string} "
         "--task {{}}"
 
 
@@ -100,6 +115,14 @@ rule deepvariant_postprocess_variants:
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),
+        gvcf=expand(
+            "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord-{shardnum}-of-{shardmax}.gz",
+            shardnum=[
+                str(i).rjust(5, "0")
+                for i in range(config["parameters"]["deepvariant"]["number-shards"])
+            ],
+            shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
+        ),
         fai="reference_data/{}/{}/ref.fasta.fai".format(
             config["behaviors"]["aligner"], reference_build
         ),
@@ -107,10 +130,18 @@ rule deepvariant_postprocess_variants:
         vcf=temp(
             "results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.vcf.gz"
         ),
+        gvcf=temp(
+            "results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.g.vcf.gz"
+        ),
         tbi=temp(
             "results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.vcf.gz.tbi"
         ),
         html="results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.visual_report.html",
+    params:
+        gvcf_string=expand(
+            "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord@{shardmax}.gz",
+            shardmax=config["parameters"]["deepvariant"]["number-shards"],
+        ),
     benchmark:
         "results/performance_benchmarks/deepvariant_postprocess_variants/{projectid}/{sampleid}.{splitnum}.tsv"
     container:
@@ -125,6 +156,8 @@ rule deepvariant_postprocess_variants:
         "postprocess_variants "
         "--ref {input.fasta} "
         "--infile {input.gz} "
+        "--nonvariant_site_tfrecord_path {params.gvcf_string} "
+        "--gvcf_outfile {output.gvcf} "
         "--outfile {output.vcf}"
 
 

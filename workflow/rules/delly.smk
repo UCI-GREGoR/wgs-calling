@@ -22,4 +22,4 @@ rule delly_run:
         mem_mb="16000",
         qname="small",
     shell:
-        "delly call -g {input.fasta} {input.bam} | bgzip -c > {output.vcf}"
+        "delly call -g {input.fasta} {input.bam} | bcftools view -i 'F_MISSING<0.5' -O z -o {output.vcf}"

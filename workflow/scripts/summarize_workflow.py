@@ -16,7 +16,9 @@ def get_pipeline_git_version() -> str:
     ).rstrip()
     try:
         commit_description = subprocess.check_output(
-            ["git", "describe", commit_branch], encoding="UTF-8", stderr=subprocess.DEVNULL
+            ["git", "describe", "--tags", commit_branch],
+            encoding="UTF-8",
+            stderr=subprocess.DEVNULL,
         )
     except subprocess.CalledProcessError:
         commit_description = commit_id
@@ -322,7 +324,7 @@ def describe_lumpy(config: dict) -> str:
     res = (
         "[lumpy](https://github.com/arq5x/lumpy-sv) "
         + lumpy_version
-        + "was run according to its project's instructions, under the wrapper program "
+        + " was run according to its project's instructions, under the wrapper program "
         "[smoove](https://github.com/brentp/smoove) "
         + smoove_version
         + ". As this pipeline is focused on single sample calling, only the first "

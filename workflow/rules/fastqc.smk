@@ -48,3 +48,33 @@ rule run_fastqc_posttrimming:
         qname="small",
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
+
+
+use rule run_fastqc_pretrimming as run_fastqc_pretrimming_combined with:
+    input:
+        r1="results/fastqs_combined/pretrimming/{projectid}/{sampleid}_R1.fastq.gz",
+        r2="results/fastqs_combined/pretrimming/{projectid}/{sampleid}_R2.fastq.gz",
+    output:
+        r1_zip="results/fastqc_combined/{projectid}/{sampleid}_R1_fastqc.zip",
+        r2_zip="results/fastqc_combined/{projectid}/{sampleid}_R2_fastqc.zip",
+        r1_html="results/fastqc_combined/{projectid}/{sampleid}_R1_fastqc.html",
+        r2_html="results/fastqc_combined/{projectid}/{sampleid}_R2_fastqc.html",
+    benchmark:
+        "results/fastqc_combined/{projectid}/{sampleid}_fastqc.tsv"
+    params:
+        outdir="results/fastqc_combined/{projectid}",
+
+
+use rule run_fastqc_posttrimming as run_fastqc_posttrimming_combined with:
+    input:
+        r1="results/fastqs_combined/posttrimming/{projectid}/{sampleid}_R1.fastq.gz",
+        r2="results/fastqs_combined/posttrimming/{projectid}/{sampleid}_R2.fastq.gz",
+    output:
+        r1_zip="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R1_fastp_fastqc.zip",
+        r2_zip="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R2_fastp_fastqc.zip",
+        r1_html="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R1_fastp_fastqc.html",
+        r2_html="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R2_fastp_fastqc.html",
+    benchmark:
+        "results/fastqc_posttrimming_combined/{projectid}/{sampleid}_fastp_fastqc.tsv"
+    params:
+        outdir="results/fastqc_posttrimming_combined/{projectid}",

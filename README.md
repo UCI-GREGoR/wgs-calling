@@ -129,11 +129,34 @@ the cookiecutter template [here](https://github.com/Snakemake-Profiles/sge).
 
 ### Step 5: Investigate results
 
-- the results of fastqc on input reads are stored in `results/multiqc`
-- the results of fastqc on post-alignment data are stored in `results/multiqc`
-- the results of SNV and SV variant calling are stored in `results/final`
+#### Read Quality Control
 
-This will be expanded once it becomes clearer to me what the expectations of this pipeline truly are.
+Quality control data from fastqc and fastp are aggregated in a multiqc report at `results/multiqc/{projectid}/multiqc.fastq.html`.
+This version of the quality control report is split by lane within the report, if per-lane fastqs have been provided
+and annotated in the manifest.
+
+#### Alignment
+
+Quality control data from the above read QC tools as well as somalier, verifybamid, alignstats,  and assorted gatk4/picard analysis tools
+are aggregated in a multiqc report at `results/multiqc/{projectid}/multiqc.alignment.html`. This version of the quality report is currently
+bugged, and should only be used for considering alignment QC results until further notice.
+
+#### Variant Calling
+
+All variant calling in this pipeline is conducted per-subject, ignoring batch data. SNV calls from the user-configured tool
+(e.g. DeepVariant, Octopus) are aggregated in `results/{toolname}/{projectid}/{sampleid}.sorted.vcf.gz`. SV calls from
+ensemble calling based on user-configured tools and exclusion criteria are aggregated in `results/final/{projectid}/{sampleid}.sv.vcf.gz`.
+Note that these paths and filenames are subject to change before stabilization of the workflow.
+
+#### (DeepVariant only) GVCFs for Batch Calling
+
+If the user has selected DeepVariant for SNV calling, gvcf files per-subject will be collected at
+`results/deepvariant/{projectid}/{sampleid}.g.vcf.gz`. These files are not used in the pipeline itself,
+and represent the raw output of `deepvariant postprocess_variants`. At some point, these will likely receive
+further processing in anticipation of use with e.g. GLnexus in a different pipeline. Also at some point,
+I'll probably add a flag for disabling the production of gvcf output, but that's not urgent.
+
+gvcf output is not supported by Octopus and so is not possible in this pipeline.
 
 #### Optional: emit methods description and software version data
 
