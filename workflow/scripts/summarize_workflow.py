@@ -322,7 +322,7 @@ def describe_lumpy(config: dict) -> str:
     res = (
         "[lumpy](https://github.com/arq5x/lumpy-sv) "
         + lumpy_version
-        + "was run according to its project's instructions, under the wrapper program "
+        + " was run according to its project's instructions, under the wrapper program "
         "[smoove](https://github.com/brentp/smoove) "
         + smoove_version
         + ". As this pipeline is focused on single sample calling, only the first "
