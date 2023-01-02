@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - duplicates are now removed, instead of just marked
 - sites with FILTER=PASS but GT=./. are now removed before ensemble calling
   - impacts TIDDIT and delly
+- alignment multiqc report points to fastqc results from merged-by-lane fastqs
+  - in response to user feedback; draft fix for an outstanding issue with the alignment multiqc report
 
 ### Removed
 
