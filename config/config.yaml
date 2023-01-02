@@ -16,12 +16,10 @@ behaviors:
     - "tiddit"
     - "svaba"
   sv-ensemble:
-    min-count: 2
-    required-callers:
-      - "manta"
+    min-count: 3
   outcome: "calling"
-  symlink-fastqs: yes
-  trim-adapters-before-alignment: no
+  symlink-fastqs: no
+  trim-adapters-before-alignment: yes
 
 parameters:
   deepvariant:
