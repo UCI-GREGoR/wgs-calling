@@ -16,7 +16,9 @@ def get_pipeline_git_version() -> str:
     ).rstrip()
     try:
         commit_description = subprocess.check_output(
-            ["git", "describe", commit_branch], encoding="UTF-8", stderr=subprocess.DEVNULL
+            ["git", "describe", "--tags", commit_branch],
+            encoding="UTF-8",
+            stderr=subprocess.DEVNULL,
         )
     except subprocess.CalledProcessError:
         commit_description = commit_id
