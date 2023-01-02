@@ -1,0 +1,81 @@
+---
+title: "SV Caller Consistency Report"
+output:
+  html_document:
+    code_folding: hide
+    md_extensions: "-fancy_lists -emoji"
+    highlight: tango
+    number_sections: no
+    theme: default
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+
+```{r link.variables, eval=TRUE, echo=FALSE}
+#### Link input parameters to local variables
+sv.source.data <- snakemake@input[["sv_source_data"]]
+source.file <- snakemake@input[["r_resources"]]
+sv.callers <- snakemake@params[["sv_callers"]]
+```
+
+```{r load.packages, eval=TRUE, echo=FALSE}
+#### Load required R packages
+suppressPackageStartupMessages(library(ggplot2, quietly = TRUE))
+suppressPackageStartupMessages(library(RColorBrewer, quietly = TRUE))
+suppressPackageStartupMessages(library(knitr, quietly = TRUE))
+suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
+suppressPackageStartupMessages(library(UpSetR, quietly = TRUE))
+```
+
+***
+<br>
+
+```{r load.source, eval=TRUE, echo=FALSE}
+#### Load source functions in separate, testable file
+source(source.file)
+```
+
+```{r load.data, eval=TRUE, echo=FALSE}
+sv.data <- load.data(sv.source.data, sv.callers)
+```
+
+```{r get.upset.list, eval=TRUE, echo=FALSE}
+upset.list <- generate.upset.list(sv.data, sv.callers)
+```
+
+## SV Calling Overlap
+
+
+```{r plot.upset, eval=TRUE, echo=FALSE, results="asis"}
+upset(fromList(upset.list), order.by = "freq")
+```
+
+***
+<br>
+
+## SV Data by Tool
+
+```{r emit.tool.specific.data, eval=TRUE, echo=FALSE, results="asis"}
+barplot.input <- generate.barplot.input(sv.data, sv.callers)
+for (sv.caller in sv.callers) {
+  cat("\n\n### ", sv.caller, "\n\n", sep = "")
+  print(get.tool.variant.barplot(barplot.input, sv.caller))
+  cat("\n\n***\n<br>\n\n")
+}
+```
+
+***
+<br>
+
+## Session Information
+
+<br>
+
+The following summarizes the loaded R configuration for the run that created this report.
+
+```{r session.info, eval=TRUE, echo=TRUE}
+sessionInfo()
+```

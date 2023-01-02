@@ -6,8 +6,8 @@ rule run_mosdepth:
     name of speed; that can always be adjusted later if desired.
     """
     input:
-        bam="results/markdups/{projectid}/{prefix}.mrkdup.sort.bam",
-        bai="results/markdups/{projectid}/{prefix}.mrkdup.sort.bam.bai",
+        bam="results/bqsr/{projectid}/{prefix}.bam",
+        bai="results/bqsr/{projectid}/{prefix}.bai",
     output:
         assorted_files=expand(
             "results/mosdepth/{{projectid}}/{{prefix}}.{suffix}",
@@ -34,7 +34,7 @@ rule run_mosdepth:
         "../envs/mosdepth.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         "mosdepth --threads {threads} "

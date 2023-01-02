@@ -4,7 +4,11 @@ rule run_multiqc_fastq:
     """
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(wildcards, manifest),
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_targets(
+            wildcards, manifest
+        ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
+        multiqc_config=config["multiqc-read-config"],
     output:
         html="results/multiqc/{projectid}/multiqc.fastq.html",
         data_zip="results/multiqc/{projectid}/multiqc.fastq_data.zip",
@@ -15,7 +19,7 @@ rule run_multiqc_fastq:
             set(
                 expand(
                     "results/{toolname}/{{projectid}}",
-                    toolname=["fastqc", "fastp"],
+                    toolname=["fastqc", "fastp", "fastqc_posttrimming"],
                 )
             )
         ),
@@ -23,14 +27,15 @@ rule run_multiqc_fastq:
         "../envs/multiqc.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         "multiqc {params.target_dirs} "
+        "--config {input.multiqc_config} "
         "-m fastqc -m fastp "
         "-x '*.fastq.gz' -x '*.fastq' "
         "--profile-runtime --zip-data-dir "
-        "-f -i 'MultiQC for Raw Fastqs' "
+        "-f -i 'MultiQC for Pre-alignment Data' "
         "-n {output.html}"
 
 
@@ -41,12 +46,15 @@ rule run_multiqc_alignment:
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(wildcards, manifest),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_targets(
+            wildcards, manifest
+        ),
         verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
         alignstats=tc.construct_combined_alignstats_targets,
         somalier=tc.construct_somalier_relate_targets,
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
-        multiqc_config=config["multiqc-config"],
+        multiqc_config=config["multiqc-alignment-config"],
     output:
         html="results/multiqc/{projectid}/multiqc.alignment.html",
         data_zip="results/multiqc/{projectid}/multiqc.alignment_data.zip",
@@ -59,12 +67,15 @@ rule run_multiqc_alignment:
                     "results/{toolname}/{{projectid}}",
                     toolname=[
                         "fastqc",
+                        "fastqc_posttrimming",
                         "fastp",
                         "collectmultiplemetrics",
                         "collectgcbiasmetrics",
                         "collectwgsmetrics",
                         "somalier",
                         "mosdepth",
+                        "contamination",
+                        "alignstats",
                     ],
                 )
             )
@@ -73,7 +84,7 @@ rule run_multiqc_alignment:
         "../envs/multiqc.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         "multiqc {params.target_dirs} "

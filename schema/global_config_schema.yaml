@@ -3,7 +3,9 @@ description: global configuration
 properties:
   manifest:
     type: string
-  multiqc-config:
+  multiqc-read-config:
+    type: string
+  multiqc-alignment-config:
     type: string
   genome-build:
     type: string
@@ -13,15 +15,29 @@ properties:
     properties:
       aligner:
         type: string
-        pattern: "^bwa-mem2$"
+        pattern: "^bwa-mem2$|^bwa$"
       snv-caller:
         type: string
-        pattern: "^octopus$"
+        pattern: "^octopus$|^deepvariant$"
       sv-callers:
         type: array
         items:
           type: string
-          pattern: "^manta$|^tiddit$"
+          pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
+      sv-ensemble:
+        type: object
+        properties:
+          min-count:
+            type: integer
+            min: 1
+          required-callers:
+            type: array
+            items:
+              type: string
+              pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
+        required:
+          - min-count
+        additionalProperties: no
       outcome:
         type: string
         pattern: "^fastqc$|^alignment$|^calling$"
@@ -35,9 +51,38 @@ properties:
     required:
       - aligner
       - snv-caller
+      - sv-callers
+      - sv-ensemble
       - outcome
       - symlink-fastqs
       - trim-adapters-before-alignment
+    additionalProperties: no
+  parameters:
+    type: object
+    properties:
+      deepvariant:
+        type: object
+        properties:
+          number-shards:
+            type: integer
+            min: 1
+          docker-version:
+            type: string
+        required:
+          - number-shards
+          - docker-version
+        additionalProperties: no
+      manta:
+        type: object
+        properties:
+          config-ini:
+            type: string
+        required:
+          - config-ini
+        additionalProperties: no
+    required:
+      - deepvariant
+      - manta
     additionalProperties: no
   references:
     type: object
@@ -51,10 +96,40 @@ properties:
             type: string
         required:
           - fasta
-          - reportable-regions
         additionalProperties: no
     required:
       - grch37
+  bqsr:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          known-indels-vcf-gz:
+            type: string
+          known-indels-vcf-gz-tbi:
+            type: string
+          dbsnp138-vcf:
+            type: string
+          dbsnp138-vcf-idx:
+            type: string
+        required:
+          - known-indels-vcf-gz
+          - known-indels-vcf-gz-tbi
+          - dbsnp138-vcf
+          - dbsnp138-vcf-idx
+        additionalProperties: no
+  collectwgsmetrics:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          reportable-regions:
+            type: string
+        required:
+          - reportable-regions
+        additionalProperties: no
   dnascope:
     type: object
     patternProperties:
@@ -116,13 +191,41 @@ properties:
       - forest-model
       - error-model
       - grch37
+  deepvariant:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          calling-ranges:
+            type: string
+        required:
+          - calling-ranges
+        additionalProperties: no
+    required:
+      - grch37
+  lumpy:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          exclude-bed:
+            type: string
+        required:
+          - exclude-bed
+        additionalProperties: no
 required:
   - manifest
-  - multiqc-config
+  - multiqc-read-config
+  - multiqc-alignment-config
   - genome-build
   - behaviors
   - references
+  - bqsr
   - dnascope
   - verifybamid2
   - octopus
+  - deepvariant
+  - lumpy
 additionalProperties: no

@@ -1,0 +1,41 @@
+max_table_rows:
+  3000
+
+fn_clean_exts:
+   - ".bwa2a.bam"
+   - ".mrkdup.sort.bam"
+   - "R1.fastq.gz"
+   - "R2.fastq.gz"
+   - "R1_001.fastq.gz"
+   - "R2_001.fastq.gz"
+   - "sentieon.alignment_summary_metrics.txt"
+   - "sentieon.insert_size_metrics_metrics.txt"
+
+
+extra_fn_clean_exts:
+  - type: regex
+    pattern: "_R1_001.*"
+  - type: regex
+    pattern: "_R2_001.*"
+  - type: regex
+    pattern: "_L00[1-4].*"
+  - type: regex
+    pattern: ".bwa2a.*"
+  - type: regex
+    pattern: ".mosdepth.*"
+
+
+log_filesize_limit: 2000000000 # 2GB limit for parsing
+
+module_order:
+  - fastqc:
+      name: 'FastQC (raw)'
+      target: ''
+      path_filters:
+        - 'results/fastqc/*/*_fastqc.zip'
+  - fastp
+  - fastqc:
+      name: 'FastQC (trimmed)'
+      target: ''
+      path_filters:
+        - 'results/fastqc_posttrimming/*/*_fastqc.zip'

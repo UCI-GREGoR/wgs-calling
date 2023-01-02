@@ -17,7 +17,7 @@ def map_fastq_from_project_and_sample(
     """
     ## New: allow rewiring of the DAG to provide adapter-trimmed fastqs directly to aligner
     if config["behaviors"]["trim-adapters-before-alignment"] is True:
-        return "results/fastp/{}/{}_{}_{}_fastp.fastq".format(
+        return "results/fastp/{}/{}_{}_{}_fastp.fastq.gz".format(
             wildcards.projectid, wildcards.sampleid, wildcards.lane, rp
         )
 
@@ -53,9 +53,7 @@ def get_bams_by_lane(
     result = manifest.query(query)
     available_lanes = result["lane"]
     result = [
-        "results/{}/{}/{}_{}.{}".format(
-            config["behaviors"]["aligner"], wildcards.projectid, wildcards.sampleid, x, suffix
-        )
+        "results/aligned/{}/{}_{}.{}".format(wildcards.projectid, wildcards.sampleid, x, suffix)
         for x in available_lanes
     ]
     return result
@@ -91,7 +89,7 @@ def construct_alignstats_targets(wildcards: Namedlist, manifest: pd.DataFrame) -
     a run of alignstats
     """
     result = [
-        "results/alignstats/{}/{}.bwa2a.alignstats.json".format(wildcards.projectid, x)
+        "results/alignstats/{}/{}.alignstats.json".format(wildcards.projectid, x)
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"]
     ]
     return list(set(result))
@@ -136,13 +134,14 @@ def construct_picard_qc_targets(wildcards: Namedlist, manifest: pd.DataFrame) ->
     return list(set(result))
 
 
-def construct_octopus_targets(manifest: pd.DataFrame) -> list:
+def construct_snv_targets(config: dict, manifest: pd.DataFrame) -> list:
     """
-    From basic input manifest entries, construct output targets for
-    octopus caller, after scattergather is complete
+    From basic input configuration and manifest entries,
+    construct output targets for selected caller, after
+    scattergather is complete
     """
     result = [
-        "results/octopus/{}/{}.sorted.vcf.gz".format(x[0], x[1])
+        "results/{}/{}/{}.sorted.vcf.gz".format(config["behaviors"]["snv-caller"], x[0], x[1])
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
     return list(set(result))
@@ -203,6 +202,28 @@ def construct_fastqc_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> li
     return list(set(results_r1))
 
 
+def construct_fastqc_posttrimming_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    a run of fastQC, for fastqs after trimming
+    """
+    results_prefix = "results/fastqc_posttrimming"
+    results_r1 = [
+        "{}/{}/{}_fastp_fastqc.zip".format(
+            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix("_001.fastq.gz")
+        )
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r1"].to_list()
+    ]
+    results_r2 = [
+        "{}/{}/{}_fastp_fastqc.zip".format(
+            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix("_001.fastq.gz")
+        )
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r2"].to_list()
+    ]
+    results_r1.extend(results_r2)
+    return list(set(results_r1))
+
+
 def construct_fastp_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
@@ -249,3 +270,15 @@ def map_reference_file(wildcards: Namedlist, config: dict) -> str | AnnotatedStr
     elif current_lvl.startswith("https://"):
         return HTTP.remote(current_lvl)
     return current_lvl
+
+
+def caller_interval_file_count(config: dict) -> int:
+    """
+    Get simple line count of a file; this is intended to
+    count a tiny text file containing <100 interval filenames.
+    """
+    fn = config[config["behaviors"]["snv-caller"]][config["genome-build"]]["calling-ranges"]
+    x = 0
+    with open(fn, "r") as f:
+        x = len(f.readlines())
+    return x

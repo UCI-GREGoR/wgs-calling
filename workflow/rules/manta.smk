@@ -3,10 +3,15 @@ rule manta_configure:
     Configure manta SV caller on a single bamfile.
     """
     input:
-        bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
-        bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
+        bam="results/bqsr/{projectid}/{sampleid}.bam",
+        bai="results/bqsr/{projectid}/{sampleid}.bai",
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        manta_config=config["parameters"]["manta"]["config-ini"],
     output:
         temp("temp/manta_workdir/{projectid}/{sampleid}/runWorkflow.py"),
     benchmark:
@@ -17,13 +22,13 @@ rule manta_configure:
         "../envs/manta.yaml"
     threads: 1
     resources:
-        h_vmem="2000",
+        mem_mb="2000",
         qname="small",
         tmpdir=lambda wildcards: "temp/manta_workdir/{}/{}".format(
             wildcards.projectid, wildcards.sampleid
         ),
     shell:
-        "configManta.py --bam {input.bam} --reference {input.fasta} --runDir {params.tmpdir}"
+        "configManta.py --config {input.manta_config} --bam {input.bam} --reference {input.fasta} --runDir {params.tmpdir}"
 
 
 rule manta_run:
@@ -31,14 +36,34 @@ rule manta_run:
     After run configuration, actually run manta SV caller.
     """
     input:
-        bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
-        bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
+        bam="results/bqsr/{projectid}/{sampleid}.bam",
+        bai="results/bqsr/{projectid}/{sampleid}.bai",
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
         script="temp/manta_workdir/{projectid}/{sampleid}/runWorkflow.py",
     output:
-        vcf=temp("temp/manta_workdir/{projectid}/{sampleid}/diploidSV.vcf.gz"),
-        tbi=temp("temp/manta_workdir/{projectid}/{sampleid}/diploidSV.vcf.gz.tbi"),
+        diploid_vcf=temp(
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/diploidSV.vcf.gz"
+        ),
+        diploid_tbi=temp(
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/diploidSV.vcf.gz.tbi"
+        ),
+        candidatesv_vcf=temp(
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/candidateSV.vcf.gz"
+        ),
+        candidatesv_tbi=temp(
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/candidateSV.vcf.gz.tbi"
+        ),
+        candidatesmallindels_vcf=temp(
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/candidateSmallIndels.vcf.gz"
+        ),
+        candidatesmallindels_tbi=temp(
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/candidateSmallIndels.vcf.gz.tbi"
+        ),
     benchmark:
         "results/performance_benchmarks/manta_run/{projectid}/{sampleid}.tsv"
     params:
@@ -47,7 +72,7 @@ rule manta_run:
         "../envs/manta.yaml"
     threads: 4
     resources:
-        h_vmem="16000",
+        mem_mb="24000",
         qname="small",
         tmpdir=lambda wildcards: "temp/manta_workdir/{}/{}".format(
             wildcards.projectid, wildcards.sampleid
@@ -61,8 +86,8 @@ rule manta_sort_output:
     After running manta, sort the vcf output.
     """
     input:
-        vcf="temp/manta_workdir/{projectid}/{sampleid}/diploidSV.vcf.gz",
-        tbi="temp/manta_workdir/{projectid}/{sampleid}/diploidSV.vcf.gz.tbi",
+        vcf="temp/manta_workdir/{projectid}/{sampleid}/results/variants/diploidSV.vcf.gz",
+        tbi="temp/manta_workdir/{projectid}/{sampleid}/results/variants/diploidSV.vcf.gz.tbi",
     output:
         vcf="results/manta/{projectid}/{sampleid}.manta.vcf.gz",
     benchmark:
@@ -73,7 +98,7 @@ rule manta_sort_output:
         "../envs/bcftools.yaml"
     threads: 4
     resources:
-        h_vmem="16000",
+        mem_mb="16000",
         qname="small",
         tmpdir=lambda wildcards: "temp/manta_workdir/{}/{}".format(
             wildcards.projectid, wildcards.sampleid

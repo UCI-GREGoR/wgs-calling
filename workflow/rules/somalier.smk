@@ -3,10 +3,14 @@ rule somalier_extract:
     Run somalier extract on a single bam.
     """
     input:
-        bam="results/markdups/{projectid}/{fileprefix}.mrkdup.sort.bam",
-        bai="results/markdups/{projectid}/{fileprefix}.mrkdup.sort.bam.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
+        bam="results/bqsr/{projectid}/{fileprefix}.bam",
+        bai="results/bqsr/{projectid}/{fileprefix}.bai",
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        fai="reference_data/{}/{}/ref.fasta.fai".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
     output:
         "results/somalier/{projectid}/extract/{fileprefix}.somalier",
     benchmark:
@@ -17,7 +21,7 @@ rule somalier_extract:
         "../envs/somalier.yaml"
     threads: 1
     resources:
-        h_vmem="2000",
+        mem_mb="2000",
         qname="small",
     shell:
         "somalier extract -d {params.extract_dir} "
@@ -45,7 +49,7 @@ rule somalier_relate:
         "../envs/somalier.yaml"
     threads: 1
     resources:
-        h_vmem="4000",
+        mem_mb="4000",
         qname="small",
     shell:
         "somalier relate --ped {input.ped} -o {params.outprefix} {input.somalier}"
@@ -59,6 +63,8 @@ rule somalier_build_pedfile:
     """
     output:
         "results/somalier/{projectid}/relate/somalier.ped",
+    benchmark:
+        "results/performance_benchmarks/somalier_build_pedfile/{projectid}/somalier.tsv"
     params:
         subjectids=lambda wildcards: manifest.loc[
             manifest["projectid"] == wildcards.projectid, "sampleid"

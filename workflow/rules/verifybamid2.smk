@@ -3,9 +3,11 @@ rule estimate_contamination:
     Use verifybamid2 to estimate contamination in samples
     """
     input:
-        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
-        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
+        bam="results/bqsr/{fileprefix}.bam",
+        bai="results/bqsr/{fileprefix}.bai",
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
         db_files=expand(
             "reference_data/verifybamid2/{genome}/ref.db.{suffix}",
             genome=reference_build,
@@ -23,7 +25,7 @@ rule estimate_contamination:
         "../envs/verifybamid2.yaml"
     threads: 4
     resources:
-        h_vmem="8000",
+        mem_mb="8000",
         qname="small",
     shell:
         "verifybamid2 "

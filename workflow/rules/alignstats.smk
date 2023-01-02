@@ -3,10 +3,10 @@ rule run_alignstats:
     Run alignstats utility on post-markdups bams
     """
     input:
-        bam="results/markdups/{fileprefix}.mrkdup.sort.bam",
-        bai="results/markdups/{fileprefix}.mrkdup.sort.bam.bai",
+        bam="results/bqsr/{fileprefix}.bam",
+        bai="results/bqsr/{fileprefix}.bai",
     output:
-        json="results/alignstats/{fileprefix}.bwa2a.alignstats.json",
+        json="results/alignstats/{fileprefix}.alignstats.json",
     benchmark:
         "results/performance_benchmarks/run_alignstats/{fileprefix}.tsv"
     params:
@@ -15,7 +15,7 @@ rule run_alignstats:
         "../envs/alignstats.yaml"
     threads: 4
     resources:
-        h_vmem="8000",
+        mem_mb="8000",
         qname="small",
     shell:
         "alignstats -C -U "
@@ -38,7 +38,7 @@ rule merge_alignstats:
         "results/performance_benchmarks/merge_alignstats/{projectid}/alignstats_summary_mqc.tsv"
     threads: 1
     resources:
-        h_vmem="2000",
+        mem_mb="2000",
         qname="small",
     script:
         "../scripts/alignstats_json_to_tsv.py"

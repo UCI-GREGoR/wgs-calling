@@ -1,0 +1,88 @@
+---
+title: "Pipeline Resource Usage Report"
+output:
+  html_document:
+    code_folding: hide
+    md_extensions: "-fancy_lists -emoji"
+  highlight: tango
+  number_sections: no
+  theme: default
+  toc: yes
+  toc_depth: 3
+  toc_float:
+    collapsed: no
+    smooth_scroll: yes
+---
+
+```{r link.variables, eval=TRUE, echo=FALSE}
+#### Link input parameters to local variables
+parent.dir <- snakemake@params[["parent_dir"]]
+target.rules <- snakemake@params[["rules"]]
+source.file <- snakemake@input[["r_resources"]]
+rule.threads <- snakemake@params[["rule_threads"]]
+```
+
+```{r load.packages, eval=TRUE, echo=FALSE}
+#### Load required R packages
+suppressPackageStartupMessages(library(ggplot2, quietly = TRUE))
+suppressPackageStartupMessages(library(RColorBrewer, quietly = TRUE))
+suppressPackageStartupMessages(library(knitr, quietly = TRUE))
+suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
+```
+
+***
+<br>
+
+```{r load.source, eval=TRUE, echo=FALSE}
+#### Load source functions in separate, testable file
+source(source.file)
+```
+
+```{r aggregate.data, eval=TRUE, echo=FALSE}
+#### For each target rule, get a data frame of performance benchmark data
+benchmark.data <- list()
+for (rule in target.rules) {
+  benchmark.df <- aggregate.performance.metrics(parent.dir, rule)
+  if (!is.null(benchmark.df)) {
+    benchmark.data[[rule]] <- benchmark.df
+  }
+}
+```
+
+## Benchmarking Results, by Rule
+
+
+```{r report.data, eval=TRUE, echo=FALSE, results="asis"}
+#### For each target rule's performance data, report something interesting?
+for (rule in names(benchmark.data)) {
+  benchmark.df <- benchmark.data[[rule]]
+  cat("### ", rule, "\n", sep = "")
+  cat(get.walltime.description())
+  print(walltime.plot(benchmark.df, rule))
+  if (length(which(is.na(benchmark.df[, "max_rss"]))) != nrow(benchmark.df)) {
+    cat(get.cpu.walltime.description())
+    print(cpu.div.walltime.plot(benchmark.df, rule, ifelse(rule %in% names(rule.threads), rule.threads[[rule]], NA)))
+    cat(get.memory.description())
+    print(memory.plot(benchmark.df))
+    cat(get.io.description())
+    print(io.plot(benchmark.df))
+  } else {
+    cat("\n\n***\n\n<br>\n\nFor this rule, insufficiently long runtime renders the remaining ",
+      "performance metrics impossible to compute, so they will be skipped.",
+      sep = ""
+    )
+  }
+  cat("\n\n***\n\n<br>\n\n")
+}
+```
+
+
+#### Session Information
+
+<br>
+
+The following summarizes the loaded R configuration for the run that created this report.
+
+```{r session.info, eval=TRUE, echo=TRUE}
+sessionInfo()
+```

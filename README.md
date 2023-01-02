@@ -31,18 +31,37 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `behaviors`: user-configurable modifiers to how the pipeline will run
   - `aligner`: which alignment tool to use. permitted values: `bwa-mem2`
   - `snv-caller`: which calling tool to use for SNVs. permitted values: `octopus`
-  - `sv-callers`: which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`
+  - `sv-callers`: which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`
+  - `sv-ensemble`: settings controlling SV ensemble calling. note that the below settings can be applied in combination
+	- `min-count`: the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering
+	- `required-callers`: a list of which tools, if any, a variant absolutely must appear in to survive ensemble filtering
   - `outcome`: which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`
   - `symlink-fastqs`: whether to copy (no) or symlink (yes) input fastqs into workspace. symlinking is faster and more memory-efficient, but
     less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch.
   - `trim-adapters-before-alignment`: whether to use adapter trimmed fastq output of `fastp` as input to aligner.
     permitted values: `yes`, `no`, or `legacy`. legacy behavior for this option is to not use trimmed output for alignment.
+- `parameters`: tool-specific parameters. note that this section is a work in progress, somewhat more than the rest
+  - `deepvariant`: parameters specific to [deepvariant](https://github.com/google/deepvariant)
+    - `number-shards`: how many shards to break calling into. needs to be at most the number of available threads in the submission queue
+	- `docker-version`: which docker tag to use when pulling the official DeepVariant docker image
+  - `manta`: parameters specific to [Manta](https://github.com/Illumina/manta)
+    - `config-ini`: relative path to Manta local configuration data. see Manta documentation for more specific information about permitted
+	  values in this config file. the exposure of this file, which is passed to `configManta.py`, is done in anticipation of toggling
+	  settings that can reduce Manta's substantial runtime, e.g. `enableRemoteReadRetrievalForInsertionsInGermlineCallingModes`
 - `references`: human genome reference data applicable to multiple tools
   - `fasta`: human sequence fasta file
   - note that the other bwa-style index files attached to this fasta used to be imported by the nextflow workflow. however, presumably by accident,
     these annotation files were getting pulled from various different directories in a way that suggested that they might be delinked from their
 	source fasta. in reality, the source reference fastas were probably the same; but to avoid any difficulties downstream, now only the fasta
 	itself is pulled in from remote, and the index files are regenerated. this also substantially cleans up the configuration.
+- `bsqr`: reference files for base quality score recalibration from GATK4
+  - `known-indels-vcf-gz`: VCF of "gold standard" indels for BQSR. intended to be pulled from Broad's cloud files
+  - `known-indels-vcf-gz-tbi`: tabix index for above known indels vcf
+  - `dbsnp138-vcf`: VCF of dbSNP variation for BQSR. intended to be pulled from Broad's cloud files
+  - `dbsnp138-vcf-idx`: .idx index file for above dbSNP vcf
+- `collectwgsmetrics`: reference files specific for GATK4 post-alignment QC utility `CollectWgsMetrics`
+  - `reportable-regions`: set of bed intervals to be considered for `CollectWgsMetrics` output. note that the legacy Nextflow workflow
+    unconditionally applied the NA12878 reportable regions set to all samples. this is likely in error, and as such will need to be changed
 - `dnascope`: reference data files specific to [Sentieon DNAscope](https://support.sentieon.com/manual/DNAscope_usage/dnascope/)
   - `model`: DNAscope model file
   - `dbsnp-vcf-gz`: dbSNP backend vcf.gz file
@@ -55,7 +74,16 @@ The following settings are recognized in `config/config.yaml`. Note that each re
   - `forest-model`: forest model annotation file for `--forest-model` [note: this is independent of genome build (probably)]
   - `error-model`: error model annotation file for `--sequence-error-model` [note: this is independent of genome build (probably)]
   - `skip-regions`: region annotation for `--skip-regions-file`
-
+  - `calling-ranges`: list of files containing chromosomal intervals for embarrassingly parallel analysis. these are currently effectively
+    placeholders that just contain the standard human chromosomes, but at some point, this will be extended to contain actual
+	balanced calling intervals
+- `deepvariant`: reference data files specific to [deepvariant](https://github.com/google/deepvariant)
+  - `calling-ranges`: list of files containing chromosomal intervals for embarrassingly parallel analysis. these are currently effectively
+    placeholders that just contain the standard human chromosomes, but at some point, this will be extended to contain actual
+	balanced calling intervals
+- `lumpy`: reference data files specific to [lumpy](https://github.com/arq5x/lumpy-sv) or [smoove](https://github.com/brentp/smoove)
+  - `exclude-bed`: set of hard-to-call bed intervals to exclude from analysis. these files are intended to be the ones listed in the tools' documentation,
+    but can be customized if desired
 
 The following columns are expected in the run manifest, by default at `config/manifest.tsv`:
 - `projectid`: run ID, or other desired grouping of sequencing samples. this will be a subdirectory under individual tools in `results/`
@@ -88,15 +116,16 @@ Execute the workflow locally via
 
 using `$N` cores or run it in a cluster environment via
 
-    snakemake --use-conda --profile --cluster sge-profile --jobs 100
+    snakemake --use-conda --profile sge-profile --cluster-config config/cluster.yaml --jobs 100
 
 See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/executable.html) for further details.
 
 #### Cluster profiles
 
 Snakemake interfaces with job schedulers via _cluster profiles_. For running jobs on SGE, you can use
-the cookiecutter template [here](https://github.com/Snakemake-Profiles/sge). If there's interest in the group,
-I (@lightning.auriga) have a functional profile for clvr that I can post to this or its own repo for sharing.
+the cookiecutter template [here](https://github.com/Snakemake-Profiles/sge).
+
+
 
 ### Step 5: Investigate results
 
@@ -105,6 +134,17 @@ I (@lightning.auriga) have a functional profile for clvr that I can post to this
 - the results of SNV and SV variant calling are stored in `results/final`
 
 This will be expanded once it becomes clearer to me what the expectations of this pipeline truly are.
+
+#### Optional: emit methods description and software version data
+
+Some users may be interested in a specific breakdown of workflow methods, relevant software versions pulled from
+conda, and the effects of certain important user configuration settings. This information can be generated upon
+completion of a workflow with the command `snakemake -j1 summarize_methods`. This will create an additional output
+file, `results/reports/methods_summary.md`, that contains the best description of the workflow as was actually run.
+Note that this information focuses on methodology as opposed to results, and only requires the relevant conda
+environments be installed; so if you want to predict what the workflow will do before actually running it,
+complete user configuration, run `snakemake -j1 --use-conda --conda-create-envs-only`, and then run the `summarize_methods`
+target to generate a markdown description of what _would_ happen if the pipeline were deployed.
 
 ### Step 6: Commit changes
 
@@ -119,10 +159,10 @@ Whenever you want to synchronize your workflow copy with new developments from u
 
 1. Once, register the upstream repository in your local copy: `git remote add -f upstream git@gitlab.com:lightning.auriga1/wgs-pipeline.git` or `upstream https://gitlab.com/lightning.auriga1/wgs-pipeline.git` if you do not have setup ssh keys.
 2. Update the upstream version: `git fetch upstream`.
-3. Create a diff with the current version: `git diff HEAD upstream/master workflow > upstream-changes.diff`.
+3. Create a diff with the current version: `git diff HEAD upstream/default workflow > upstream-changes.diff`.
 4. Investigate the changes: `vim upstream-changes.diff`.
 5. Apply the modified diff via: `git apply upstream-changes.diff`.
-6. Carefully check whether you need to update the config files: `git diff HEAD upstream/master config`. If so, do it manually, and only where necessary, since you would otherwise likely overwrite your settings and samples.
+6. Carefully check whether you need to update the config files: `git diff HEAD upstream/default config`. If so, do it manually, and only where necessary, since you would otherwise likely overwrite your settings and samples.
 
 
 ### Step 8: Contribute back
@@ -145,10 +185,25 @@ git checkout -b your-new-branch
 Testing infrastructure for embedded python and R scripts is installed under `lib/` and `workflow/scripts/`. Additional testing
 coverage for the Snakemake infrastructure itself should be added once the workflow is more mature ([see here](https://github.com/lightning.auriga/snakemake-unit-tests)).
 
+### Python testing with `pytest`
 The testing under `lib/` is currently functional. Partial testing exists for the builtin scripts under `workflow/scripts`: the new utilities
 for this implementation are tested, but some code inherited from the legacy pipeline(s) is not yet covered. To run the tests, do the following (from top level):
 
 ```bash
 mamba install pytest-cov
 pytest --cov=lib --cov=workflow/scripts lib workflow/scripts
+```
+
+
+### R testing with `testthat`
+The testing under `workflow/scripts` is currently functional. The tests can be run with the utility script `run_tests.R`:
+
+```bash
+Rscript ./run_tests.R
+```
+
+To execute the above command, the environment must have an instance of R with appropriate libraries:
+
+```bash
+mamba install -c bioconda -c conda-forge "r-base>=4" r-testthat r-covr r-r.utils r-desctools
 ```

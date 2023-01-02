@@ -27,7 +27,7 @@ def test_map_fastq_from_project_and_sample(
     config["behaviors"]["trim-adapters-before-alignment"] = use_trimmed
     ## with trimming, the target should be fastp output; otherwise, it's the fastq input symlink or copy
     if use_trimmed is True:
-        expected = "results/fastp/PROJ1/SAM2_{}_{}_fastp.fastq".format(
+        expected = "results/fastp/PROJ1/SAM2_{}_{}_fastp.fastq.gz".format(
             wildcards_with_lane.lane, readname
         )
     else:
@@ -66,7 +66,7 @@ def test_get_bams_by_lane(wildcards_without_lane, standard_config, standard_mani
     to acquire all lane-specific files for a sample
     based on manifest fastq entries.
     """
-    expected = ["results/bwa-mem2/PROJ1/SAM2_{}.{}".format(x, suffix) for x in ["L001", "L002"]]
+    expected = ["results/aligned/PROJ1/SAM2_{}.{}".format(x, suffix) for x in ["L001", "L002"]]
     observed = tc.get_bams_by_lane(
         wildcards_without_lane, standard_config, standard_manifest, suffix
     )
@@ -110,8 +110,7 @@ def test_construct_alignstats_targets(wildcards_without_lane, standard_manifest)
     the output files of alignstats.
     """
     expected = [
-        "results/alignstats/PROJ1/{}.bwa2a.alignstats.json".format(x)
-        for x in ["SAM1", "SAM2", "SAM3"]
+        "results/alignstats/PROJ1/{}.alignstats.json".format(x) for x in ["SAM1", "SAM2", "SAM3"]
     ]
     observed = tc.construct_alignstats_targets(wildcards_without_lane, standard_manifest)
     ## this function is used for snakemake target population, so order is irrelevant
@@ -153,15 +152,15 @@ def test_construct_picard_qc_targets(wildcards_without_lane, standard_manifest):
     assert observed == expected
 
 
-def test_construct_octopus_targets(standard_manifest):
+def test_construct_snv_targets(standard_config, standard_manifest):
     """
-    Test that construct_octopus_targets can determine
-    the output sorted vcf files of the octopus sub-dag.
+    Test that construct_snv_targets can determine
+    the output sorted vcf files of the SNV caller sub-dag.
     """
     expected = [
         "results/octopus/PROJ1/{}.sorted.vcf.gz".format(x) for x in ["SAM1", "SAM2", "SAM3"]
     ]
-    observed = tc.construct_octopus_targets(standard_manifest)
+    observed = tc.construct_snv_targets(standard_config, standard_manifest)
     ## this function is used for snakemake target population, so order is irrelevant
     expected.sort()
     observed.sort()
