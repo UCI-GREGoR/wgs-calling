@@ -224,6 +224,44 @@ def construct_fastqc_posttrimming_targets(wildcards: Namedlist, manifest: pd.Dat
     return list(set(results_r1))
 
 
+def construct_fastqc_combined_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    a run of fastQC, but on lane-combined fastqs
+    """
+    results_prefix = "results/fastqc_combined"
+    results_r1 = [
+        "{}/{}/{}_R1_fastqc.zip".format(results_prefix, wildcards.projectid, x)
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
+    ]
+    results_r2 = [
+        "{}/{}/{}_R2_fastqc.zip".format(results_prefix, wildcards.projectid, x)
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
+    ]
+    results_r1.extend(results_r2)
+    return list(set(results_r1))
+
+
+def construct_fastqc_posttrimming_combined_targets(
+    wildcards: Namedlist, manifest: pd.DataFrame
+) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    a run of fastQC, for fastqs after trimming, but on lane-combined fastqs
+    """
+    results_prefix = "results/fastqc_posttrimming_combined"
+    results_r1 = [
+        "{}/{}/{}_R1_fastp_fastqc.zip".format(results_prefix, wildcards.projectid, x)
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
+    ]
+    results_r2 = [
+        "{}/{}/{}_R2_fastp_fastqc.zip".format(results_prefix, wildcards.projectid, x)
+        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
+    ]
+    results_r1.extend(results_r2)
+    return list(set(results_r1))
+
+
 def construct_fastp_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
     """
     From basic input manifest entries, construct output targets for
