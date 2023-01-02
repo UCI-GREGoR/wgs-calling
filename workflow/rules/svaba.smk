@@ -63,5 +63,5 @@ rule svaba_select_output_variants:
     shell:
         "mkdir -p {params.tmpdir} && "
         "echo -e '{params.bam}\\t{wildcards.sampleid}' > {output.linker} && "
-        "bcftools reheader -O u -s {output.linker} {input.vcf} | "
+        "bcftools reheader -s {output.linker} {input.vcf} | "
         "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf}"
