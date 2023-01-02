@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 	- the best available git description of your installed pipeline version
 	- the version data of all pertinent packages installed from conda
 	- descriptions of the most prominent user configuration settings and commentary on the impact of important settings therein
+- gvcf generation by DeepVariant
 
 ### Changed
 
@@ -27,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - due to TIDDIT update, manual conversion of `TDUP` variants is no longer relevant,
   as these were harmonized away to standardized SV types between <3 and current
 - duplicates are now removed, instead of just marked
+- sites with FILTER=PASS but GT=./. are now removed before ensemble calling
+  - impacts TIDDIT and delly
 
 ### Removed
 
