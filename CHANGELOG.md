@@ -10,8 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - support for [delly](https://github.com/dellytools/delly)
 - support for [lumpy](https://github.com/arq5x/lumpy-sv)
   - lumpy's own repo recommends using [smoove](https://github.com/brentp/smoove) to actually run lumpy, and so that's recapitulated here
+- support for [svaba](https://github.com/walaj/svaba)
 - ensemble SV calling
   - variants are still merged with svdb, but additional filters are applied to select out subsets of variants based on how many/which callers detected them
+- methods summary and version reporting
+  - once the workflow instance's conda environments have been installed, for example after the run is complete, run `snakemake -j1 summarize_methods`
+    to emit a report in `results/reports` that summarizes:
+	- the bioinformatic methodology deployed in your installed version of the workflow
+	- the best available git description of your installed pipeline version
+	- the version data of all pertinent packages installed from conda
+	- descriptions of the most prominent user configuration settings and commentary on the impact of important settings therein
 
 ## [0.2.0] - DeepVariant
 
