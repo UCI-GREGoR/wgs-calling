@@ -92,8 +92,6 @@ properties:
         properties:
           fasta:
             type: string
-          reportable-regions:
-            type: string
         required:
           - fasta
         additionalProperties: no
@@ -118,17 +116,6 @@ properties:
           - known-indels-vcf-gz-tbi
           - dbsnp138-vcf
           - dbsnp138-vcf-idx
-        additionalProperties: no
-  collectwgsmetrics:
-    type: object
-    patternProperties:
-      "^grch[0-9]+$":
-        type: object
-        properties:
-          reportable-regions:
-            type: string
-        required:
-          - reportable-regions
         additionalProperties: no
   dnascope:
     type: object
