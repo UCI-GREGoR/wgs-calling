@@ -139,7 +139,7 @@ and annotated in the manifest.
 
 Quality control data from the above read QC tools as well as somalier, verifybamid, alignstats,  and assorted gatk4/picard analysis tools
 are aggregated in a multiqc report at `results/multiqc/{projectid}/multiqc.alignment.html`. This version of the quality report is currently
-bugged, and should only be used for considering alignment QC results until further notice.
+under active modification, and should only be used for considering alignment QC results (as opposed to pre-alignment read QC) until further notice.
 
 #### Variant Calling
 

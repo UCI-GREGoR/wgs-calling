@@ -37,6 +37,8 @@ def get_conda_version_string(pkgname: str, require_first: bool = False):
         "{}/{}".format(conda_dir, y)
         for y in filter(lambda x: x.endswith(".yaml"), os.listdir(conda_dir))
     ]
+    candidate_yamls = []
+    candidate_tags = []
     for yaml_file in yaml_files:
         with open(yaml_file, "r") as f:
             config = yaml.safe_load(f)
@@ -44,21 +46,36 @@ def get_conda_version_string(pkgname: str, require_first: bool = False):
             if require_first and config["dependencies"][0] != pkgname:
                 continue
             env_prefix = yaml_file.removesuffix(".yaml")
-            targets = [
-                "{}/conda-meta/{}".format(env_prefix, y)
-                for y in filter(
-                    lambda x: x.startswith(pkgname),
-                    os.listdir("{}/conda-meta".format(env_prefix)),
-                )
-            ]
-            ## let's make the dangerous assumption that the first such result is the one we want.
-            ## there are instances of packages with identical prefix strings (e.g. lumpy-sv- and
-            ## lumpy-sv-minimal-). in that particular instance, the actual version number is the same;
-            ## and while in such instances we'd often expect the version numbers to be the same,
-            ## there's no easy guarantee of that
-            pkg_tag = os.path.basename(targets[0]).removeprefix(pkgname + "-").removesuffix(".json")
-            return pkg_tag.split("-")[0]
-    return "{not found in installed conda environments}"
+            candidate_yamls.append(env_prefix)
+    for env_prefix in candidate_yamls:
+        targets = [
+            "{}/conda-meta/{}".format(env_prefix, y)
+            for y in filter(
+                lambda x: x.startswith(pkgname),
+                os.listdir("{}/conda-meta".format(env_prefix)),
+            )
+        ]
+        ## let's make the dangerous assumption that the first such result is the one we want.
+        ## there are instances of packages with identical prefix strings (e.g. lumpy-sv- and
+        ## lumpy-sv-minimal-). in that particular instance, the actual version number is the same;
+        ## and while in such instances we'd often expect the version numbers to be the same,
+        ## there's no easy guarantee of that
+        pkg_tag = (
+            os.path.basename(targets[0])
+            .removeprefix(pkgname + "-")
+            .removesuffix(".json")
+            .split("-")[0]
+        )
+        candidate_tags.append(pkg_tag)
+    ## this script does not currently have a method of distinguishing between multiple installations of the same
+    ## conda environment that have been installed in the same place due to e.g. development changes to conda env specs.
+    ## for the moment, we can at least detect if this has occurred, and not return the entirely wrong answer.
+    if len(set(candidate_tags)) == 1:
+        return candidate_tags[0]
+    elif len(candidate_tags) > 0:
+        return "{multiple conflicting versions found in installed conda environments}"
+    else:
+        return "{not found in installed conda environments}"
 
 
 def describe_read_qc(config: dict) -> list:
