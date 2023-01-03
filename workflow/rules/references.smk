@@ -9,11 +9,13 @@ rule download_reference_data:
 
     In some instances, the remote source will be gzipped but the local version
     won't be; in that instance, decompress midflight.
+
+    I'm giving up on remotes, because the FTP one is unusable with conda env creation.
     """
-    input:
-        lambda wildcards: tc.map_reference_file(wildcards, config),
     output:
         "reference_data/{reference_file}",
+    params:
+        lambda wildcards: tc.map_reference_file(wildcards, config),
     benchmark:
         "results/performance_benchmarks/download_reference_data/{reference_file}.tsv"
     conda:
@@ -24,13 +26,11 @@ rule download_reference_data:
         qname="small",
         tmpdir="temp/",
     shell:
-        'if [[ "{input}" = *".gz" ]] && [[ "{output}" != *".gz" ]] ; then cat {input} | gunzip -c > {output} ; else cp {input} {output} ; fi'
-
-
-## Note that I'm switching back and forth between simple bash handling and Snakemake remote providers,
-## as I'm trying to decide which one I want. The simple bash handler is as follows:
-## 'if [[ "{params}" == s3://* ]] ; then aws s3 cp {params} {output} ; else cp {params} {output} ; fi'
-## Also, for the bash version, the remote file needs to be a params entry; as a remote provider, it is input
+        'if [[ "{params}" == "s3://"* ]] ; then aws s3 cp {params} {output}.staging ; '
+        'elif [[ "{params}" == "http://"* ]] || [[ "{params}" == "https://"* ]] || [[ "{params}" == "ftp://"* ]] ; then wget -O {output}.staging {params} ; '
+        "else cp {params} {output}.staging ; fi ; "
+        'if [[ "{params}" = *".gz" ]] && [[ "{output}" != *".gz" ]] ; then cat {output}.staging | gunzip -c > {output} && rm {output}.staging ; '
+        "else mv {output}.staging {output} ; fi"
 
 
 rule index_vcf:

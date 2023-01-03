@@ -2,13 +2,6 @@ import os
 
 import pandas as pd
 from snakemake.io import AnnotatedString, Namedlist
-from snakemake.remote.FTP import RemoteProvider as FTPRemoteProvider
-from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
-from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
-
-S3 = S3RemoteProvider()
-HTTP = HTTPRemoteProvider()
-FTP = FTPRemoteProvider()
 
 
 def map_fastq_from_project_and_sample(
@@ -303,14 +296,8 @@ def map_reference_file(wildcards: Namedlist, config: dict) -> str | AnnotatedStr
         current_lvl = current_lvl[query]
     ## The intention for this function was to distinguish between S3 file paths and others,
     ## and return wrapped objects related to the remote provider service when appropriate.
-    ## There have been periodic issues with the remote provider interface, but it seems
-    ## to be working, somewhat inefficiently but very conveniently, for the time being.
-    if current_lvl.startswith("s3://"):
-        return S3.remote(current_lvl)
-    elif current_lvl.startswith("https://"):
-        return HTTP.remote(current_lvl)
-    elif current_lvl.startswith("ftp://"):
-        return FTP.remote(current_lvl)
+    ## There have been periodic issues with the remote provider interface, and the FTP one
+    ## is completely unusable with conda env creation due to timeouts, so I'm giving up
     return current_lvl
 
 
