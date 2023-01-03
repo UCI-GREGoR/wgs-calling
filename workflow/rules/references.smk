@@ -6,6 +6,9 @@ rule download_reference_data:
     All the interesting stuff happens in the input mapping function,
     which uses the path contents between 'reference_data' and the actual
     filename to determine which configured reference file to pull.
+
+    In some instances, the remote source will be gzipped but the local version
+    won't be; in that instance, decompress midflight.
     """
     input:
         lambda wildcards: tc.map_reference_file(wildcards, config),
@@ -21,7 +24,7 @@ rule download_reference_data:
         qname="small",
         tmpdir="temp/",
     shell:
-        "cp {input} {output}"
+        'if [[ "{input}" = *".gz" ]] && [[ "{output}" != *".gz" ]] ; then cat {input} | gunzip -c > {output} ; else cp {input} {output} ; fi'
 
 
 ## Note that I'm switching back and forth between simple bash handling and Snakemake remote providers,
