@@ -246,9 +246,6 @@ rule picard_collectwgsmetrics:
         dic="reference_data/{}/{}/ref.fasta.dict".format(
             config["behaviors"]["aligner"], reference_build
         ),
-        intervals="reference_data/collectwgsmetrics/{}/ref.reportable-regions".format(
-            reference_build
-        ),
     output:
         txt="results/collectwgsmetrics/{fileprefix}.picard.collect_wgs_metrics.txt",
     benchmark:
@@ -269,5 +266,4 @@ rule picard_collectwgsmetrics:
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "
         "-OUTPUT {output.txt} "
-        "-INTERVALS {input.intervals} "
         "--TMP_DIR {params.tmpdir}"

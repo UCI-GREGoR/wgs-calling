@@ -2,11 +2,13 @@ import os
 
 import pandas as pd
 from snakemake.io import AnnotatedString, Namedlist
+from snakemake.remote.FTP import RemoteProvider as FTPRemoteProvider
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 
 S3 = S3RemoteProvider()
 HTTP = HTTPRemoteProvider()
+FTP = FTPRemoteProvider()
 
 
 def map_fastq_from_project_and_sample(
@@ -307,6 +309,8 @@ def map_reference_file(wildcards: Namedlist, config: dict) -> str | AnnotatedStr
         return S3.remote(current_lvl)
     elif current_lvl.startswith("https://"):
         return HTTP.remote(current_lvl)
+    elif current_lvl.startswith("ftp://"):
+        return FTP.remote(current_lvl)
     return current_lvl
 
 
