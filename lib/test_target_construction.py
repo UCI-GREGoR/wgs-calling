@@ -257,7 +257,7 @@ def test_map_reference_file_s3(wildcards_s3_reference, standard_config):
     Test that map_reference_file can successfully detect things that look
     like they come from an s3 bucket
     """
-    expected = S3.remote("s3://my.skip-regions")
+    expected = "s3://my.skip-regions"
     observed = tc.map_reference_file(wildcards_s3_reference, standard_config)
     assert observed == expected
 
@@ -267,6 +267,6 @@ def test_map_reference_file_url(wildcards_url_reference, standard_config):
     Test that map_reference_file can successfully detect things that look
     like they come from a URL
     """
-    expected = HTTP.remote("https://my.calling-ranges")
+    expected = "https://my.calling-ranges"
     observed = tc.map_reference_file(wildcards_url_reference, standard_config)
     assert observed == expected
