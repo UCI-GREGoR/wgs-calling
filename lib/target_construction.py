@@ -251,11 +251,11 @@ def construct_fastqc_posttrimming_combined_targets(
     """
     results_prefix = "results/fastqc_posttrimming_combined"
     results_r1 = [
-        "{}/{}/{}_R1_fastp_fastqc.zip".format(results_prefix, wildcards.projectid, x)
+        "{}/{}/{}_R1_fastqc.zip".format(results_prefix, wildcards.projectid, x)
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
     ]
     results_r2 = [
-        "{}/{}/{}_R2_fastp_fastqc.zip".format(results_prefix, wildcards.projectid, x)
+        "{}/{}/{}_R2_fastqc.zip".format(results_prefix, wildcards.projectid, x)
         for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
     ]
     results_r1.extend(results_r2)
