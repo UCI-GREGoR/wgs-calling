@@ -117,6 +117,17 @@ properties:
           - dbsnp138-vcf
           - dbsnp138-vcf-idx
         additionalProperties: no
+  somalier:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          sites-vcf-gz:
+            type: string
+        required:
+          - sites-vcf-gz
+        additionalProperties: no
   dnascope:
     type: object
     patternProperties:
@@ -210,6 +221,7 @@ required:
   - behaviors
   - references
   - bqsr
+  - somalier
   - dnascope
   - verifybamid2
   - octopus

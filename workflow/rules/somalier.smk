@@ -11,6 +11,7 @@ rule somalier_extract:
         fai="reference_data/{}/{}/ref.fasta.fai".format(
             config["behaviors"]["aligner"], reference_build
         ),
+        sites_vcf="reference_data/somalier/{}/ref.sites.vcf.gz".format(reference_build),
     output:
         "results/somalier/{projectid}/extract/{fileprefix}.somalier",
     benchmark:
@@ -25,7 +26,7 @@ rule somalier_extract:
         qname="small",
     shell:
         "somalier extract -d {params.extract_dir} "
-        "--sites ${{CONDA_PREFIX}}/share/somalier/sites.GRCh37.vcf.gz "
+        "--sites {input.sites_vcf} "
         "-f {input.fasta} "
         "{input.bam}"
 
