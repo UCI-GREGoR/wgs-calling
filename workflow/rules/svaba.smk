@@ -53,6 +53,7 @@ rule svaba_select_output_variants:
     params:
         tmpdir="temp",
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
+        blacklist_definition='##FILTER=<ID=BLACKLIST,Description=\\"Variant is in calling exclusion region\\">',
     benchmark:
         "results/performance_benchmarks/svaba_select_output_variants/{projectid}/{sampleid}.svaba.tsv"
     conda:
@@ -64,5 +65,6 @@ rule svaba_select_output_variants:
     shell:
         "mkdir -p {params.tmpdir} && "
         "echo -e '{params.bam}\\t{wildcards.sampleid}' > {output.linker} && "
-        "bcftools reheader -s {output.linker} {input.vcf} | "
+        'awk -v blacklist="{params.blacklist_definition}" \'/^#CHROM/ {{OFS="\\t" ; print blacklist"\\n"$0}} ; ! /^#CHROM/\' {input.vcf} | '
+        "bcftools reheader -s {output.linker} | "
         "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf}"
