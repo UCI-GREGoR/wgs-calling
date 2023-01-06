@@ -11,6 +11,7 @@ rule delly_run:
         fai="reference_data/{}/{}/ref.fasta.fai".format(
             config["behaviors"]["aligner"], reference_build
         ),
+        bed="reference_data/delly/{}/ref.exclude.bed".format(reference_build),
     output:
         vcf="results/delly/{projectid}/{sampleid}.delly.vcf.gz",
     conda:
@@ -22,4 +23,4 @@ rule delly_run:
         mem_mb="16000",
         qname="small",
     shell:
-        "delly call -g {input.fasta} {input.bam} | bcftools view -i 'F_MISSING<0.5' -O z -o {output.vcf}"
+        "delly call -g {input.fasta} -x {input.bed} {input.bam} | bcftools view -i 'F_MISSING<0.5' -O z -o {output.vcf}"

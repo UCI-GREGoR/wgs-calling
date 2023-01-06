@@ -202,6 +202,17 @@ properties:
         additionalProperties: no
     required:
       - grch37
+  delly:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          exclude-bed:
+            type: string
+        required:
+          - exclude-bed
+        additionalProperties: no
   lumpy:
     type: object
     patternProperties:
@@ -226,5 +237,6 @@ required:
   - verifybamid2
   - octopus
   - deepvariant
+  - delly
   - lumpy
 additionalProperties: no
