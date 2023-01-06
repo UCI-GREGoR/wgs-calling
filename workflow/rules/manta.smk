@@ -12,8 +12,10 @@ rule manta_configure:
             config["behaviors"]["aligner"], reference_build
         ),
         manta_config=config["parameters"]["manta"]["config-ini"],
-        calling_region="reference_data/manta/{}/ref.calling.range.bed.gz",
-        calling_region_tbi="reference_data/manta/{}/ref.calling.range.bed.gz.tbi",
+        calling_region="reference_data/manta/{}/ref.calling.range.bed.gz".format(reference_build),
+        calling_region_tbi="reference_data/manta/{}/ref.calling.range.bed.gz.tbi".format(
+            reference_build
+        ),
     output:
         temp("temp/manta_workdir/{projectid}/{sampleid}/runWorkflow.py"),
     benchmark:
