@@ -43,7 +43,20 @@ rule svaba_select_output_variants:
     """
     svaba emits filtered and unfiltered variant sets, split by svs and indels.
     this will probably have to wait until there's actual output files to be
-    certain how this should be handled
+    certain how this should be handled.
+
+    This command has been complicated by malformations in the vcf output format from SvABA.
+    The awk and sed and reheader corrections below are as follows:
+
+    - SvABA emits sample IDs as the path to the bamfile that was provided to it. this is obviously
+    a problem as it doesn't respect the actual expected sample ID
+    - using the exclusion bedfile -B with SvABA causes the program to start flagging variants
+    as FILTER=BLACKLIST, but SvABA does not bother to emit a FILTER=BLACKLIST definition in the
+    vcf header
+    - the output vcf contains mysterious additional columns between FORMAT and the genotypes.
+    no idea what's up with that
+    - the output vcf FORMAT definition for PL is '.' but bcftools complains that it should be 'G';
+    that is, one value per genotype
     """
     input:
         vcf="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.sv.vcf",
@@ -66,5 +79,7 @@ rule svaba_select_output_variants:
         "mkdir -p {params.tmpdir} && "
         "echo -e '{params.bam}\\t{wildcards.sampleid}' > {output.linker} && "
         'awk -v blacklist="{params.blacklist_definition}" \'/^#CHROM/ {{OFS="\\t" ; print blacklist"\\n"$0}} ; ! /^#CHROM/\' {input.vcf} | '
+        'awk -F"\\t" \'/^#/ ; ! /^#/ {{OFS = "\\t" ; print $1,$2,$3,$4,$5,$6,$7,$8,$9,$13}}\' | '
+        "sed 's/<ID=PL,Number=.,/<ID=PL,Number=G,/' | "
         "bcftools reheader -s {output.linker} | "
         "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf}"
