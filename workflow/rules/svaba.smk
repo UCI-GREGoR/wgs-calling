@@ -14,6 +14,7 @@ rule svaba_run:
             genome=reference_build,
             suffix=aligner_index_suffixes[config["behaviors"]["aligner"]] + ["fai", "dict"],
         ),
+        bed="reference_data/svaba/{}/ref.exclude.bed".format(reference_build),
     output:
         bps="results/svaba/{projectid}/{sampleid}.bps.txt.gz",
         contigs="results/svaba/{projectid}/{sampleid}.contigs.bam",
@@ -35,7 +36,7 @@ rule svaba_run:
         mem_mb="32000",
         qname="large",
     shell:
-        "svaba run -p {threads} -G {input.bwa_fasta} -I -L 6 -t {input.bam} -a {params.outprefix}"
+        "svaba run -p {threads} -G {input.bwa_fasta} -I -L 6 -t {input.bam} -B {input.bed} -a {params.outprefix}"
 
 
 rule svaba_select_output_variants:

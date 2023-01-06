@@ -80,6 +80,15 @@ lumpy:
     exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/ceph18.b37.lumpy.exclude.2014-01-15.bed"
   grch38:
     exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/exclude.cnvnator_100bp.GRCh38.20170403.bed"
+svaba:
+  grch37:
+    exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/ceph18.b37.lumpy.exclude.2014-01-15.bed"
+  grch38:
+    exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/exclude.cnvnator_100bp.GRCh38.20170403.bed"
+manta:
+  grch38:
+    calling-range-bed-gz: "resources/manta_calling_ranges_grch38.bed.gz"
+    calling-range-bed-gz-tbi: "resources/manta_calling_ranges_grch38.bed.gz.tbi"
 somalier:
   grch37:
     sites-vcf-gz: "https://github.com/brentp/somalier/files/3412455/sites.GRCh37.vcf.gz"

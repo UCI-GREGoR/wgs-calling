@@ -224,6 +224,31 @@ properties:
         required:
           - exclude-bed
         additionalProperties: no
+  svaba:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          exclude-bed:
+            type: string
+        required:
+          - exclude-bed
+        additionalProperties: no
+  manta:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          calling-range-bed-gz:
+            type: string
+          calling-range-bed-gz-tbi:
+            type: string
+        required:
+          - calling-range-bed-gz
+          - calling-range-bed-gz-tbi
+        additionalProperties: no
 required:
   - manifest
   - multiqc-read-config
@@ -239,4 +264,6 @@ required:
   - deepvariant
   - delly
   - lumpy
+  - svaba
+  - manta
 additionalProperties: no
