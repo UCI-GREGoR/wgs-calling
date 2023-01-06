@@ -80,9 +80,19 @@ properties:
         required:
           - config-ini
         additionalProperties: no
+      tiddit:
+        type: object
+        properties:
+          min-contig-size:
+            type: integer
+            min: 0
+        required:
+          - min-contig-size
+        additionalProperties: no
     required:
       - deepvariant
       - manta
+      - tiddit
     additionalProperties: no
   references:
     type: object
