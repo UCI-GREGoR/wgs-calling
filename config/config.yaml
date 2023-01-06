@@ -27,6 +27,8 @@ parameters:
     docker-version: "1.4.0"
   manta:
     config-ini: "config/configManta.py.ini"
+  tiddit:
+    min-contig-size: 2000000
 
 references:
   grch37:
@@ -70,11 +72,25 @@ deepvariant:
     calling-ranges: "resources/deepvariant_calling_ranges_grch37.tsv"
   grch38:
     calling-ranges: "resources/deepvariant_calling_ranges_grch38.tsv"
+delly:
+  grch37:
+    exclude-bed: "https://raw.githubusercontent.com/dellytools/delly/main/excludeTemplates/human.hg19.excl.tsv"
+  grch38:
+    exclude-bed: "https://raw.githubusercontent.com/dellytools/delly/main/excludeTemplates/human.hg38.excl.tsv"
 lumpy:
   grch37:
     exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/ceph18.b37.lumpy.exclude.2014-01-15.bed"
   grch38:
     exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/exclude.cnvnator_100bp.GRCh38.20170403.bed"
+svaba:
+  grch37:
+    exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/ceph18.b37.lumpy.exclude.2014-01-15.bed"
+  grch38:
+    exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/exclude.cnvnator_100bp.GRCh38.20170403.bed"
+manta:
+  grch38:
+    calling-range-bed-gz: "resources/manta_calling_ranges_grch38.bed.gz"
+    calling-range-bed-gz-tbi: "resources/manta_calling_ranges_grch38.bed.gz.tbi"
 somalier:
   grch37:
     sites-vcf-gz: "https://github.com/brentp/somalier/files/3412455/sites.GRCh37.vcf.gz"
