@@ -80,9 +80,19 @@ properties:
         required:
           - config-ini
         additionalProperties: no
+      tiddit:
+        type: object
+        properties:
+          min-contig-size:
+            type: integer
+            min: 0
+        required:
+          - min-contig-size
+        additionalProperties: no
     required:
       - deepvariant
       - manta
+      - tiddit
     additionalProperties: no
   references:
     type: object
@@ -202,6 +212,17 @@ properties:
         additionalProperties: no
     required:
       - grch37
+  delly:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          exclude-bed:
+            type: string
+        required:
+          - exclude-bed
+        additionalProperties: no
   lumpy:
     type: object
     patternProperties:
@@ -212,6 +233,31 @@ properties:
             type: string
         required:
           - exclude-bed
+        additionalProperties: no
+  svaba:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          exclude-bed:
+            type: string
+        required:
+          - exclude-bed
+        additionalProperties: no
+  manta:
+    type: object
+    patternProperties:
+      "^grch[0-9]+$":
+        type: object
+        properties:
+          calling-range-bed-gz:
+            type: string
+          calling-range-bed-gz-tbi:
+            type: string
+        required:
+          - calling-range-bed-gz
+          - calling-range-bed-gz-tbi
         additionalProperties: no
 required:
   - manifest
@@ -226,5 +272,8 @@ required:
   - verifybamid2
   - octopus
   - deepvariant
+  - delly
   - lumpy
+  - svaba
+  - manta
 additionalProperties: no

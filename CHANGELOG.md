@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - support for [delly](https://github.com/dellytools/delly)
+  - calling exclusion ranges userspace configurable
 - support for [lumpy](https://github.com/arq5x/lumpy-sv)
   - lumpy's own repo recommends using [smoove](https://github.com/brentp/smoove) to actually run lumpy, and so that's recapitulated here
+  - calling exclusion ranges userspace configurable
 - support for [svaba](https://github.com/walaj/svaba)
+  - calling exclusion ranges userspace configurable
 - ensemble SV calling
   - variants are still merged with svdb, but additional filters are applied to select out subsets of variants based on how many/which callers detected them
 - methods summary and version reporting
@@ -32,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - impacts TIDDIT and delly
 - alignment multiqc report points to fastqc results from merged-by-lane fastqs
   - in response to user feedback; draft fix for an outstanding issue with the alignment multiqc report
+- calling ranges now configured for Manta
+- min contig size now configured for TIDDIT
 
 ### Removed
 

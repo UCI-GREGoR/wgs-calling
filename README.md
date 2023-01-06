@@ -48,6 +48,9 @@ The following settings are recognized in `config/config.yaml`. Note that each re
     - `config-ini`: relative path to Manta local configuration data. see Manta documentation for more specific information about permitted
 	  values in this config file. the exposure of this file, which is passed to `configManta.py`, is done in anticipation of toggling
 	  settings that can reduce Manta's substantial runtime, e.g. `enableRemoteReadRetrievalForInsertionsInGermlineCallingModes`
+  - `tiddit`: parameters specific to [TIDDIT](https://github.com/SciLifeLab/TIDDIT)
+	- `min-contig-size`: minimum size of contigs on which to make calls, in bases. a minimum size of 2000000 will remove the remaining
+	  non-standard contigs present in the no-alt version of GRCh38, for example. unfortunately, TIDDIT does not directly support calling regions
 - `references`: human genome reference data applicable to multiple tools
   - `fasta`: human sequence fasta file
   - note that the other bwa-style index files attached to this fasta used to be imported by the nextflow workflow. however, presumably by accident,
@@ -84,6 +87,16 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `lumpy`: reference data files specific to [lumpy](https://github.com/arq5x/lumpy-sv) or [smoove](https://github.com/brentp/smoove)
   - `exclude-bed`: set of hard-to-call bed intervals to exclude from analysis. these files are intended to be the ones listed in the tools' documentation,
     but can be customized if desired
+- `delly`: reference data files specific to [delly](https://github.com/dellytools/delly)
+  - `exclude-bed`: set of hard-to-call bed intervals to exclude from analysis. these files are intended to be the ones listed in the tools' documentation,
+    but can be customized if desired
+- `svaba`: reference data files specific to [svaba](https://github.com/walaj/svaba)
+  - `exclude-bed`: set of hard-to-call bed intervals to exclude from analysis. though this option is exposed by SvABA, there is no recommended file
+    to use here, so one might just use the lumpy files, for example
+- `manta`: reference data files specific to [manta](https://github.com/Illumina/manta)
+  - `calling-range-bed-gz`: bgzip-compressed bedfile of valid calling ranges, e.g. autosomes. manta recommends not providing very many regions here,
+    as it evidently causes problems with its task dispatch heuristics
+  - `calling-range-bed-gz-tbi`: tabix index of above compressed bedfile
 
 The following columns are expected in the run manifest, by default at `config/manifest.tsv`:
 - `projectid`: run ID, or other desired grouping of sequencing samples. this will be a subdirectory under individual tools in `results/`
