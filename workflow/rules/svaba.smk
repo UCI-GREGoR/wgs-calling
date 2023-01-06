@@ -50,11 +50,12 @@ rule svaba_select_output_variants:
 
     - SvABA emits sample IDs as the path to the bamfile that was provided to it. this is obviously
     a problem as it doesn't respect the actual expected sample ID
-    - using the exclusion bedfile -B with SvABA causes the program to start flagging variants
-    as FILTER=BLACKLIST, but SvABA does not bother to emit a FILTER=BLACKLIST definition in the
-    vcf header
+    - the program flags variants as FILTER=BLACKLIST, but SvABA does not bother to emit a
+    FILTER=BLACKLIST definition in the vcf header
     - the output vcf contains mysterious additional columns between FORMAT and the genotypes.
-    no idea what's up with that
+    this has evidently been patched in a non-release version of SvABA. this makes me sad. I've checked
+    the commit in question, and evidently it is safe to just ignore the offending columns, as long as
+    that happens before bcftools gets to the file
     - the output vcf FORMAT definition for PL is '.' but bcftools complains that it should be 'G';
     that is, one value per genotype
     """
