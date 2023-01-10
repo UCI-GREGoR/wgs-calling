@@ -6,6 +6,7 @@ fn_clean_exts:
    - "R2.fastq.gz"
    - "R1_001.fastq.gz"
    - "R2_001.fastq.gz"
+   - ".fastq.gz"
 
 
 extra_fn_clean_exts:
