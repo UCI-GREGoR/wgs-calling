@@ -159,7 +159,6 @@ rule picard_collectmultiplemetrics:
         extension=".txt",
         validation_stringency="LENIENT",
         metric_accumulation_level="SAMPLE",
-        stop_after="2000000",
     conda:
         "../envs/gatk4.yaml"
     threads: 1
@@ -176,7 +175,6 @@ rule picard_collectmultiplemetrics:
         "-VALIDATION_STRINGENCY {params.validation_stringency} "
         "-METRIC_ACCUMULATION_LEVEL {params.metric_accumulation_level} "
         "-LEVEL {params.metric_accumulation_level} "
-        "-STOP_AFTER {params.stop_after} "
         "-PROGRAM CollectAlignmentSummaryMetrics "
         "-PROGRAM CollectInsertSizeMetrics "
         "-PROGRAM QualityScoreDistribution "
