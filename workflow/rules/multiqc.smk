@@ -68,7 +68,6 @@ rule run_multiqc_alignment:
                     toolname=[
                         "fastqc_combined",
                         "fastqc_posttrimming_combined",
-                        "fastp",
                         "collectmultiplemetrics",
                         "collectgcbiasmetrics",
                         "collectwgsmetrics",
@@ -76,6 +75,7 @@ rule run_multiqc_alignment:
                         "mosdepth",
                         "contamination",
                         "alignstats",
+                        "markdups",
                     ],
                 )
             )

@@ -1,28 +1,13 @@
 max_table_rows:
   3000
 
+plots_force_interactive: true
+
 fn_clean_exts:
-   - ".bwa2a.bam"
-   - ".mrkdup.sort.bam"
-   - "R1.fastq.gz"
-   - "R2.fastq.gz"
-   - "R1_001.fastq.gz"
-   - "R2_001.fastq.gz"
-   - "sentieon.alignment_summary_metrics.txt"
-   - "sentieon.insert_size_metrics_metrics.txt"
-
-
-extra_fn_clean_exts:
-  - type: regex
-    pattern: "_R1_001.*"
-  - type: regex
-    pattern: "_R2_001.*"
-  - type: regex
-    pattern: "_L00[1-4].*"
-  - type: regex
-    pattern: ".bwa2a.*"
-  - type: regex
-    pattern: ".mosdepth.*"
+   - "_001.fastq.gz"
+   - ".fastq.gz"
+   - "_fastp"
+   - "_fastp.fastq.gz"
 
 
 log_filesize_limit: 2000000000 # 2GB limit for parsing
