@@ -4,7 +4,7 @@ rule svaba_run:
     """
     input:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bam.bai",
+        bai="results/bqsr/{projectid}/{sampleid}.bai",
         bwa_fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),

@@ -2,25 +2,19 @@ max_table_rows:
   3000
 
 fn_clean_exts:
-   - ".bwa2a.bam"
+   - "_L001.bam"
+   - ".bam"
+   - "_L001"
    - ".mrkdup.sort.bam"
-   - "R1.fastq.gz"
-   - "R2.fastq.gz"
-   - "R1_001.fastq.gz"
-   - "R2_001.fastq.gz"
-   - "sentieon.alignment_summary_metrics.txt"
-   - "sentieon.insert_size_metrics_metrics.txt"
+   - "_001.fastq.gz"
+   - ".fastq.gz"
 
 
 extra_fn_clean_exts:
   - type: regex
-    pattern: "_R1_001.*"
+    pattern: "_001.*"
   - type: regex
-    pattern: "_R2_001.*"
-  - type: regex
-    pattern: "_L00[1-4].*"
-  - type: regex
-    pattern: ".bwa2a.*"
+    pattern: "_001.*"
   - type: regex
     pattern: ".mosdepth.*"
 
@@ -30,6 +24,7 @@ log_filesize_limit: 2000000000 # 2GB limit for parsing
 picard_config:
   general_stats_target_coverage:
     - 10
+    - 15
     - 20
     - 30
     - 50
@@ -46,25 +41,27 @@ sp:
   alignstats:
     fn: "alignstats_summary_mqc.tsv"
   picard/gcbias:
-    fn: "collect_gc_bias_metrics_summary.txt"
+    fn_re: ".*gc_bias_metrics.*"
+  picard/markdups:
+    fn_re: ".*mrkdup.score.txt"
 
 module_order:
   - fastqc:
       name: 'FastQC (raw)'
       target: ''
       path_filters:
-        - 'results/fastqc/*/*_fastqc.zip'
+        - 'results/fastqc_combined/*/*_fastqc.zip'
   - fastp
   - fastqc:
       name: 'FastQC (trimmed)'
       target: ''
       path_filters:
-        - 'results/fastqc_posttrimming/*/*_fastqc.zip'
-  - alignstats
-  - somalier
+        - 'results/fastqc_posttrimming_combined/*/*_fastqc.zip'
   - picard
-  - mosdepth
+  - somalier
   - verifybamid
+  - mosdepth
+  - alignstats
   - custom_content
 
 exclude_modules:
