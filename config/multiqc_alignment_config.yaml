@@ -43,9 +43,9 @@ sp:
   alignstats:
     fn: "alignstats_summary_mqc.tsv"
   picard/gcbias:
-    fn: "collect_gc_bias_metrics_summary.txt"
+    fn_re: ".*gc_bias_metrics_summary.txt"
   picard/markdups:
-    fn: "mrkdup.score.txt"
+    fn_re: ".*mrkdup.score.txt"
 
 module_order:
   - fastqc:
