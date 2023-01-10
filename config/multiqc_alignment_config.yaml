@@ -2,14 +2,12 @@ max_table_rows:
   3000
 
 fn_clean_exts:
-   - ".bwa2a.bam"
+   - ".bam"
    - ".mrkdup.sort.bam"
    - "R1.fastq.gz"
    - "R2.fastq.gz"
    - "R1_001.fastq.gz"
    - "R2_001.fastq.gz"
-   - "sentieon.alignment_summary_metrics.txt"
-   - "sentieon.insert_size_metrics_metrics.txt"
 
 
 extra_fn_clean_exts:
@@ -20,8 +18,6 @@ extra_fn_clean_exts:
   - type: regex
     pattern: "_L00[1-4].*"
   - type: regex
-    pattern: ".bwa2a.*"
-  - type: regex
     pattern: ".mosdepth.*"
 
 
@@ -30,6 +26,7 @@ log_filesize_limit: 2000000000 # 2GB limit for parsing
 picard_config:
   general_stats_target_coverage:
     - 10
+    - 15
     - 20
     - 30
     - 50
@@ -53,13 +50,13 @@ module_order:
       name: 'FastQC (raw)'
       target: ''
       path_filters:
-        - 'results/fastqc/*/*_fastqc.zip'
+        - 'results/fastqc_combined/*/*_fastqc.zip'
   - fastp
   - fastqc:
       name: 'FastQC (trimmed)'
       target: ''
       path_filters:
-        - 'results/fastqc_posttrimming/*/*_fastqc.zip'
+        - 'results/fastqc_posttrimming_combined/*/*_fastqc.zip'
   - alignstats
   - somalier
   - picard
