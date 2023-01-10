@@ -76,6 +76,7 @@ rule run_multiqc_alignment:
                         "mosdepth",
                         "contamination",
                         "alignstats",
+                        "markdups",
                     ],
                 )
             )

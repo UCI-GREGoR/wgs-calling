@@ -44,6 +44,8 @@ sp:
     fn: "alignstats_summary_mqc.tsv"
   picard/gcbias:
     fn: "collect_gc_bias_metrics_summary.txt"
+  picard/markdups:
+    fn: "mrkdup.score.txt"
 
 module_order:
   - fastqc:
@@ -57,11 +59,11 @@ module_order:
       target: ''
       path_filters:
         - 'results/fastqc_posttrimming_combined/*/*_fastqc.zip'
-  - alignstats
-  - somalier
   - picard
-  - mosdepth
+  - somalier
   - verifybamid
+  - mosdepth
+  - alignstats
   - custom_content
 
 exclude_modules:
