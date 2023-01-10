@@ -28,8 +28,8 @@ rule run_mosdepth:
     params:
         outprefix="results/mosdepth/{projectid}/{prefix}",
         win_size=1000,
-        mapq=0,
-        T="0,10,20,30",
+        mapq=20,
+        T="0,10,15,20,30",
     conda:
         "../envs/mosdepth.yaml"
     threads: 1
