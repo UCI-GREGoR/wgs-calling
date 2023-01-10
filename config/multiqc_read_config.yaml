@@ -1,19 +1,13 @@
 max_table_rows:
   3000
 
+plots_force_interactive: true
+
 fn_clean_exts:
-   - "R1.fastq.gz"
-   - "R2.fastq.gz"
-   - "R1_001.fastq.gz"
-   - "R2_001.fastq.gz"
+   - "_001.fastq.gz"
    - ".fastq.gz"
-
-
-extra_fn_clean_exts:
-  - type: regex
-    pattern: "_R1_001.*"
-  - type: regex
-    pattern: "_R2_001.*"
+   - "_fastp"
+   - "_fastp.fastq.gz"
 
 
 log_filesize_limit: 2000000000 # 2GB limit for parsing
