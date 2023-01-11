@@ -19,7 +19,7 @@ checkpoint generate_linker:
         "../scripts/construct_linker_from_labbook.R"
 
 
-def construct_export_files(suffix: str) -> list:
+def construct_export_files(wildcards, manifest: pd.DataFrame, suffix: str) -> list:
     """
     Use checkpoint output of linker generation rule to
     determine what files need to be constructed for a
@@ -28,9 +28,12 @@ def construct_export_files(suffix: str) -> list:
     res = []
     linker_fn = checkpoints.generate_linker.get().output[0]
     linker_df = pd.read_csv(linker_fn, sep="\t")
+    subjectids = (manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list(),)
+    ruid = (wildcards.projectid,)
+    targets = linker_df.loc[(linker_df["ru"] == ruid) & (linker_df["sq"] in subjectids), "output"]
     res = expand(
         "results/export/{file_prefix}.{file_suffix}",
-        file_prefix=linker_df["output"],
+        file_prefix=targets.to_list(),
         file_suffix=suffix,
     )
     return res
@@ -95,10 +98,10 @@ rule create_export_manifest:
     report the expected fileset for a data release
     """
     input:
-        bam=lambda wildcards: construct_export_files("bam"),
-        bai=lambda wildcards: construct_export_files("bam.bai"),
-        vcf=lambda wildcards: construct_export_files("snv.vcf.gz"),
-        tbi=lambda wildcards: construct_export_files("snv.vcf.gz.tbi"),
+        bam=lambda wildcards: construct_export_files(wildcards, manifest, "bam"),
+        bai=lambda wildcards: construct_export_files(wildcards, manifest, "bam.bai"),
+        vcf=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz"),
+        tbi=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi"),
     output:
         "results/export/manifest.tsv",
     shell:
