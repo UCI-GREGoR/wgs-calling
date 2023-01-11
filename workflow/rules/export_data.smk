@@ -32,7 +32,8 @@ def construct_export_files(wildcards, manifest: pd.DataFrame, suffix: str) -> li
     ruid = (wildcards.projectid,)
     targets = linker_df.loc[(linker_df["ru"] == ruid) & (linker_df["sq"] in subjectids), "output"]
     res = expand(
-        "results/export/{file_prefix}.{file_suffix}",
+        "results/export/{projectid}/{file_prefix}.{file_suffix}",
+        projectid=wildcards.projectid,
         file_prefix=targets.to_list(),
         file_suffix=suffix,
     )
@@ -103,6 +104,6 @@ rule create_export_manifest:
         vcf=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz"),
         tbi=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi"),
     output:
-        "results/export/manifest.tsv",
+        "results/export/{projectid}/manifest.tsv",
     shell:
         "echo {input.bam} {input.bai} {input.vcf} {input.tbi} > {output}"
