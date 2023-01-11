@@ -19,7 +19,9 @@ shell.executable("/bin/bash")
 shell.prefix("set -euo pipefail; ")
 
 try:
-    pipeline_version = subprocess.check_output(["git", "describe", "--tags", "HEAD"]).strip()
+    pipeline_version = subprocess.check_output(
+        ["git", "describe", "--tags", "HEAD"], encoding="UTF-8"
+    ).strip()
 except subprocess.CalledProcessError:
     pipeline_version = "{version not detected}"
 print("wgs-pipeline version {}".format(pipeline_version))
