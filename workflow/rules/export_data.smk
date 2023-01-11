@@ -134,6 +134,10 @@ rule checksum:
         "md5sum {input} > {output}"
 
 
+localrules:
+    create_export_manifest,
+
+
 rule create_export_manifest:
     """
     For export tracking and checkpointing purposes,
