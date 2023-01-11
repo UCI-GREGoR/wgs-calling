@@ -76,9 +76,9 @@ rule create_bai_export:
     due to idiosyncratic requirements of loading order of rules with inheritance
     """
     input:
-        "results/export/{prefix}.bam",
+        bam="results/export/{prefix}.bam",
     output:
-        "results/export/{prefix}.bai",
+        bai="results/export/{prefix}.bai",
     benchmark:
         "results/performance_benchmarks/create_bai_export/{prefix}.tsv"
     conda:
