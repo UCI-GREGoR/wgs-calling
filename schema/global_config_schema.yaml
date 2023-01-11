@@ -3,6 +3,8 @@ description: global configuration
 properties:
   manifest:
     type: string
+  sample-logbook:
+    type: string
   multiqc-read-config:
     type: string
   multiqc-alignment-config:
@@ -40,7 +42,7 @@ properties:
         additionalProperties: no
       outcome:
         type: string
-        pattern: "^fastqc$|^alignment$|^calling$"
+        pattern: "^fastqc$|^alignment$|^calling$|^release$"
       symlink-fastqs:
         type: boolean
       trim-adapters-before-alignment:
