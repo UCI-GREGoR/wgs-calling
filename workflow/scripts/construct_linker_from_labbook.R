@@ -23,8 +23,6 @@ run.construct.linker <- function(input.fn, output.fn) {
       if (length(jira.col) != 1) {
         next
       }
-      print("thing")
-      print(jira.col)
       for (row.num in seq_len(nrow(df))) {
         pmgrc.id <- c(pmgrc.id, df[row.num, pmgrc.col])
         jira.tickets <- c(jira.tickets, df[row.num, jira.col])
