@@ -24,7 +24,7 @@ def run_construct_somalier_pedfile(linker: str, ruid: str, sampleids: list, outf
     ## Due to fastqs from multiple lanes, the input sample list may contain duplicates,
     ## which is not acceptable in this context.
     ids = pd.DataFrame(
-        data={"ruid": [ruid for ruid in range(len(sampleids))], "sampleid": sampleids}
+        data={"ruid": [ruid for x in range(len(sampleids))], "sampleid": sampleids}
     ).drop_duplicates()
 
     ## load linker information formatted from the lab logbook
