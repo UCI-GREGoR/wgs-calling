@@ -74,6 +74,9 @@ if config["behaviors"]["outcome"] == "calling":
         )
     )
 
+if config["behaviors"]["outcome"] == "release":
+    TARGETS.append("results/export/linker.tsv")
+
 
 ## To deal with the fact that s3 remote provider service is very slow
 ## and sometimes buggy, while not interfering with a streamlined
@@ -102,6 +105,7 @@ include: "rules/deepvariant.smk"
 include: "rules/delly.smk"
 include: "rules/duphold.smk"
 include: "rules/ensemble_sv_calling.smk"
+include: "rules/export_data.smk"
 include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
 include: "rules/lumpy.smk"

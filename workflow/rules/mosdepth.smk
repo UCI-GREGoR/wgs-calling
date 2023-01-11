@@ -27,7 +27,7 @@ rule run_mosdepth:
         "results/performance_benchmarks/run_mosdepth/{projectid}/{prefix}.tsv"
     params:
         outprefix="results/mosdepth/{projectid}/{prefix}",
-        win_size=1000,
+        win_size=200,
         mapq=20,
         T="0,10,15,20,30",
     conda:
