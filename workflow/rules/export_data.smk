@@ -65,7 +65,7 @@ rule create_bam_export:
         "samtools reheader -c 'sed \"s/SM:{wildcards.sqid}/SM:{params.exportid}/ ; "
         "s/LB:{wildcards.sqid}/LB:{params.exportid}/ ; "
         "s/PU:{wildcards.sqid}/PU:{params.exportid}/ ; "
-        "\\$a@CO wgs-pipelineVersion={params.pipeline_version}\"' {input} > {output}"
+        "\\$a@CO\\twgs-pipelineVersion={params.pipeline_version}\"' {input} > {output}"
 
 
 rule create_bai_export:
