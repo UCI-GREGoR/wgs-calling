@@ -84,7 +84,11 @@ if config["behaviors"]["outcome"] == "calling":
     )
 
 if config["behaviors"]["outcome"] == "release":
-    TARGETS.append("results/export/manifest.tsv")
+    TARGETS.append(
+        expand(
+            "results/export/{projectid}/manifest.tsv", projectid=list(set(manifest["projectid"]))
+        )
+    )
 
 
 ## To deal with the fact that s3 remote provider service is very slow
