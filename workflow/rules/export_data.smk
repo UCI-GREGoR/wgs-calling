@@ -68,6 +68,15 @@ rule create_bam_export:
         "\\$a@CO wgs-pipelineVersion={params.pipeline_version}\"' {input} > {output}"
 
 
+use rule samtools_create_bai as create_bai_export with:
+    input:
+        "results/export/{prefix}.bam",
+    output:
+        "results/export/{prefix}.bai",
+    benchmark:
+        "results/performance_benchmarks/create_bai_export/{prefix}.tsv"
+
+
 rule create_snv_vcf_export:
     """
     Take snv vcf output and turn it into something to release
@@ -102,7 +111,7 @@ rule create_export_manifest:
     """
     input:
         bam=lambda wildcards: construct_export_files(wildcards, manifest, "bam"),
-        bai=lambda wildcards: construct_export_files(wildcards, manifest, "bam.bai"),
+        bai=lambda wildcards: construct_export_files(wildcards, manifest, "bai"),
         vcf=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz"),
         tbi=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi"),
     output:
