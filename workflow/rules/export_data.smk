@@ -28,7 +28,7 @@ def construct_export_files(wildcards, manifest: pd.DataFrame, suffix: str) -> li
     res = []
     linker_fn = checkpoints.generate_linker.get().output[0]
     linker_df = pd.read_csv(linker_fn, sep="\t")
-    subjectids = (manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list(),)
+    subjectids = manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
     targets = linker_df.loc[
         (linker_df["ru"] == wildcards.projectid) & [x in subjectids for x in linker_df["sq"]],
         "output",
