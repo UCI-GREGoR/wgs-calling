@@ -145,7 +145,7 @@ rule create_export_manifest:
         vcf=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz"),
         tbi=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi"),
         bam_md5=lambda wildcards: construct_export_files(wildcards, manifest, "bam.md5"),
-        bai_md5=lambda wildcards: construct_export_files(wildcards, manifest, "bai,md5"),
+        bai_md5=lambda wildcards: construct_export_files(wildcards, manifest, "bai.md5"),
         vcf_md5=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.md5"),
         tbi_md5=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi.md5"),
     output:
