@@ -37,7 +37,7 @@ def run_construct_somalier_pedfile(linker: str, ruid: str, sampleids: list, outf
             (linker_data["ru"] == ruid) & (linker_data["sq"] == sampleid), "sex"
         ]
         if len(sample_sex) == 1:
-            self_reported_sex.append(convert_sex_representation(sample_sex))
+            self_reported_sex.append(convert_sex_representation(sample_sex[0]))
         else:
             self_reported_sex.append(0)
 
