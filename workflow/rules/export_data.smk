@@ -68,13 +68,27 @@ rule create_bam_export:
         "\\$a@CO wgs-pipelineVersion={params.pipeline_version}\"' {input} > {output}"
 
 
-use rule samtools_create_bai as create_bai_export with:
+rule create_bai_export:
+    """
+    Index export bam file
+
+    This isn't using rule inheritance from the rule in the picard code
+    due to idiosyncratic requirements of loading order of rules with inheritance
+    """
     input:
         "results/export/{prefix}.bam",
     output:
         "results/export/{prefix}.bai",
     benchmark:
         "results/performance_benchmarks/create_bai_export/{prefix}.tsv"
+    conda:
+        "../envs/samtools.yaml"
+    threads: 4
+    resources:
+        mem_mb="8000",
+        qname="small",
+    shell:
+        "samtools index -@ {threads} -b -o {output.bai} {input.bam}"
 
 
 rule create_snv_vcf_export:
