@@ -65,7 +65,7 @@ if config["behaviors"]["outcome"] != "fastqc":
         ]
     )
 
-if config["behaviors"]["outcome"] == "calling":
+if config["behaviors"]["outcome"] != "fastqc" and config["behaviors"]["outcome"] != "alignment":
     TARGETS.append(
         [
             tc.construct_snv_targets(config, manifest),
