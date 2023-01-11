@@ -22,7 +22,7 @@ try:
     pipeline_version = subprocess.check_output(["git", "describe", "--tags", "HEAD"]).strip()
 except subprocess.CalledProcessError:
     pipeline_version = "{version not detected}"
-print(f"wgs-pipeline version {pipeline_version}")
+print("wgs-pipeline version {}".format(pipeline_version))
 
 
 configfile: "config/config.yaml"
