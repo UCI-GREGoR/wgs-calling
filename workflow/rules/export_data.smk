@@ -155,4 +155,4 @@ rule create_export_manifest:
     output:
         "results/export/{projectid}/manifest.tsv",
     shell:
-        "echo {input.bam} {input.bai} {input.vcf} {input.tbi} > {output}"
+        "echo {input.bam} {input.bai} {input.vcf} {input.tbi} | sed 's/ /\\n/g' > {output}"
