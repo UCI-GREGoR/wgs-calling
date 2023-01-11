@@ -461,10 +461,14 @@ def run_summarize_workflow(config: dict, manta_config: str, oname: str) -> None:
     ## All pipeline instances run read QC
     process_description.extend(describe_read_qc(config))
     ## Only include alignment description if the user requested it, either directly or implicitly
-    if config["behaviors"]["outcome"] == "alignment" or config["behaviors"]["outcome"] == "calling":
+    if (
+        config["behaviors"]["outcome"] == "alignment"
+        or config["behaviors"]["outcome"] == "calling"
+        or config["behaviors"]["outcome"] == "release"
+    ):
         process_description.extend(describe_alignment(config))
     ## Only include calling description if the user requested it
-    if config["behaviors"]["outcome"] == "calling":
+    if config["behaviors"]["outcome"] == "calling" or config["behaviors"]["outcome"] == "release":
         process_description.extend(describe_snv_calling(config))
         process_description.extend(describe_sv_calling(config, manta_config))
     with open(oname, "w") as f:
