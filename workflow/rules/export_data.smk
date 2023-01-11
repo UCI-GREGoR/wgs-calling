@@ -1,4 +1,4 @@
-rule generate_linker:
+checkpoint generate_linker:
     """
     From a sample logbook, generate a simple linker
     between various sample ID types
