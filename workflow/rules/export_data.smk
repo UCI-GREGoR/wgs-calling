@@ -118,6 +118,22 @@ rule create_snv_vcf_export:
         'bcftools reheader -s <(echo "{wildcards.sqid}\\t{params.exportid}") | bgzip -c > {output}'
 
 
+rule checksum:
+    """
+    Create checksum files to go along with transported files
+    """
+    input:
+        "{prefix}",
+    output:
+        "{prefix}.md5",
+    threads: 1
+    resources:
+        mem_mb="1000",
+        qname="small",
+    shell:
+        "md5sum {input} > {output}"
+
+
 rule create_export_manifest:
     """
     For export tracking and checkpointing purposes,
@@ -128,6 +144,10 @@ rule create_export_manifest:
         bai=lambda wildcards: construct_export_files(wildcards, manifest, "bai"),
         vcf=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz"),
         tbi=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi"),
+        bam_md5=lambda wildcards: construct_export_files(wildcards, manifest, "bam.md5"),
+        bai_md5=lambda wildcards: construct_export_files(wildcards, manifest, "bai,md5"),
+        vcf_md5=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.md5"),
+        tbi_md5=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi.md5"),
     output:
         "results/export/{projectid}/manifest.tsv",
     shell:
