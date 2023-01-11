@@ -72,7 +72,7 @@ rule create_snv_vcf_export:
             toolname=config["behaviors"]["snv-caller"],
         ),
     output:
-        "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.vcf.gz",
+        "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.snv.vcf.gz",
     params:
         pipeline_version=pipeline_version,
         exportid="{sampleid}_{lsid}_{sqid}",
