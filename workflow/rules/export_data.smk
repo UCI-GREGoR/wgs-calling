@@ -47,7 +47,7 @@ rule create_bam_export:
     Take bqsr bamfile and turn it into something to release
     """
     input:
-        "results/bqsr/{projectid}/{sampleid}.bam",
+        "results/bqsr/{projectid}/{sqid}.bam",
     output:
         "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.bam",
     params:
@@ -62,9 +62,9 @@ rule create_bam_export:
         mem_mb="2000",
         qname="small",
     shell:
-        "samtools reheader -c 'sed \"s/SM:{wildcards.sampleid}/SM:{params.exportid}/ ; "
-        "s/LB:{wildcards.sampleid}/LB:{params.exportid}/ ; "
-        "s/PU:{wildcards.sampleid}/PU:{params.exportid}/ ; "
+        "samtools reheader -c 'sed \"s/SM:{wildcards.sqid}/SM:{params.exportid}/ ; "
+        "s/LB:{wildcards.sqid}/LB:{params.exportid}/ ; "
+        "s/PU:{wildcards.sqid}/PU:{params.exportid}/ ; "
         "\\$a@CO wgs-pipelineVersion={params.pipeline_version}\"' {input} > {output}"
 
 
@@ -97,7 +97,7 @@ rule create_snv_vcf_export:
     """
     input:
         expand(
-            "results/{toolname}/{{projectid}}/{{sampleid}}.sorted.vcf.gz",
+            "results/{toolname}/{{projectid}}/{{sqid}}.sorted.vcf.gz",
             toolname=config["behaviors"]["snv-caller"],
         ),
     output:
@@ -115,7 +115,7 @@ rule create_snv_vcf_export:
         qname="small",
     shell:
         'bcftools annotate -h <(echo "## wgs-pipelineVersion={params.pipeline_version}") -O v {input} | '
-        'bcftools reheader -s <(echo "{wildcards.sampleid}\\t{params.exportid}") -o {output}'
+        'bcftools reheader -s <(echo "{wildcards.sqid}\\t{params.exportid}") -o {output}'
 
 
 rule create_export_manifest:
