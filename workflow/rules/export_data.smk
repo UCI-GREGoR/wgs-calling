@@ -115,7 +115,7 @@ rule create_snv_vcf_export:
         mem_mb="2000",
         qname="small",
     shell:
-        'bcftools annotate -h <(echo "##wgs-pipelineVersion={params.pipeline_version}\\n##reference={params.reference_build}") -O u {input} | '
+        'bcftools annotate -h <(echo -e "##wgs-pipelineVersion={params.pipeline_version}\\n##reference={params.reference_build}") -O u {input} | '
         'bcftools view -i \'(FILTER = "PASS" | FILTER = ".")\' -O u | '
         "bcftools norm -m -both -O u | "
         "bcftools view -i 'FORMAT/DP >= 10 & FORMAT/GQ >= 20 & "
