@@ -114,8 +114,8 @@ rule create_snv_vcf_export:
         mem_mb="2000",
         qname="small",
     shell:
-        'bcftools annotate -h <(echo "##wgs-pipelineVersion={params.pipeline_version}") -O v {input} | '
-        'bcftools view -i \'(FILTER = "PASS" | FILTER = ".")\' '
+        'bcftools annotate -h <(echo "##wgs-pipelineVersion={params.pipeline_version}") -O u {input} | '
+        'bcftools view -i \'(FILTER = "PASS" | FILTER = ".")\' -O v | '
         'bcftools reheader -s <(echo -e "{wildcards.sqid}\\t{params.exportid}") | bgzip -c > {output}'
 
 
