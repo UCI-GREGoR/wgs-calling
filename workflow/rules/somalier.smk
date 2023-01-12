@@ -77,5 +77,9 @@ rule somalier_build_pedfile:
             manifest["projectid"] == wildcards.projectid, "sampleid"
         ].to_list(),
         ruid=lambda wildcards: wildcards.projectid,
+    threads: 1
+    resources:
+        mem_mb="1000",
+        qname="small",
     script:
         "../scripts/construct_somalier_pedfile.py"

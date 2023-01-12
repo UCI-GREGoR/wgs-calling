@@ -1,6 +1,13 @@
 library(openxlsx)
 library(stringr)
 
+construct.output.stems <- function(df) {
+  ## try to construct IDs of the format PMGRCID_LSID_SQID
+  output.stems <- paste(df$pmgrc, df$ls, df$sq, sep = "_")
+  output.stems[is.na(df$pmgrc) | is.na(df$ls) | is.na(df$sq)] <- NA
+  output.stems
+}
+
 run.construct.linker <- function(input.fn, output.fn) {
   sheet.names <- openxlsx::getSheetNames(input.fn)
   pmgrc.id <- c()
@@ -23,8 +30,6 @@ run.construct.linker <- function(input.fn, output.fn) {
       if (length(jira.col) != 1) {
         next
       }
-      print("thing")
-      print(jira.col)
       for (row.num in seq_len(nrow(df))) {
         pmgrc.id <- c(pmgrc.id, df[row.num, pmgrc.col])
         jira.tickets <- c(jira.tickets, df[row.num, jira.col])
@@ -49,6 +54,9 @@ run.construct.linker <- function(input.fn, output.fn) {
   )
   ## remove entries with useless content
   res <- res[!(is.na(res[, 1]) & is.na(res[, 2]) & is.na(res[, 3]) & is.na(res[, 4]) & is.na(res[, 5])), ]
+  ## construct output stems for deliverables, if sufficient information is present to fit the accepted format
+  output.stems <- construct.output.stems(res)
+  res$output <- output.stems
   write.table(res, output.fn, row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 }
 
