@@ -9,3 +9,4 @@ dependencies:
   - r-rmarkdown
   - r-kableextra
   - r-upsetr
+  - r-openxlsx

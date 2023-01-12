@@ -7,6 +7,7 @@ import pandas as pd
 from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 from snakemake.utils import validate
+import subprocess
 
 S3 = S3RemoteProvider()
 
@@ -16,6 +17,14 @@ from lib import target_construction as tc
 
 shell.executable("/bin/bash")
 shell.prefix("set -euo pipefail; ")
+
+try:
+    pipeline_version = subprocess.check_output(
+        ["git", "describe", "--tags", "HEAD"], encoding="UTF-8"
+    ).strip()
+except subprocess.CalledProcessError:
+    pipeline_version = "{version not detected}"
+print("wgs-pipeline version {}".format(pipeline_version))
 
 
 configfile: "config/config.yaml"
@@ -56,7 +65,7 @@ if config["behaviors"]["outcome"] != "fastqc":
         ]
     )
 
-if config["behaviors"]["outcome"] == "calling":
+if config["behaviors"]["outcome"] != "fastqc" and config["behaviors"]["outcome"] != "alignment":
     TARGETS.append(
         [
             tc.construct_snv_targets(config, manifest),
@@ -71,6 +80,13 @@ if config["behaviors"]["outcome"] == "calling":
         expand(
             "results/reports/{projectid}/sv_caller_comparison.html",
             projectid=list(set(manifest["projectid"])),
+        )
+    )
+
+if config["behaviors"]["outcome"] == "release":
+    TARGETS.append(
+        expand(
+            "results/export/{projectid}/manifest.tsv", projectid=list(set(manifest["projectid"]))
         )
     )
 
@@ -102,6 +118,7 @@ include: "rules/deepvariant.smk"
 include: "rules/delly.smk"
 include: "rules/duphold.smk"
 include: "rules/ensemble_sv_calling.smk"
+include: "rules/export_data.smk"
 include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
 include: "rules/lumpy.smk"

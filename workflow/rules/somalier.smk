@@ -60,8 +60,14 @@ rule somalier_build_pedfile:
     """
     Generate a pedfile for sex check for somalier.
 
-    In v0.0.1 here, this pedfile will only contain placeholders.
+    In the post 0.3.0 world, this is going to try to suck in self-reported sex
+    information from the newly-generated sample ID linker. However, this information
+    is only unreliably reported upstream, and as such this sexcheck will still be
+    very incomplete. This is flagged to eventually be replaced with queries to retool,
+    once that is actually implemented and operational.
     """
+    input:
+        linker="results/export/linker.tsv",
     output:
         "results/somalier/{projectid}/relate/somalier.ped",
     benchmark:
@@ -70,5 +76,10 @@ rule somalier_build_pedfile:
         subjectids=lambda wildcards: manifest.loc[
             manifest["projectid"] == wildcards.projectid, "sampleid"
         ].to_list(),
+        ruid=lambda wildcards: wildcards.projectid,
+    threads: 1
+    resources:
+        mem_mb="1000",
+        qname="small",
     script:
         "../scripts/construct_somalier_pedfile.py"
