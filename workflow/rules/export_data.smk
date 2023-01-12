@@ -116,7 +116,10 @@ rule create_snv_vcf_export:
     shell:
         'bcftools annotate -h <(echo "##wgs-pipelineVersion={params.pipeline_version}") -O u {input} | '
         'bcftools view -i \'(FILTER = "PASS" | FILTER = ".")\' -O u | '
-        "bcftools norm -m -both -O v | "
+        "bcftools norm -m -both -O u | "
+        "bcftools view -i 'FORMAT/DP >= 10 & FORMAT/GQ >= 20 & "
+        '((FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) >= 0.2 & FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) <= 0.8 & GT != "1/1") | '
+        ' (FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) <= 0.05 & GT = "1/1"))\' -O v | '
         'bcftools reheader -s <(echo -e "{wildcards.sqid}\\t{params.exportid}") | bgzip -c > {output}'
 
 
