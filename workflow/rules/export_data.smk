@@ -104,6 +104,7 @@ rule create_snv_vcf_export:
         "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.snv.vcf.gz",
     params:
         pipeline_version=pipeline_version,
+        reference_build=reference_build,
         exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
         "results/performance_benchmarks/create_snv_vcf_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
@@ -114,7 +115,7 @@ rule create_snv_vcf_export:
         mem_mb="2000",
         qname="small",
     shell:
-        'bcftools annotate -h <(echo "##wgs-pipelineVersion={params.pipeline_version}") -O u {input} | '
+        'bcftools annotate -h <(echo "##wgs-pipelineVersion={params.pipeline_version}\\n##reference={params.reference_build}") -O u {input} | '
         'bcftools view -i \'(FILTER = "PASS" | FILTER = ".")\' -O u | '
         "bcftools norm -m -both -O u | "
         "bcftools view -i 'FORMAT/DP >= 10 & FORMAT/GQ >= 20 & "
