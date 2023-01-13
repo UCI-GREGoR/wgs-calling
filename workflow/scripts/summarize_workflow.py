@@ -184,9 +184,10 @@ def describe_alignment(config: dict) -> list:
         )
     res = (
         res
-        + " CollectWgsMetrics is run in the targeted intervals of the NA12878 'reportable regions.' Note that this selection "
-        "of regions based on a single HG reference subject is neither appropriate nor evidently originally intended for prior CLO workflow, "
-        "and as such is flagged for modification in the near future."
+        + " CollectWgsMetrics is run genome-wide. In the legacy implementation of the pipeline, this step was run "
+        "exclusively in the targeted intervals of the NA12878 'reportable regions.' Note that this selection "
+        "of regions based on a single HG reference subject is neither appropriate nor evidently originally intended for prior CLO workflow. "
+        "This functionality is flagged for additional consideration at a later date."
     )
     res = (
         res
@@ -196,8 +197,10 @@ def describe_alignment(config: dict) -> list:
         + verify_version
         + "; and [somalier](https://github.com/brentp/somalier) "
         + somalier_version
-        + ". Note that currently neither self-reported sex nor expected pedigree information is available to somalier, so "
-        "its utility as a qc tool is very limited."
+        + ". Note that currently self-reported sex information is pulled from the upstream 'labbook' sheet, and as such "
+        "the completeness of this sexcheck assessment is only as good as the completeness of the 'labbook' annotations. "
+        "Furthermore, the relatedness information encoded in the subject ID is not parsed out for direct relatedness checking, "
+        "as this is flagged for inclusion in a downstream inter-flowcell QC workflow."
     )
     all_lines.append(res)
     return all_lines
@@ -441,6 +444,38 @@ def describe_sv_calling(config: dict, manta_config: str) -> list:
     return all_lines
 
 
+def describe_data_release(config: dict) -> None:
+    """
+    Describe the steps applied to data release
+    """
+    all_lines = ["## Data Preparation for Release"]
+    all_lines.append("### Aligned Reads")
+    all_lines.append(
+        "Aligned bam files are mapped to generic sample IDs {PMGRCID_LSID_SQID}. For recordkeeping, this pipeline's version is added "
+        "to the bam header as a comment (@CO) tag."
+    )
+    all_lines.append("### SNV Calls")
+    all_lines.append(
+        "SNV VCFs are mapped to generic sample IDs {PMGRCID_LSID_SQID}, both in filename and in vcf sample header."
+        "SNVs are filtered based on the following criteria (derived from [Pedersen _et al._](https://doi.org/10.1038/s41525-021-00227-3):\n"
+        "  - filter status PASS\n"
+        "  - genotype quality >= 20\n"
+        "  - genotype total depth >= 10\n"
+        "  - allele balance (heterozygotes) between 0.2 and 0.8, inclusive\n"
+        "  - allele balance (homozygous alts) less than 0.04\n"
+        "    - this is the only meaningful deviation from the above citation,\n"
+        "      and is based on the observation that a meaningful proportion of\n"
+        "      calls have exactly one reference read, and at least by observation\n"
+        "      it seems like these variants don't deserve to be filtered out at this step\n"
+        '  - not intersecting with ENCODE "blacklist V2" regions [here](https://github.com/Boyle-Lab/Blacklist)\n'
+        "Multiallelics are split with [bcftools norm -m -both](https://samtools.github.io/bcftools/bcftools.html#norm).\n"
+        "For recordkeeping purposes, this pipeline's version is added to the vcf header. For compatibility with Moon,\n"
+        "the genome reference code provided in configuration ("
+        + config["genome-build"]
+        + ") is added to the vcf header."
+    )
+
+
 def run_summarize_workflow(config: dict, manta_config: str, oname: str) -> None:
     """
     Describe the current workflow structure in prose
@@ -473,6 +508,9 @@ def run_summarize_workflow(config: dict, manta_config: str, oname: str) -> None:
         process_description.extend(describe_sv_calling(config, manta_config))
     with open(oname, "w") as f:
         f.writelines(["{}\n\n".format(x) for x in process_description])
+    ## Only include data release description if the user requested it
+    if config["behaviors"]["outcome"] == "release":
+        process_description.extend(describe_data_release(config))
 
 
 run_summarize_workflow(
