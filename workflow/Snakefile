@@ -86,7 +86,9 @@ if config["behaviors"]["outcome"] != "fastqc" and config["behaviors"]["outcome"]
 if config["behaviors"]["outcome"] == "release":
     TARGETS.append(
         expand(
-            "results/export/{projectid}/manifest.tsv", projectid=list(set(manifest["projectid"]))
+            "results/export/{projectid}/{filename}",
+            projectid=list(set(manifest["projectid"])),
+            filename=["manifest.tsv", "methods_summary.html"],
         )
     )
 

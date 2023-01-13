@@ -104,8 +104,11 @@ properties:
         properties:
           fasta:
             type: string
+          exclusion-regions-bed:
+            type: string
         required:
           - fasta
+          - exclusion-regions-bed
         additionalProperties: no
     required:
       - grch37
