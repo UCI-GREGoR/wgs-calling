@@ -511,11 +511,12 @@ def run_summarize_workflow(config: dict, manta_config: str, oname: str) -> None:
     if config["behaviors"]["outcome"] == "calling" or config["behaviors"]["outcome"] == "release":
         process_description.extend(describe_snv_calling(config))
         process_description.extend(describe_sv_calling(config, manta_config))
-    with open(oname, "w") as f:
-        f.writelines(["{}\n\n".format(x) for x in process_description])
     ## Only include data release description if the user requested it
     if config["behaviors"]["outcome"] == "release":
         process_description.extend(describe_data_release(config))
+    ## Write to output
+    with open(oname, "w") as f:
+        f.writelines(["{}\n\n".format(x) for x in process_description])
 
 
 run_summarize_workflow(
