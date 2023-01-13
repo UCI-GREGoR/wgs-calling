@@ -177,8 +177,8 @@ rule create_export_manifest:
     report the expected fileset for a data release
     """
     input:
-        bam=lambda wildcards: construct_export_files(wildcards, manifest, "bam"),
-        bai=lambda wildcards: construct_export_files(wildcards, manifest, "bai"),
+        bam=lambda wildcards: construct_export_files(wildcards, manifest, "cram"),
+        bai=lambda wildcards: construct_export_files(wildcards, manifest, "crai"),
         vcf=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz"),
         tbi=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi"),
         cram_md5=lambda wildcards: construct_export_files(wildcards, manifest, "cram.md5"),
