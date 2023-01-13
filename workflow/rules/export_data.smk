@@ -68,8 +68,7 @@ rule create_cram_export:
         "samtools reheader -c 'sed \"s/SM:{wildcards.sqid}/SM:{params.exportid}/ ; "
         "s/LB:{wildcards.sqid}/LB:{params.exportid}/ ; "
         "s/PU:{wildcards.sqid}/PU:{params.exportid}/ ; "
-        "\\$a@CO\\twgs-pipelineVersion={params.pipeline_version} ; "
-        "\\$a@CO\\treferenceUrl={params.reference_url}\"' {input.bam} | "
+        "\\$a@CO\\twgs-pipelineVersion={params.pipeline_version}\\n@CO\\treferenceUrl={params.reference_url}\"' {input.bam} | "
         "samtools view -C -T {input.fasta} -o {output}"
 
 
