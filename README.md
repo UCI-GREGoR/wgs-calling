@@ -35,7 +35,7 @@ The following settings are recognized in `config/config.yaml`. Note that each re
   - `sv-ensemble`: settings controlling SV ensemble calling. note that the below settings can be applied in combination
 	- `min-count`: the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering
 	- `required-callers`: a list of which tools, if any, a variant absolutely must appear in to survive ensemble filtering
-  - `outcome`: which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`
+  - `outcome`: which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`; or `release` to prepare results for distribution
   - `symlink-fastqs`: whether to copy (no) or symlink (yes) input fastqs into workspace. symlinking is faster and more memory-efficient, but
     less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch.
   - `trim-adapters-before-alignment`: whether to use adapter trimmed fastq output of `fastp` as input to aligner.
@@ -57,6 +57,7 @@ The following settings are recognized in `config/config.yaml`. Note that each re
     these annotation files were getting pulled from various different directories in a way that suggested that they might be delinked from their
 	source fasta. in reality, the source reference fastas were probably the same; but to avoid any difficulties downstream, now only the fasta
 	itself is pulled in from remote, and the index files are regenerated. this also substantially cleans up the configuration.
+  - `exclusion-regions-bed`: set of bed regions to be excluded from output SNV data. expected to be from https://doi.org/10.1038/s41598-019-45839-z
 - `bsqr`: reference files for base quality score recalibration from GATK4
   - `known-indels-vcf-gz`: VCF of "gold standard" indels for BQSR. intended to be pulled from Broad's cloud files
   - `known-indels-vcf-gz-tbi`: tabix index for above known indels vcf
@@ -181,6 +182,29 @@ Note that this information focuses on methodology as opposed to results, and onl
 environments be installed; so if you want to predict what the workflow will do before actually running it,
 complete user configuration, run `snakemake -j1 --use-conda --conda-create-envs-only`, and then run the `summarize_methods`
 target to generate a markdown description of what _would_ happen if the pipeline were deployed.
+
+#### Data Release
+
+When the pipeline is run in `release` mode, postprocessed output files for each flowcell will be emitted under
+`results/export/{flowcell_id}`. The following files will be present, with modifications as annotated:
+
+- aligned reads, represented as lossless crams
+  - the source reference fasta used for these files is both in the cram header as a `@CO` and also
+    annotated in the output methods html
+- `crai` index files for the above cram files
+- SNV vcfs, bgzip-compressed, with the following modifications (derived from [Pedersen _et al._](https://doi.org/10.1038/s41525-021-00227-3):
+  - only FILTER=PASS variants
+  - multiallelics split to biallelics
+  - GQ >= 20
+  - DP >= 10
+  - for heterozygotes, allele balance on `[0.2, 0.8]`
+  - for homozygous alts, allele balance `<= 0.04`
+  - variants intersected with configured exclusion regions removed
+- tabix indices for the above vcfs
+- md5 sums for all above files
+- a plaintext `manifest.tsv` containing a list of the above data files
+- an immutable `methods_summary.html` representing the rendered version of the above methods description for the version of the pipeline that created the release
+- SVs TBD
 
 ### Step 6: Commit changes
 

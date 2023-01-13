@@ -42,19 +42,22 @@ def construct_export_files(wildcards, manifest: pd.DataFrame, suffix: str) -> li
     return res
 
 
-rule create_bam_export:
+rule create_cram_export:
     """
     Take bqsr bamfile and turn it into something to release
     """
     input:
-        "results/bqsr/{projectid}/{sqid}.bam",
+        bam="results/bqsr/{projectid}/{sqid}.bam",
+        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
+        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
-        "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.bam",
+        "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.cram",
     params:
         pipeline_version=pipeline_version,
+        reference_url=config["references"][reference_build]["fasta"],
         exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_bam_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
+        "results/performance_benchmarks/create_cram_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/samtools.yaml"
     threads: 1
@@ -65,22 +68,23 @@ rule create_bam_export:
         "samtools reheader -c 'sed \"s/SM:{wildcards.sqid}/SM:{params.exportid}/ ; "
         "s/LB:{wildcards.sqid}/LB:{params.exportid}/ ; "
         "s/PU:{wildcards.sqid}/PU:{params.exportid}/ ; "
-        "\\$a@CO\\twgs-pipelineVersion={params.pipeline_version}\"' {input} > {output}"
+        "\\$a@CO\\twgs-pipelineVersion={params.pipeline_version}\\n@CO\\treferenceUrl={params.reference_url}\"' {input.bam} | "
+        "samtools view -C -T {input.fasta} -o {output}"
 
 
-rule create_bai_export:
+rule create_crai_export:
     """
-    Index export bam file
+    Index export cram file
 
     This isn't using rule inheritance from the rule in the picard code
     due to idiosyncratic requirements of loading order of rules with inheritance
     """
     input:
-        bam="results/export/{prefix}.bam",
+        bam="results/export/{prefix}.cram",
     output:
-        bai="results/export/{prefix}.bai",
+        bai="results/export/{prefix}.crai",
     benchmark:
-        "results/performance_benchmarks/create_bai_export/{prefix}.tsv"
+        "results/performance_benchmarks/create_crai_export/{prefix}.tsv"
     conda:
         "../envs/samtools.yaml"
     threads: 4
@@ -88,7 +92,7 @@ rule create_bai_export:
         mem_mb="8000",
         qname="small",
     shell:
-        "samtools index -@ {threads} -b -o {output.bai} {input.bam}"
+        "samtools index -@ {threads} -o {output.crai} {input.cram}"
 
 
 rule create_snv_vcf_export:
@@ -101,7 +105,7 @@ rule create_snv_vcf_export:
             toolname=config["behaviors"]["snv-caller"],
         ),
     output:
-        "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.snv.vcf.gz",
+        temp("results/export/{projectid}/{sampleid}_{lsid}_{sqid}.snv-allregions.vcf.gz"),
     params:
         pipeline_version=pipeline_version,
         reference_build=reference_build,
@@ -122,6 +126,28 @@ rule create_snv_vcf_export:
         '((FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) >= 0.2 & FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) <= 0.8 & GT != "1/1") | '
         ' (FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) <= 0.05 & GT = "1/1"))\' -O v | '
         'bcftools reheader -s <(echo -e "{wildcards.sqid}\\t{params.exportid}") | bgzip -c > {output}'
+
+
+rule remove_snv_region_exclusions:
+    """
+    Once SNV output data have had hard filters applied, further remove configurable exclusion regions.
+    These are intended to be pulled from https://github.com/Boyle-Lab/Blacklist
+    """
+    input:
+        vcf="{prefix}.snv-allregions.vcf.gz",
+        bed="reference_data/references/{}/ref.exclusion.regions.bed".format(reference_build),
+    output:
+        vcf="{prefix}.snv.vcf.gz",
+    benchmark:
+        "results/remove_snv_region_exclusions/{prefix}.tsv"
+    conda:
+        "../envs/bedtools.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    shell:
+        "bedtools intersect -a {input.vcf} -b {input.bed} -wa -v -header | bgzip -c > {output}"
 
 
 rule checksum:
@@ -150,15 +176,33 @@ rule create_export_manifest:
     report the expected fileset for a data release
     """
     input:
-        bam=lambda wildcards: construct_export_files(wildcards, manifest, "bam"),
-        bai=lambda wildcards: construct_export_files(wildcards, manifest, "bai"),
+        bam=lambda wildcards: construct_export_files(wildcards, manifest, "cram"),
+        bai=lambda wildcards: construct_export_files(wildcards, manifest, "crai"),
         vcf=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz"),
         tbi=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi"),
-        bam_md5=lambda wildcards: construct_export_files(wildcards, manifest, "bam.md5"),
-        bai_md5=lambda wildcards: construct_export_files(wildcards, manifest, "bai.md5"),
+        cram_md5=lambda wildcards: construct_export_files(wildcards, manifest, "cram.md5"),
+        crai_md5=lambda wildcards: construct_export_files(wildcards, manifest, "crai.md5"),
         vcf_md5=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.md5"),
         tbi_md5=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi.md5"),
     output:
         "results/export/{projectid}/manifest.tsv",
     shell:
-        "echo {input.bam} {input.bai} {input.vcf} {input.tbi} | sed 's/ /\\n/g' > {output}"
+        "echo {input.cram} {input.crai} {input.vcf} {input.tbi} | sed 's/ /\\n/g' > {output}"
+
+
+rule create_export_methods_summary:
+    """
+    For export tracking, report methods summary in immutable form
+    """
+    input:
+        "results/reports/methods_summary.md",
+    output:
+        "results/export/{projectid}/methods_summary.html",
+    conda:
+        "../envs/python_markdown.yaml"
+    threads: 1
+    resources:
+        mem_mb="1000",
+        qname="small",
+    shell:
+        "python -m markdown {input} > {output}"
