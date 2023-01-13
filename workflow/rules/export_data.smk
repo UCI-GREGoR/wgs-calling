@@ -48,13 +48,13 @@ rule create_cram_export:
     """
     input:
         bam="results/bqsr/{projectid}/{sqid}.bam",
-        fasta="reference_data/references/{}/ref.fasta".format(genome_build),
-        fai="reference_data.references/{}/ref.fasta.fai".format(genome_build),
+        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
+        fai="reference_data.references/{}/ref.fasta.fai".format(reference_build),
     output:
         "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.cram",
     params:
         pipeline_version=pipeline_version,
-        reference_url=config["references"][genome_build]["fasta"],
+        reference_url=config["references"][reference_build]["fasta"],
         exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
         "results/performance_benchmarks/create_cram_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
