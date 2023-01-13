@@ -80,9 +80,9 @@ rule create_crai_export:
     due to idiosyncratic requirements of loading order of rules with inheritance
     """
     input:
-        bam="results/export/{prefix}.cram",
+        cram="results/export/{prefix}.cram",
     output:
-        bai="results/export/{prefix}.crai",
+        crai="results/export/{prefix}.crai",
     benchmark:
         "results/performance_benchmarks/create_crai_export/{prefix}.tsv"
     conda:
