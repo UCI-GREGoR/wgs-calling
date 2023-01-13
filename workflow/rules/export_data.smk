@@ -42,19 +42,21 @@ def construct_export_files(wildcards, manifest: pd.DataFrame, suffix: str) -> li
     return res
 
 
-rule create_bam_export:
+rule create_cram_export:
     """
     Take bqsr bamfile and turn it into something to release
     """
     input:
-        "results/bqsr/{projectid}/{sqid}.bam",
+        bam="results/bqsr/{projectid}/{sqid}.bam",
+        fasta="reference_data/references/{}/ref.fasta".format(genome_build),
+        fai="reference_data.references/{}/ref.fasta.fai".format(genome_build),
     output:
-        "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.bam",
+        "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.cram",
     params:
         pipeline_version=pipeline_version,
         exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_bam_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
+        "results/performance_benchmarks/create_cram_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/samtools.yaml"
     threads: 1
@@ -65,22 +67,23 @@ rule create_bam_export:
         "samtools reheader -c 'sed \"s/SM:{wildcards.sqid}/SM:{params.exportid}/ ; "
         "s/LB:{wildcards.sqid}/LB:{params.exportid}/ ; "
         "s/PU:{wildcards.sqid}/PU:{params.exportid}/ ; "
-        "\\$a@CO\\twgs-pipelineVersion={params.pipeline_version}\"' {input} > {output}"
+        "\\$a@CO\\twgs-pipelineVersion={params.pipeline_version}\"' {input.bam} | "
+        "samtools view -C -T {input.fasta} -o {output}"
 
 
-rule create_bai_export:
+rule create_crai_export:
     """
-    Index export bam file
+    Index export cram file
 
     This isn't using rule inheritance from the rule in the picard code
     due to idiosyncratic requirements of loading order of rules with inheritance
     """
     input:
-        bam="results/export/{prefix}.bam",
+        bam="results/export/{prefix}.cram",
     output:
-        bai="results/export/{prefix}.bai",
+        bai="results/export/{prefix}.crai",
     benchmark:
-        "results/performance_benchmarks/create_bai_export/{prefix}.tsv"
+        "results/performance_benchmarks/create_crai_export/{prefix}.tsv"
     conda:
         "../envs/samtools.yaml"
     threads: 4
@@ -88,7 +91,7 @@ rule create_bai_export:
         mem_mb="8000",
         qname="small",
     shell:
-        "samtools index -@ {threads} -b -o {output.bai} {input.bam}"
+        "samtools index -@ {threads} -o {output.crai} {input.cram}"
 
 
 rule create_snv_vcf_export:
@@ -176,14 +179,14 @@ rule create_export_manifest:
         bai=lambda wildcards: construct_export_files(wildcards, manifest, "bai"),
         vcf=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz"),
         tbi=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi"),
-        bam_md5=lambda wildcards: construct_export_files(wildcards, manifest, "bam.md5"),
-        bai_md5=lambda wildcards: construct_export_files(wildcards, manifest, "bai.md5"),
+        cram_md5=lambda wildcards: construct_export_files(wildcards, manifest, "cram.md5"),
+        crai_md5=lambda wildcards: construct_export_files(wildcards, manifest, "crai.md5"),
         vcf_md5=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.md5"),
         tbi_md5=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi.md5"),
     output:
         "results/export/{projectid}/manifest.tsv",
     shell:
-        "echo {input.bam} {input.bai} {input.vcf} {input.tbi} | sed 's/ /\\n/g' > {output}"
+        "echo {input.cram} {input.crai} {input.vcf} {input.tbi} | sed 's/ /\\n/g' > {output}"
 
 
 rule create_export_methods_summary:
