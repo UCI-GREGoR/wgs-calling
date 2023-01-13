@@ -57,6 +57,7 @@ The following settings are recognized in `config/config.yaml`. Note that each re
     these annotation files were getting pulled from various different directories in a way that suggested that they might be delinked from their
 	source fasta. in reality, the source reference fastas were probably the same; but to avoid any difficulties downstream, now only the fasta
 	itself is pulled in from remote, and the index files are regenerated. this also substantially cleans up the configuration.
+  - `exclusion-regions-bed`: set of bed regions to be excluded from output SNV data. expected to be from https://doi.org/10.1038/s41598-019-45839-z
 - `bsqr`: reference files for base quality score recalibration from GATK4
   - `known-indels-vcf-gz`: VCF of "gold standard" indels for BQSR. intended to be pulled from Broad's cloud files
   - `known-indels-vcf-gz-tbi`: tabix index for above known indels vcf
