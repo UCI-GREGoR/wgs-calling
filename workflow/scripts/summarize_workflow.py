@@ -460,18 +460,19 @@ def describe_data_release(config: dict) -> None:
     )
     all_lines.append("### SNV Calls")
     all_lines.append(
-        "SNV VCFs are mapped to generic sample IDs {PMGRCID_LSID_SQID}, both in filename and in vcf sample header."
-        "SNVs are filtered based on the following criteria (derived from [Pedersen _et al._](https://doi.org/10.1038/s41525-021-00227-3):\n\n"
+        "SNV VCFs are mapped to generic sample IDs {PMGRCID_LSID_SQID}, both in filename and in vcf sample header. "
+        "SNVs are filtered based on the following criteria (derived from [Pedersen _et al._](https://doi.org/10.1038/s41525-021-00227-3)):\n\n"
         "  - filter status PASS\n\n"
         "  - genotype quality >= 20\n\n"
         "  - genotype total depth >= 10\n\n"
         "  - allele balance (heterozygotes) between 0.2 and 0.8, inclusive\n\n"
         "  - allele balance (homozygous alts) less than 0.04\n\n"
-        "    - this is the only meaningful deviation from the above citation,\n\n"
-        "      and is based on the observation that a meaningful proportion of\n\n"
-        "      calls have exactly one reference read, and at least by observation\n\n"
+        "    - this is the only meaningful deviation from the above citation,\n"
+        "      and is based on the observation that a meaningful proportion of\n"
+        "      calls have exactly one reference read, and at least by observation\n"
         "      it seems like these variants don't deserve to be filtered out at this step\n\n"
         '  - not intersecting with ENCODE "blacklist V2" regions [here](https://github.com/Boyle-Lab/Blacklist)\n\n'
+        "  - not intersecting telomeres or centromeres, as annotated in the UCSC table browser\n\n"
         "Multiallelics are split with [bcftools norm -m -both](https://samtools.github.io/bcftools/bcftools.html#norm).\n"
         "For recordkeeping purposes, this pipeline's version is added to the vcf header. For compatibility with Moon,\n"
         "the genome reference code provided in configuration ("
