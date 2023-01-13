@@ -35,7 +35,7 @@ The following settings are recognized in `config/config.yaml`. Note that each re
   - `sv-ensemble`: settings controlling SV ensemble calling. note that the below settings can be applied in combination
 	- `min-count`: the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering
 	- `required-callers`: a list of which tools, if any, a variant absolutely must appear in to survive ensemble filtering
-  - `outcome`: which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`
+  - `outcome`: which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`; or `release` to prepare results for distribution
   - `symlink-fastqs`: whether to copy (no) or symlink (yes) input fastqs into workspace. symlinking is faster and more memory-efficient, but
     less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch.
   - `trim-adapters-before-alignment`: whether to use adapter trimmed fastq output of `fastp` as input to aligner.
