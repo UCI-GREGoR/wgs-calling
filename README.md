@@ -183,6 +183,29 @@ environments be installed; so if you want to predict what the workflow will do b
 complete user configuration, run `snakemake -j1 --use-conda --conda-create-envs-only`, and then run the `summarize_methods`
 target to generate a markdown description of what _would_ happen if the pipeline were deployed.
 
+#### Data Release
+
+When the pipeline is run in `release` mode, postprocessed output files for each flowcell will be emitted under
+`results/export/{flowcell_id}`. The following files will be present, with modifications as annotated:
+
+- aligned reads, represented as lossless crams
+  - the source reference fasta used for these files is both in the cram header as a `@CO` and also
+    annotated in the output methods html
+- `crai` index files for the above cram files
+- SNV vcfs, bgzip-compressed, with the following modifications (derived from [Pedersen _et al._](https://doi.org/10.1038/s41525-021-00227-3):
+  - only FILTER=PASS variants
+  - multiallelics split to biallelics
+  - GQ >= 20
+  - DP >= 10
+  - for heterozygotes, allele balance on `[0.2, 0.8]`
+  - for homozygous alts, allele balance `<= 0.04`
+  - variants intersected with configured exclusion regions removed
+- tabix indices for the above vcfs
+- md5 sums for all above files
+- a plaintext `manifest.tsv` containing a list of the above data files
+- an immutable `methods_summary.html` representing the rendered version of the above methods description for the version of the pipeline that created the release
+- SVs TBD
+
 ### Step 6: Commit changes
 
 Whenever you change something, don't forget to commit the changes back to your github copy of the repository:
