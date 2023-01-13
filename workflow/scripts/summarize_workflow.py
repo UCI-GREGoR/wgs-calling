@@ -461,7 +461,7 @@ def describe_data_release(config: dict) -> None:
     all_lines.append("### SNV Calls")
     all_lines.append(
         "SNV VCFs are mapped to generic sample IDs {PMGRCID_LSID_SQID}, both in filename and in vcf sample header."
-        "SNVs are filtered based on the following criteria (derived from [Pedersen _et al._](https://doi.org/10.1038/s41525-021-00227-3):\n"
+        "SNVs are filtered based on the following criteria (derived from [Pedersen _et al._](https://doi.org/10.1038/s41525-021-00227-3):\n\n"
         "  - filter status PASS\n"
         "  - genotype quality >= 20\n"
         "  - genotype total depth >= 10\n"
@@ -471,7 +471,7 @@ def describe_data_release(config: dict) -> None:
         "      and is based on the observation that a meaningful proportion of\n"
         "      calls have exactly one reference read, and at least by observation\n"
         "      it seems like these variants don't deserve to be filtered out at this step\n"
-        '  - not intersecting with ENCODE "blacklist V2" regions [here](https://github.com/Boyle-Lab/Blacklist)\n'
+        '  - not intersecting with ENCODE "blacklist V2" regions [here](https://github.com/Boyle-Lab/Blacklist)\n\n'
         "Multiallelics are split with [bcftools norm -m -both](https://samtools.github.io/bcftools/bcftools.html#norm).\n"
         "For recordkeeping purposes, this pipeline's version is added to the vcf header. For compatibility with Moon,\n"
         "the genome reference code provided in configuration ("
