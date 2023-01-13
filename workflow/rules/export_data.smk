@@ -101,7 +101,7 @@ rule create_snv_vcf_export:
             toolname=config["behaviors"]["snv-caller"],
         ),
     output:
-        "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.snv.vcf.gz",
+        temp("results/export/{projectid}/{sampleid}_{lsid}_{sqid}.snv-allregions.vcf.gz"),
     params:
         pipeline_version=pipeline_version,
         reference_build=reference_build,
@@ -122,6 +122,28 @@ rule create_snv_vcf_export:
         '((FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) >= 0.2 & FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) <= 0.8 & GT != "1/1") | '
         ' (FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) <= 0.05 & GT = "1/1"))\' -O v | '
         'bcftools reheader -s <(echo -e "{wildcards.sqid}\\t{params.exportid}") | bgzip -c > {output}'
+
+
+rule remove_snv_region_exclusions:
+    """
+    Once SNV output data have had hard filters applied, further remove configurable exclusion regions.
+    These are intended to be pulled from https://github.com/Boyle-Lab/Blacklist
+    """
+    input:
+        vcf="{prefix}.snv-allregions.vcf.gz",
+        bed="reference_data/references/{}/ref.exclusion.regions.bed".format(reference_build),
+    output:
+        vcf="{prefix}.snv.vcf.gz",
+    benchmark:
+        "results/remove_snv_region_exclusions/{prefix}.tsv"
+    conda:
+        "../envs/bedtools.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    shell:
+        "bedtools intersect -a {input.vcf} -b {input.bed} -wa -v -header | bgzip -c > {output}"
 
 
 rule checksum:
