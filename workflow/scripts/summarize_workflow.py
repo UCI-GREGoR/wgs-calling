@@ -474,6 +474,7 @@ def describe_data_release(config: dict) -> None:
         + config["genome-build"]
         + ") is added to the vcf header."
     )
+    return all_lines
 
 
 def run_summarize_workflow(config: dict, manta_config: str, oname: str) -> None:
