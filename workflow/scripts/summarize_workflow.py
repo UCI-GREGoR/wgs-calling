@@ -451,8 +451,12 @@ def describe_data_release(config: dict) -> None:
     all_lines = ["## Data Preparation for Release"]
     all_lines.append("### Aligned Reads")
     all_lines.append(
-        "Aligned bam files are mapped to generic sample IDs {PMGRCID_LSID_SQID}. For recordkeeping, this pipeline's version is added "
-        "to the bam header as a comment (@CO) tag."
+        "Aligned bam files are mapped to generic sample IDs {PMGRCID_LSID_SQID} and converted to lossless crams. "
+        "For recordkeeping, this pipeline's version is added to the bam header as a comment (@CO) tag. "
+        "For additional recordkeeping, the source path for the input reference fasta used for this pipeline "
+        "is also added to the cram header. For posterity, that same information is reported here: "
+        + config["references"][config["genome-build"]]["fasta"]
+        + "."
     )
     all_lines.append("### SNV Calls")
     all_lines.append(

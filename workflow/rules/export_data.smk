@@ -54,6 +54,7 @@ rule create_cram_export:
         "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.cram",
     params:
         pipeline_version=pipeline_version,
+        reference_url=config["references"][genome_build]["fasta"],
         exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
         "results/performance_benchmarks/create_cram_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
@@ -67,7 +68,8 @@ rule create_cram_export:
         "samtools reheader -c 'sed \"s/SM:{wildcards.sqid}/SM:{params.exportid}/ ; "
         "s/LB:{wildcards.sqid}/LB:{params.exportid}/ ; "
         "s/PU:{wildcards.sqid}/PU:{params.exportid}/ ; "
-        "\\$a@CO\\twgs-pipelineVersion={params.pipeline_version}\"' {input.bam} | "
+        "\\$a@CO\\twgs-pipelineVersion={params.pipeline_version} ; "
+        "\\$a@CO\\treferenceUrl={params.reference_url}\"' {input.bam} | "
         "samtools view -C -T {input.fasta} -o {output}"
 
 
