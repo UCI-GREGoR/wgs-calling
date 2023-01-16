@@ -466,7 +466,7 @@ def describe_data_release(config: dict) -> None:
         "  - genotype quality >= 20\n\n"
         "  - genotype total depth >= 10\n\n"
         "  - allele balance (heterozygotes) between 0.2 and 0.8, inclusive\n\n"
-        "  - allele balance (homozygous alts) less than 0.04\n\n"
+        "  - allele balance (homozygous alts) less than 0.05\n\n"
         "    - this is the only meaningful deviation from the above citation,\n"
         "      and is based on the observation that a meaningful proportion of\n"
         "      calls have exactly one reference read, and at least by observation\n"
