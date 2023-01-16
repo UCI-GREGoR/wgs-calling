@@ -13,6 +13,7 @@ S3 = S3RemoteProvider()
 
 sys.path.insert(0, ".")
 from lib import resource_calculator as rc
+from lib import string_manipulations as sm
 from lib import target_construction as tc
 
 shell.executable("/bin/bash")

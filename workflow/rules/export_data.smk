@@ -98,6 +98,19 @@ rule create_crai_export:
 rule create_snv_vcf_export:
     """
     Take snv vcf output and turn it into something to release
+
+    Note the following things that have nothing to do with actual vcf spec compliance:
+
+    - Moon, the first intended downstream user of this file, has some truly absurd logic
+    for determining reference genome build that involves sniffing the vcf header for the
+    case-sensitive strings 'GRCh38' 'hg38' 'GRCh37' 'hg19'. as such, the user configuration
+    genome build tag is modified to try to meet that format restriction
+
+    - Moon commits the cardinal sin of reimplementing a vcf parser. It does not seem
+    to bother to implement a handler for unphased heterozygotes encoded as '1/0', even
+    though they are completely valid and equivalent to hets encoded as '0/1'. I don't
+    know at this time whether this is actually causing any particular issue with Moon,
+    but I'm going to resentfully change these genotypes manually in anticipation.
     """
     input:
         expand(
@@ -108,7 +121,7 @@ rule create_snv_vcf_export:
         temp("results/export/{projectid}/{sampleid}_{lsid}_{sqid}.snv-allregions.vcf.gz"),
     params:
         pipeline_version=pipeline_version,
-        reference_build=reference_build,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
         exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
         "results/performance_benchmarks/create_snv_vcf_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
@@ -125,7 +138,8 @@ rule create_snv_vcf_export:
         "bcftools view -i 'FORMAT/DP >= 10 & FORMAT/GQ >= 20 & "
         '((FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) >= 0.2 & FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) <= 0.8 & GT != "1/1") | '
         ' (FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) <= 0.05 & GT = "1/1"))\' -O v | '
-        'bcftools reheader -s <(echo -e "{wildcards.sqid}\\t{params.exportid}") | bgzip -c > {output}'
+        'bcftools reheader -s <(echo -e "{wildcards.sqid}\\t{params.exportid}") | '
+        "sed 's|\\t1/0:|\\t0/1:|' | bgzip -c > {output}"
 
 
 rule remove_snv_region_exclusions:
