@@ -108,7 +108,7 @@ rule create_snv_vcf_export:
         temp("results/export/{projectid}/{sampleid}_{lsid}_{sqid}.snv-allregions.vcf.gz"),
     params:
         pipeline_version=pipeline_version,
-        reference_build=reference_build,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
         exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
         "results/performance_benchmarks/create_snv_vcf_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
