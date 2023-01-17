@@ -21,6 +21,7 @@ behaviors:
   outcome: "calling"
   symlink-fastqs: no
   trim-adapters-before-alignment: yes
+  assume-last-sample-sex: "female"
 
 parameters:
   deepvariant:
