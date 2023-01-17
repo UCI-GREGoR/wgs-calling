@@ -29,6 +29,18 @@ picard_config:
     - 30
     - 50
 
+mosdepth_config:
+  exclude_contigs:
+    - "*_alt"
+    - "*_decoy"
+    - "*_random"
+    - "chrUn*"
+    - "HLA*"
+    - "chrM"
+    - "chrEBV"
+    - "M"
+    - "MT"
+
 custom_data:
   alignstats:
     id: 'alignstats'
