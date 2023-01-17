@@ -34,6 +34,7 @@ def run_construct_somalier_pedfile(
 
     ## iterate across manifest subjects and try to find matching values
     self_reported_sex = []
+    family_id = []
     mat_id = []
     pat_id = []
     parent_data = {}
@@ -67,10 +68,12 @@ def run_construct_somalier_pedfile(
                 mat_id.append(parent_data["{}_{}-2".format(ruid, parsed_sample_id[1])])
             else:
                 mat_id.append("0")
+            family_id.append(parsed_sample_id[2])
         else:
             self_reported_sex.append(0)
             mat_id.append(0)
             pat_id.append(0)
+            family_id.append(0)
 
     last_sample_sex = convert_sex_representation(last_sample_sex)
     if last_sample_sex != 0:
@@ -78,7 +81,7 @@ def run_construct_somalier_pedfile(
 
     x = pd.DataFrame(
         data={
-            "FID": ids["sampleid"],
+            "FID": family_id,
             "Sample": ids["sampleid"],
             "Pat": pat_id,
             "Mat": mat_id,
