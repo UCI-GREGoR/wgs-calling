@@ -15,7 +15,9 @@ def convert_sex_representation(sample_sex: str) -> int:
         return 0
 
 
-def run_construct_somalier_pedfile(linker: str, ruid: str, sampleids: list, outfn: str) -> None:
+def run_construct_somalier_pedfile(
+    linker: str, ruid: str, sampleids: list, last_sample_sex: str, outfn: str
+) -> None:
     """
     Create a somalier format pedfile for linking sample id to sex annotation.
 
@@ -32,21 +34,57 @@ def run_construct_somalier_pedfile(linker: str, ruid: str, sampleids: list, outf
 
     ## iterate across manifest subjects and try to find matching values
     self_reported_sex = []
+    family_id = []
+    mat_id = []
+    pat_id = []
+    parent_data = {}
+    for pmgrcid, ruid, sqid in zip(linker_data["pmgrc"], linker_data["ru"], linker_data["sq"]):
+        parsed_sample_id = pmgrcid.split("-")
+        parent_data["{}_{}-{}".format(ruid, parsed_sample_id[2], parsed_sample_id[3])] = sqid
+
     for ruid, sampleid in zip(ids["ruid"], ids["sampleid"]):
         sample_sex = linker_data.loc[
             (linker_data["ru"] == ruid) & (linker_data["sq"] == sampleid), "sex"
         ]
+        pmgrc_id = linker_data.loc[
+            (linker_data["ru"] == ruid) & (linker_data["sq"] == sampleid), "pmgrc"
+        ]
         if len(sample_sex) == 1:
-            self_reported_sex.append(convert_sex_representation(sample_sex.to_list()[0]))
+            parsed_sample_id = pmgrc_id.to_list()[0].split("-")
+            sex_representation = convert_sex_representation(sample_sex.to_list()[0])
+            if sex_representation != 0:
+                self_reported_sex.append(sex_representation)
+            elif parsed_sample_id[3] == "1":
+                self_reported_sex.append(convert_sex_representation("Male"))
+            elif parsed_sample_id[3] == "2":
+                self_reported_sex.append(convert_sex_representation("Female"))
+            else:
+                self_reported_sex.append(0)
+            if "{}_{}-1".format(ruid, parsed_sample_id[1]) in parent_data:
+                pat_id.append(parent_data["{}_{}-1".format(ruid, parsed_sample_id[1])])
+            else:
+                pat_id.append("0")
+            if "{}_{}-2".format(ruid, parsed_sample_id[1]) in parent_data:
+                mat_id.append(parent_data["{}_{}-2".format(ruid, parsed_sample_id[1])])
+            else:
+                mat_id.append("0")
+            family_id.append(parsed_sample_id[2])
         else:
             self_reported_sex.append(0)
+            mat_id.append(0)
+            pat_id.append(0)
+            family_id.append(0)
+
+    last_sample_sex = convert_sex_representation(last_sample_sex)
+    if last_sample_sex != 0:
+        self_reported_sex[-1] = last_sample_sex
 
     x = pd.DataFrame(
         data={
-            "FID": ids["sampleid"],
+            "FID": family_id,
             "Sample": ids["sampleid"],
-            "Pat": ["0" for x in ids["sampleid"]],
-            "Mat": ["0" for x in ids["sampleid"]],
+            "Pat": pat_id,
+            "Mat": mat_id,
             "Sex": self_reported_sex,
             "Pheno": ["-9" for x in ids["sampleid"]],
         }
@@ -58,5 +96,6 @@ run_construct_somalier_pedfile(
     snakemake.input[0],  # noqa: F821
     snakemake.params["ruid"],  # noqa: F821
     snakemake.params["subjectids"],  # noqa: F821
+    snakemake.params["last_sample_sex"],  # noqa: F821
     snakemake.output[0],  # noqa: F821
 )
