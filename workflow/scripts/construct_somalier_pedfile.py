@@ -15,7 +15,9 @@ def convert_sex_representation(sample_sex: str) -> int:
         return 0
 
 
-def run_construct_somalier_pedfile(linker: str, ruid: str, sampleids: list, outfn: str) -> None:
+def run_construct_somalier_pedfile(
+    linker: str, ruid: str, sampleids: list, last_sample_sex: str, outfn: str
+) -> None:
     """
     Create a somalier format pedfile for linking sample id to sex annotation.
 
@@ -70,6 +72,10 @@ def run_construct_somalier_pedfile(linker: str, ruid: str, sampleids: list, outf
             mat_id.append(0)
             pat_id.append(0)
 
+    last_sample_sex = convert_sex_representation(last_sample_sex)
+    if last_sample_sex != 0:
+        self_reported_sex[-1] = last_sample_sex
+
     x = pd.DataFrame(
         data={
             "FID": ids["sampleid"],
@@ -87,5 +93,6 @@ run_construct_somalier_pedfile(
     snakemake.input[0],  # noqa: F821
     snakemake.params["ruid"],  # noqa: F821
     snakemake.params["subjectids"],  # noqa: F821
+    snakemake.params["last_sample_sex"],  # noqa: F821
     snakemake.output[0],  # noqa: F821
 )

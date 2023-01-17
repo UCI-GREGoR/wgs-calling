@@ -40,6 +40,9 @@ The following settings are recognized in `config/config.yaml`. Note that each re
     less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch.
   - `trim-adapters-before-alignment`: whether to use adapter trimmed fastq output of `fastp` as input to aligner.
     permitted values: `yes`, `no`, or `legacy`. legacy behavior for this option is to not use trimmed output for alignment.
+  - `assume-last-sample-sex`: upstream convention is to include a low-depth NA24385 as the final sample in every flowcell. that sample is not annotated
+    in the logbook in a way that the parser understands. to maintain compatibility with Somalier sexcheck, set this to `female`. if no sex should be assumed
+	for the sample, delete this configuration option
 - `parameters`: tool-specific parameters. note that this section is a work in progress, somewhat more than the rest
   - `deepvariant`: parameters specific to [deepvariant](https://github.com/google/deepvariant)
     - `number-shards`: how many shards to break calling into. needs to be at most the number of available threads in the submission queue
