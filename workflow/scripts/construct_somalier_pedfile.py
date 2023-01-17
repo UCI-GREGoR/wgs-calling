@@ -35,31 +35,40 @@ def run_construct_somalier_pedfile(linker: str, ruid: str, sampleids: list, outf
     mat_id = []
     pat_id = []
     parent_data = {}
-    for sampleid in ids["sampleid"]:
-        parsed_sample_id = sampleid.split("-")
-        parent_data["{}-{}".format(parsed_sample_id[2], parsed_sample_id[3])] = sampleid
+    for pmgrcid, sqid in zip(linker_data["pmgrc"], linker_data["sq"]):
+        parsed_sample_id = pmgrcid.split("-")
+        parent_data["{}-{}".format(parsed_sample_id[2], parsed_sample_id[3])] = sqid
 
     for ruid, sampleid in zip(ids["ruid"], ids["sampleid"]):
         sample_sex = linker_data.loc[
             (linker_data["ru"] == ruid) & (linker_data["sq"] == sampleid), "sex"
         ]
-        parsed_sample_id = sampleid.split("-")
+        pmgrc_id = linker_data.loc[
+            (linker_data["ru"] == ruid) & (linker_data["sq"] == sampleid), "pmgrc"
+        ]
         if len(sample_sex) == 1:
-            self_reported_sex.append(convert_sex_representation(sample_sex.to_list()[0]))
-        elif parsed_sample_id[3] == "1":
-            self_reported_sex.append(convert_sex_representation("Male"))
-        elif parsed_sample_id[3] == "2":
-            self_reported_sex.append(convert_sex_representation("Female"))
+            parsed_sample_id = pmgrc_id.to_list()[0].split("-")
+            sex_representation = convert_sex_representation(sample_sex.to_list()[0])
+            if sex_representation != 0:
+                self_reported_sex.append(sex_representation)
+            elif parsed_sample_id[3] == "1":
+                self_reported_sex.append(convert_sex_representation("Male"))
+            elif parsed_sample_id[3] == "2":
+                self_reported_sex.append(convert_sex_representation("Female"))
+            else:
+                self_reported_sex.append(0)
+            if "{}-1".format(parsed_sample_id[1]) in parent_data:
+                pat_id.append(parent_data["{}-1".format(parsed_sample_id[1])])
+            else:
+                pat_id.append("0")
+            if "{}-2".format(parsed_sample_id[1]) in parent_data:
+                mat_id.append(parent_data["{}-2".format(parsed_sample_id[1])])
+            else:
+                mat_id.append("0")
         else:
             self_reported_sex.append(0)
-        if "{}-1".format(parsed_sample_id[1]) in parent_data:
-            pat_id.append(parent_data["{}-1".format(parsed_sample_id[1])])
-        else:
-            pat_id.append("0")
-        if "{}-2".format(parsed_sample_id[1]) in parent_data:
-            mat_id.append(parent_data["{}-2".format(parsed_sample_id[1])])
-        else:
-            mat_id.append("0")
+            mat_id.append(0)
+            pat_id.append(0)
 
     x = pd.DataFrame(
         data={
