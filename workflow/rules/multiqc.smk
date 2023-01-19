@@ -98,3 +98,47 @@ rule run_multiqc_alignment:
         "-f -i 'MultiQC for Read Alignment' "
         "-n {output.html} "
         "--profile-runtime --zip-data-dir"
+
+
+rule run_multiqc_calling:
+    """
+    Run multiqc on variant calling only
+    """
+    input:
+        vcf_raw=tc.construct_snv_targets(config, manifest),
+        vcf_export=lambda wildcards: ed.construct_export_files(wildcards, manifest, "snv.vcf.stats"),
+        vcf_nonexport=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, "snv.vcf.stats"
+        ),
+        multiqc_config=config["multiqc-calling-config"],
+    output:
+        html="results/multiqc/{projectid}/multiqc.calling.html",
+        data_zip="results/multiqc/{projectid}/multiqc.calling_data.zip",
+    benchmark:
+        "results/performance_benchmarks/run_multiqc_calling/{projectid}.tsv"
+    params:
+        target_dirs=list(
+            set(
+                expand(
+                    "results/{toolname}/{{projectid}}",
+                    toolname=[
+                        "export",
+                        "nonexport",
+                    ],
+                )
+            )
+        ),
+    conda:
+        "../envs/multiqc.yaml"
+    threads: 1
+    resources:
+        mem_mb="4000",
+        qname="small",
+    shell:
+        "multiqc {params.target_dirs} "
+        "--config {input.multiqc_config} "
+        "-m bcftools/stats "
+        "--interactive "
+        "-f -i 'MultiQC for Variant Calling' "
+        "-n {output.html} "
+        "--profile-runtime --zip-data-dir"

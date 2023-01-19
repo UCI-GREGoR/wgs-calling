@@ -9,6 +9,8 @@ properties:
     type: string
   multiqc-alignment-config:
     type: string
+  multiqc-calling-config:
+    type: string
   genome-build:
     type: string
     pattern: "^grch[0-9]+$"
@@ -271,6 +273,7 @@ required:
   - manifest
   - multiqc-read-config
   - multiqc-alignment-config
+  - multiqc-calling-config
   - genome-build
   - behaviors
   - references
