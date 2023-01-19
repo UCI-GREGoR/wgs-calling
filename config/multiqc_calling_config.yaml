@@ -13,7 +13,8 @@ module_order:
       name: 'bcftools/stats (pre-filters)'
       target: ''
       path_filters:
-        - 'results/final/*/*stats'
+        - 'results/deepvariant/*/*stats'
+        - 'results/octopus/*/*stats'
   - bcftools/stats:
       name: 'bcftools/stats (post-filters)'
       target: ''
