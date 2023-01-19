@@ -15,8 +15,20 @@ def convert_sex_representation(sample_sex: str) -> int:
         return 0
 
 
+def add_problem(problems: dict, sampleid: str, problem: str) -> dict:
+    """
+    Add annotation of problematic ID/annotation configuration to
+    aggregator for later reporting
+    """
+    if sampleid in problems:
+        problems[sampleid] = problems[sampleid] + "; " + problem
+    else:
+        problems[sampleid] = problem
+    return problems
+
+
 def run_construct_somalier_pedfile(
-    linker: str, ruid: str, sampleids: list, last_sample_sex: str, outfn: str
+    linker: str, ruid: str, sampleids: list, last_sample_sex: str, outfn: str, problemfn: str
 ) -> None:
     """
     Create a somalier format pedfile for linking sample id to sex annotation.
@@ -31,6 +43,9 @@ def run_construct_somalier_pedfile(
 
     ## load linker information formatted from the lab logbook
     linker_data = pd.read_csv(linker, sep="\t")
+
+    ## track detected problems with ID consistency
+    problems = {}
 
     ## iterate across manifest subjects and try to find matching values
     self_reported_sex = []
@@ -51,9 +66,25 @@ def run_construct_somalier_pedfile(
         ]
         if len(sample_sex) == 1:
             parsed_sample_id = pmgrc_id.to_list()[0].split("-")
+            if parsed_sample_id[1] == parsed_sample_id[2] and parsed_sample_id[3] != "0":
+                problems = add_problem(
+                    problems, sampleid, "subject with proband ID is not flagged -0"
+                )
             sex_representation = convert_sex_representation(sample_sex.to_list()[0])
             if sex_representation != 0:
                 self_reported_sex.append(sex_representation)
+                if parsed_sample_id[3] == "1" and sex_representation != 1:
+                    problems = add_problem(
+                        problems,
+                        sampleid,
+                        "subject is proband father without self-reported male sex",
+                    )
+                elif parsed_sample_id[3] == "2" and sex_representation != 2:
+                    problems = add_problem(
+                        problems,
+                        sampleid,
+                        "subject is proband mother without self-reported female sex",
+                    )
             elif parsed_sample_id[3] == "1":
                 self_reported_sex.append(convert_sex_representation("Male"))
             elif parsed_sample_id[3] == "2":
@@ -74,6 +105,9 @@ def run_construct_somalier_pedfile(
             mat_id.append(0)
             pat_id.append(0)
             family_id.append(0)
+            problems = add_problem(
+                problems, ids["sampleid"], "self-reported sex missing from annotations"
+            )
 
     last_sample_sex = convert_sex_representation(last_sample_sex)
     if last_sample_sex != 0:
@@ -90,6 +124,8 @@ def run_construct_somalier_pedfile(
         }
     )
     x.to_csv(outfn, sep="\t", index=False, header=False)
+    problems = pd.DataFramt(data=problems)
+    problems.to_csv(problemfn, sep="\t", index=False, header=True)
 
 
 run_construct_somalier_pedfile(
@@ -97,5 +133,6 @@ run_construct_somalier_pedfile(
     snakemake.params["ruid"],  # noqa: F821
     snakemake.params["subjectids"],  # noqa: F821
     snakemake.params["last_sample_sex"],  # noqa: F821
-    snakemake.output[0],  # noqa: F821
+    snakemake.output["ped"],  # noqa: F821
+    snakemake.output["problems"],  # noqa: F821
 )

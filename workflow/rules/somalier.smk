@@ -69,7 +69,8 @@ rule somalier_build_pedfile:
     input:
         linker="results/export/linker.tsv",
     output:
-        "results/somalier/{projectid}/relate/somalier.ped",
+        ped="results/somalier/{projectid}/relate/somalier.ped",
+        problems="results/somalier/{projectid}/discordant_annotations.tsv",
     benchmark:
         "results/performance_benchmarks/somalier_build_pedfile/{projectid}/somalier.tsv"
     params:
