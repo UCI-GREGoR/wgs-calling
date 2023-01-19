@@ -105,7 +105,9 @@ rule run_multiqc_calling:
     Run multiqc on variant calling only
     """
     input:
-        vcf_raw=expand("{prefix}.stats", prefix=tc.construct_snv_targets(config, manifest)),
+        vcf_raw=[
+            x.removesuffix(".gz") + ".stats" for x in tc.construct_snv_targets(config, manifest)
+        ],
         vcf_export=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.vcf.stats"
         ),
