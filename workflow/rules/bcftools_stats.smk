@@ -8,8 +8,8 @@ rule bcftools_stats:
     input:
         vcf="results/{prefix}.vcf.gz",
         tbi="results/{prefix}.vcf.gz.tbi",
-        fasta="reference_data/references/{}/ref.fasta".format(genome_build),
-        fai="reference_data/references/{}/ref.fasta.fai".format(genome_build),
+        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
+        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:
         stats="results/{prefix}.vcf.stats",
     benchmark:
