@@ -52,7 +52,7 @@ def construct_nonexport_files(
     res = expand(
         "results/nonexport/{projectid}/{file_prefix}.{file_suffix}",
         projectid=wildcards.projectid,
-        file_prefix=nonexport_targets.to_list(),
+        file_prefix=nonexport_targets,
         file_suffix=suffix,
     )
     return res
