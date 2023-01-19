@@ -20,7 +20,7 @@ def add_problem(problems: dict, sampleid: str, problem: str) -> dict:
     Add annotation of problematic ID/annotation configuration to
     aggregator for later reporting
     """
-    if sampleid in problems:
+    if sampleid in problems.keys():
         problems[sampleid] = problems[sampleid] + "; " + problem
     else:
         problems[sampleid] = problem
