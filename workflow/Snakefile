@@ -92,6 +92,12 @@ if config["behaviors"]["outcome"] == "release":
             filename=["manifest.tsv", "methods_summary.html"],
         )
     )
+    TARGETS.append(
+        expand(
+            "results/nonexport/{projectid}/manifest.tsv",
+            projectid=list(set(manifest["projectid"])),
+        )
+    )
 
 
 ## To deal with the fact that s3 remote provider service is very slow
