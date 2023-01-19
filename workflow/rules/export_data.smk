@@ -170,6 +170,7 @@ rule checksum:
 
 localrules:
     create_export_manifest,
+    create_nonexported_manifest,
 
 
 rule create_export_manifest:
