@@ -8,11 +8,11 @@ rule run_fastp:
     output:
         html="results/fastp/{projectid}/{sampleid}_{lane}_fastp.html",
         json="results/fastp/{projectid}/{sampleid}_{lane}_fastp.json",
-        r1_fastq="results/fastp/{projectid}/{sampleid}_{lane}_R1_fastp.fastq.gz",
-        r2_fastq="results/fastp/{projectid}/{sampleid}_{lane}_R2_fastp.fastq.gz",
-        r1_unp_fastq="results/fastp/{projectid}/{sampleid}_{lane}_R1_unp_fastp.fastq.gz",
-        r2_unp_fastq="results/fastp/{projectid}/{sampleid}_{lane}_R2_unp_fastp.fastq.gz",
-        failed_fastq="results/fastp/{projectid}/{sampleid}_{lane}_failed.fastq.gz",
+        r1_fastq=temp("results/fastp/{projectid}/{sampleid}_{lane}_R1_fastp.fastq.gz"),
+        r2_fastq=temp("results/fastp/{projectid}/{sampleid}_{lane}_R2_fastp.fastq.gz"),
+        r1_unp_fastq=temp("results/fastp/{projectid}/{sampleid}_{lane}_R1_unp_fastp.fastq.gz"),
+        r2_unp_fastq=temp("results/fastp/{projectid}/{sampleid}_{lane}_R2_unp_fastp.fastq.gz"),
+        failed_fastq=temp("results/fastp/{projectid}/{sampleid}_{lane}_failed.fastq.gz"),
     benchmark:
         "results/performance_benchmarks/run_fastp/{projectid}/{sampleid}_{lane}.tsv"
     params:

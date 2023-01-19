@@ -54,7 +54,7 @@ rule mark_duplicates:
         bam=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bam"),
         bai=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bam.bai"),
     output:
-        bam="results/markdups/{projectid}/{sampleid}.mrkdup.bam",
+        bam=temp("results/markdups/{projectid}/{sampleid}.mrkdup.bam"),
         score="results/markdups/{projectid}/{sampleid}.mrkdup.score.txt",
     benchmark:
         "results/performance_benchmarks/mark_duplicates/{projectid}/{sampleid}.tsv"
