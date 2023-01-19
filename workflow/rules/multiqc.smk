@@ -106,9 +106,11 @@ rule run_multiqc_calling:
     """
     input:
         vcf_raw=tc.construct_snv_targets(config, manifest),
-        vcf_export=lambda wildcards: ed.construct_export_files(wildcards, manifest, "snv.vcf.stats"),
+        vcf_export=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.vcf.stats"
+        ),
         vcf_nonexport=lambda wildcards: ed.construct_nonexport_files(
-            wildcards, manifest, "snv.vcf.stats"
+            wildcards, manifest, checkpoints, "snv.vcf.stats"
         ),
         multiqc_config=config["multiqc-calling-config"],
     output:
