@@ -139,7 +139,7 @@ rule run_multiqc_calling:
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
-        "-m bcftools/stats "
+        "-m bcftools "
         "--interactive "
         "-f -i 'MultiQC for Variant Calling' "
         "-n {output.html} "
