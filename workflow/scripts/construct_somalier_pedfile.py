@@ -66,36 +66,50 @@ def run_construct_somalier_pedfile(
         ]
         if len(sample_sex) == 1:
             parsed_sample_id = pmgrc_id.to_list()[0].split("-")
+            invalid_family_structure = False
             if parsed_sample_id[1] == parsed_sample_id[2] and parsed_sample_id[3] != "0":
                 problems = add_problem(
                     problems, sampleid, "subject with proband ID is not flagged -0"
                 )
+                invalid_family_structure = True
             sex_representation = convert_sex_representation(sample_sex.to_list()[0])
+            invalid_sex_configuration = False
             if sex_representation != 0:
-                self_reported_sex.append(sex_representation)
                 if parsed_sample_id[3] == "1" and sex_representation != 1:
                     problems = add_problem(
                         problems,
                         sampleid,
                         "subject is proband father without self-reported male sex",
                     )
+                    invalid_sex_configuration = True
                 elif parsed_sample_id[3] == "2" and sex_representation != 2:
                     problems = add_problem(
                         problems,
                         sampleid,
                         "subject is proband mother without self-reported female sex",
                     )
+                    invalid_sex_configuration = True
+                if not invalid_sex_configuration:
+                    self_reported_sex.append(sex_representation)
+                else:
+                    self_reported_sex.append(0)
             elif parsed_sample_id[3] == "1":
                 self_reported_sex.append(convert_sex_representation("Male"))
             elif parsed_sample_id[3] == "2":
                 self_reported_sex.append(convert_sex_representation("Female"))
             else:
                 self_reported_sex.append(0)
-            if "{}_{}-1".format(ruid, parsed_sample_id[1]) in parent_data:
+            if (
+                "{}_{}-1".format(ruid, parsed_sample_id[1]) in parent_data
+                and not invalid_family_structure
+            ):
                 pat_id.append(parent_data["{}_{}-1".format(ruid, parsed_sample_id[1])])
             else:
                 pat_id.append("0")
-            if "{}_{}-2".format(ruid, parsed_sample_id[1]) in parent_data:
+            if (
+                "{}_{}-2".format(ruid, parsed_sample_id[1]) in parent_data
+                and not invalid_family_structure
+            ):
                 mat_id.append(parent_data["{}_{}-2".format(ruid, parsed_sample_id[1])])
             else:
                 mat_id.append("0")
