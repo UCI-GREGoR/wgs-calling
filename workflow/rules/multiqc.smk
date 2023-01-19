@@ -66,6 +66,7 @@ rule run_multiqc_alignment:
                 expand(
                     "results/{toolname}/{{projectid}}",
                     toolname=[
+                        "bqsr",
                         "fastqc_combined",
                         "fastqc_posttrimming_combined",
                         "collectmultiplemetrics",
@@ -89,7 +90,7 @@ rule run_multiqc_alignment:
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
-        "-m fastqc -m fastp -m verifybamid -m picard -m somalier -m mosdepth -m custom_content "
+        "-m fastqc -m fastp -m verifybamid -m picard -m somalier -m gatk -m mosdepth -m custom_content "
         "--interactive "
         "-x '*.js' "
         "-x '*.bam' "
