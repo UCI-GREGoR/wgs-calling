@@ -119,9 +119,7 @@ def run_construct_somalier_pedfile(
             mat_id.append(0)
             pat_id.append(0)
             family_id.append(0)
-            problems = add_problem(
-                problems, ids["sampleid"], "self-reported sex missing from annotations"
-            )
+            problems = add_problem(problems, sampleid, "self-reported sex missing from annotations")
 
     last_sample_sex = convert_sex_representation(last_sample_sex)
     if last_sample_sex != 0:
@@ -138,7 +136,9 @@ def run_construct_somalier_pedfile(
         }
     )
     x.to_csv(outfn, sep="\t", index=False, header=False)
-    problems = pd.DataFramt(data=problems)
+    for problem_key in problems.keys():
+        problems[problem_key] = [problems[problem_key]]
+    problems = pd.DataFrame(data=problems)
     problems.to_csv(problemfn, sep="\t", index=False, header=True)
 
 
