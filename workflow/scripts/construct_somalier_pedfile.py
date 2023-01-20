@@ -118,7 +118,7 @@ def run_construct_somalier_pedfile(
             self_reported_sex.append(0)
             mat_id.append(0)
             pat_id.append(0)
-            family_id.append(0)
+            family_id.append(sampleid)
             problems = add_problem(problems, sampleid, "self-reported sex missing from annotations")
 
     last_sample_sex = convert_sex_representation(last_sample_sex)
