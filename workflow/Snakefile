@@ -12,6 +12,7 @@ import subprocess
 S3 = S3RemoteProvider()
 
 sys.path.insert(0, ".")
+from lib import export_data as ed
 from lib import resource_calculator as rc
 from lib import string_manipulations as sm
 from lib import target_construction as tc
@@ -92,6 +93,21 @@ if config["behaviors"]["outcome"] == "release":
             filename=["manifest.tsv", "methods_summary.html"],
         )
     )
+    TARGETS.append(
+        expand(
+            "results/nonexport/{projectid}/manifest.tsv",
+            projectid=list(set(manifest["projectid"])),
+        )
+    )
+    TARGETS.append(
+        [
+            expand(
+                "results/multiqc/{projectid}/multiqc.{runtype}.html",
+                projectid=list(manifest["projectid"].unique()),
+                runtype="calling",
+            )
+        ]
+    )
 
 
 ## To deal with the fact that s3 remote provider service is very slow
@@ -114,6 +130,7 @@ rule all:
 
 include: "rules/acquire_data.smk"
 include: "rules/alignstats.smk"
+include: "rules/bcftools_stats.smk"
 include: "rules/bqsr.smk"
 include: "rules/bwamem.smk"
 include: "rules/combine_fastqs.smk"

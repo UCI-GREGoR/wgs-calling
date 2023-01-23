@@ -19,29 +19,6 @@ checkpoint generate_linker:
         "../scripts/construct_linker_from_labbook.R"
 
 
-def construct_export_files(wildcards, manifest: pd.DataFrame, suffix: str) -> list:
-    """
-    Use checkpoint output of linker generation rule to
-    determine what files need to be constructed for a
-    data export
-    """
-    res = []
-    linker_fn = checkpoints.generate_linker.get().output[0]
-    linker_df = pd.read_csv(linker_fn, sep="\t")
-    subjectids = manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
-    targets = linker_df.loc[
-        (linker_df["ru"] == wildcards.projectid) & [x in subjectids for x in linker_df["sq"]],
-        "output",
-    ]
-    res = expand(
-        "results/export/{projectid}/{file_prefix}.{file_suffix}",
-        projectid=wildcards.projectid,
-        file_prefix=targets.to_list(),
-        file_suffix=suffix,
-    )
-    return res
-
-
 rule create_cram_export:
     """
     Take bqsr bamfile and turn it into something to release
@@ -124,7 +101,7 @@ rule create_snv_vcf_export:
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
         exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_snv_vcf_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
+        "results/performance_benchmarks/create_snv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/bcftools.yaml"
     threads: 1
@@ -140,6 +117,17 @@ rule create_snv_vcf_export:
         ' (FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) <= 0.05 & GT = "1/1"))\' -O v | '
         'bcftools reheader -s <(echo -e "{wildcards.sqid}\\t{params.exportid}") | '
         "sed 's|\\t1/0:|\\t0/1:|' | bgzip -c > {output}"
+
+
+use rule create_snv_vcf_export as create_snv_vcf_nonexport with:
+    output:
+        temp("results/nonexport/{projectid}/{sqid}.snv-allregions.vcf.gz"),
+    params:
+        pipeline_version=pipeline_version,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
+        exportid="{sqid}",
+    benchmark:
+        "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
 
 
 rule remove_snv_region_exclusions:
@@ -182,6 +170,7 @@ rule checksum:
 
 localrules:
     create_export_manifest,
+    create_nonexported_manifest,
 
 
 rule create_export_manifest:
@@ -190,18 +179,56 @@ rule create_export_manifest:
     report the expected fileset for a data release
     """
     input:
-        cram=lambda wildcards: construct_export_files(wildcards, manifest, "cram"),
-        crai=lambda wildcards: construct_export_files(wildcards, manifest, "crai"),
-        vcf=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz"),
-        tbi=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi"),
-        cram_md5=lambda wildcards: construct_export_files(wildcards, manifest, "cram.md5"),
-        crai_md5=lambda wildcards: construct_export_files(wildcards, manifest, "crai.md5"),
-        vcf_md5=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.md5"),
-        tbi_md5=lambda wildcards: construct_export_files(wildcards, manifest, "snv.vcf.gz.tbi.md5"),
+        cram=lambda wildcards: ed.construct_export_files(wildcards, manifest, checkpoints, "cram"),
+        crai=lambda wildcards: ed.construct_export_files(wildcards, manifest, checkpoints, "crai"),
+        vcf=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz"
+        ),
+        tbi=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz.tbi"
+        ),
+        cram_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "cram.md5"
+        ),
+        crai_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "crai.md5"
+        ),
+        vcf_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz.md5"
+        ),
+        tbi_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz.tbi.md5"
+        ),
     output:
         "results/export/{projectid}/manifest.tsv",
     shell:
         "echo {input.cram} {input.crai} {input.vcf} {input.tbi} | sed 's/ /\\n/g' > {output}"
+
+
+rule create_nonexported_manifest:
+    """
+    At least one library in each run is expected
+    to not be exported. I'm still interested in those
+    libraries' variant calling performance. Don't bother
+    constructing crams, as they're gigantic and annoying.
+    """
+    input:
+        vcf=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz"
+        ),
+        tbi=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz.tbi"
+        ),
+        vcf_md5=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz.md5"
+        ),
+        tbi_md5=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz.tbi.md5"
+        ),
+    output:
+        "results/nonexport/{projectid}/manifest.tsv",
+    shell:
+        "echo {input.vcf} {input.tbi} | sed 's/ /\\n/g' > {output}"
 
 
 rule create_export_methods_summary:

@@ -73,8 +73,8 @@ rule bwa_map_and_sort:
             suffix=aligner_index_suffixes[config["behaviors"]["aligner"]] + ["fai"],
         ),
     output:
-        bam="results/aligned/{projectid}/{sampleid}_{lane}.bam",
-        bai="results/aligned/{projectid}/{sampleid}_{lane}.bam.bai",
+        bam=temp("results/aligned/{projectid}/{sampleid}_{lane}.bam"),
+        bai=temp("results/aligned/{projectid}/{sampleid}_{lane}.bam.bai"),
     benchmark:
         "results/performance_benchmarks/bwa_map_and_sort/{projectid}/{sampleid}_{lane}.tsv"
     params:

@@ -5,6 +5,7 @@ manifest: "config/manifest.tsv"
 sample-logbook: "resources/example_logbook.xlsx.xlsx"
 multiqc-read-config: "config/multiqc_read_config.yaml"
 multiqc-alignment-config: "config/multiqc_alignment_config.yaml"
+multiqc-calling-config: "config/multiqc_calling_config.yaml"
 genome-build: "grch38"
 
 behaviors:

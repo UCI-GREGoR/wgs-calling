@@ -19,7 +19,7 @@ rule combine_input_fastqs_by_lane:
             lane=manifest.loc[manifest["sampleid"] == wildcards.sampleid, "lane"],
         ),
     output:
-        "results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{readgroup}.fastq.gz",
+        temp("results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{readgroup}.fastq.gz"),
     conda:
         "../envs/bcftools.yaml"
     threads: 1
@@ -37,4 +37,4 @@ use rule combine_input_fastqs_by_lane as combine_fastp_fastqs_by_lane with:
             lane=manifest.loc[manifest["sampleid"] == wildcards.sampleid, "lane"],
         ),
     output:
-        "results/fastqs_combined/posttrimming/{projectid}/{sampleid}_{readgroup}.fastq.gz",
+        temp("results/fastqs_combined/posttrimming/{projectid}/{sampleid}_{readgroup}.fastq.gz"),
