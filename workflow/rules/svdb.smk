@@ -65,7 +65,7 @@ rule summarize_sv_variant_sources:
     output:
         "results/reports/sv_data/{projectid}/{sampleid}.sv.svdb-raw.tsv",
     benchmark:
-        "results/performance_benchmarks/summarisze_sv_variant_sources/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/summarize_sv_variant_sources/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
     threads: 1
