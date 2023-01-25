@@ -26,7 +26,11 @@ Configure the workflow according to your needs via editing the files in the `con
 The following settings are recognized in `config/config.yaml`. Note that each reference data option below exists under an arbitrary tag denoting desired reference genome build. This tag is completely arbitrary and will be used to recognize the requested build for the current pipeline run.
 
 - `manifest`: relative path to run manifest
-- `multiqc-config`: relative path to configuration settings for post-alignment multiQC report
+- `sample-logbook`: local Excel spreadsheet clone of sample manifest information from Google docs
+  - this is upstream input. a local cloned file is preferred due to the possibility of uncontrolled upstream changes
+- `multiqc-read-config`: relative path to configuration settings for pre-alignment multiQC report
+- `multiqc-alignment-config`: relative path to configuration settings for post-alignment multiQC report
+- `multiqc-calling-config`: relative path to configuration settings for post-calling multiQC report
 - `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
 - `behaviors`: user-configurable modifiers to how the pipeline will run
   - `aligner`: which alignment tool to use. permitted values: `bwa-mem2`
