@@ -18,7 +18,9 @@ rule vep_download_databases:
         mem_mb="1000",
         qname="small",
     shell:
-        "perl {params.vep_prefix}/ensembl-vep/INSTALL.pl -a cfp -s homo_sapiens -y {params.reference_build} -c resources/vep/{params.reference_build} -g all && touch {output}"
+        "mkdir -p resources/vep && "
+        "perl {params.vep_prefix}/ensembl-vep/INSTALL.pl -a cfp -s homo_sapiens -y {params.reference_build} -c resources/vep/{params.reference_build} -g all && "
+        "touch {output}"
 
 
 rule vep_convert_cache:
