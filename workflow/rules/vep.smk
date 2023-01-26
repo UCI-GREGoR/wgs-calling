@@ -52,6 +52,8 @@ rule vep_annotate:
         tbi="results/{prefix}.vcf.gz.tbi",
     output:
         temp("results/{prefix}.vcf.vep-annotated.gz"),
+    params:
+        reference_build=reference_build,
     container:
         "docker://quay.io/biocontainers/ensembl-vep:108.2--pl5321h4a94de4_0"
     threads: 1
