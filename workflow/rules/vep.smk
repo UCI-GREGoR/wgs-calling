@@ -11,7 +11,7 @@ rule vep_download_databases:
     benchmark:
         "results/performance_benchmarks/vep_download_databases/out.tsv"
     container:
-        "docker://quay.io/biocontainers/ensembl-vep:108.2--pl5321h4a94de4_0"
+        "docker://ensemblorg/ensembl-vep"
     threads: 1
     resources:
         mem_mb="1000",
@@ -33,7 +33,7 @@ rule vep_convert_cache:
     benchmark:
         "results/performance_benchmarks/vep_convert_cache/out.tsv"
     container:
-        "docker://quay.io/biocontainers/ensembl-vep:108.2--pl5321h4a94de4_0"
+        "docker://ensemblorg/ensembl-vep"
     threads: 1
     resources:
         mem_mb="4000",
@@ -55,7 +55,7 @@ rule vep_annotate:
     params:
         reference_build=reference_build,
     container:
-        "docker://quay.io/biocontainers/ensembl-vep:108.2--pl5321h4a94de4_0"
+        "docker://ensemblorg/ensembl-vep"
     threads: 1
     resources:
         mem_mb="4000",
