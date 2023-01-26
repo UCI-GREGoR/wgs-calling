@@ -7,7 +7,7 @@ rule vep_download_databases:
     output:
         "results/vep/{}/.download.tracker.txt".format(reference_build),
     params:
-        reference_build=reference_build,
+        reference_build=sm.format_reference_build(reference_build),
         vep_prefix="/opt/vep/src",
     benchmark:
         "results/performance_benchmarks/vep_download_databases/out.tsv"
@@ -32,7 +32,7 @@ rule vep_convert_cache:
     output:
         "results/vep/{}/.convert.tracker.txt".format(reference_build),
     params:
-        reference_build=reference_build,
+        reference_build=sm.format_reference_build(reference_build),
         vep_prefix="/opt/vep/src",
     benchmark:
         "results/performance_benchmarks/vep_convert_cache/out.tsv"
@@ -57,7 +57,7 @@ rule vep_annotate:
     output:
         temp("results/{prefix}.vcf.vep-annotated.gz"),
     params:
-        reference_build=reference_build,
+        reference_build=sm.format_reference_build(reference_build),
         vep_prefix="/opt/vep/src",
     container:
         "docker://ensemblorg/ensembl-vep"
