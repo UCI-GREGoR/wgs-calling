@@ -43,7 +43,7 @@ rule vep_convert_cache:
         mem_mb="4000",
         qname="small",
     shell:
-        "perl {params.vep_prefix}/ensembl-vep/convert_cache.pl -species homo_sapiens --cache --dir_cache resources/vep/{params.reference_build} -version all && touch {output}"
+        "perl {params.vep_prefix}/ensembl-vep/convert_cache.pl -species homo_sapiens --dir resources/vep/{params.reference_build} -version all && touch {output}"
 
 
 rule vep_annotate:
