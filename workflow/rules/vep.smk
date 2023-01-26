@@ -8,6 +8,7 @@ rule vep_download_databases:
         "results/vep/{}/.download.tracker.txt".format(reference_build),
     params:
         reference_build=reference_build,
+        vep_prefix="/opt/vep/src",
     benchmark:
         "results/performance_benchmarks/vep_download_databases/out.tsv"
     container:
@@ -17,7 +18,7 @@ rule vep_download_databases:
         mem_mb="1000",
         qname="small",
     shell:
-        "perl INSTALL.pl -a cfp -s homo_sapiens -y {params.reference_build} -c resources/vep/{params.reference_build} -g all && touch {output}"
+        "perl {params.vep_prefix}/ensembl-vep/INSTALL.pl -a cfp -s homo_sapiens -y {params.reference_build} -c resources/vep/{params.reference_build} -g all && touch {output}"
 
 
 rule vep_convert_cache:
@@ -30,6 +31,7 @@ rule vep_convert_cache:
         "results/vep/{}/.convert.tracker.txt".format(reference_build),
     params:
         reference_build=reference_build,
+        vep_prefix="/opt/vep/src",
     benchmark:
         "results/performance_benchmarks/vep_convert_cache/out.tsv"
     container:
@@ -39,7 +41,7 @@ rule vep_convert_cache:
         mem_mb="4000",
         qname="small",
     shell:
-        "perl convert_cache.pl -species homo_sapiens -c resources/vep/{params.reference_build} -version all && touch {output}"
+        "perl {params.vep_prefix}/ensembl-vep/convert_cache.pl -species homo_sapiens -c resources/vep/{params.reference_build} -version all && touch {output}"
 
 
 rule vep_annotate:
@@ -54,6 +56,7 @@ rule vep_annotate:
         temp("results/{prefix}.vcf.vep-annotated.gz"),
     params:
         reference_build=reference_build,
+        vep_prefix="/opt/vep/src",
     container:
         "docker://ensemblorg/ensembl-vep"
     threads: 1
@@ -61,7 +64,7 @@ rule vep_annotate:
         mem_mb="4000",
         qname="small",
     shell:
-        "vep --input_file {input.vcf} --output_file {output} --force_overwrite "
+        "{params.vep_prefix}/ensembl-vep/vep --input_file {input.vcf} --output_file {output} --force_overwrite "
         "--compress_output=gzip --cache --dir resources/vep/{params.reference_build} --offline "
         "--assembly={params.reference_build} --check_existing"
 
