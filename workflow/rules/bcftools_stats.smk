@@ -29,8 +29,8 @@ rule bcftools_stats:
     to be run against pre- and post-filter vcfs
     """
     input:
-        vcf="results/{prefix}.vcf.gz",
-        tbi="results/{prefix}.vcf.gz.tbi",
+        vcf="results/{prefix}.annotated.vcf.gz",
+        tbi="results/{prefix}.annotated.vcf.gz.tbi",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
         bed_gz="results/bcftools_stats/exons.bed.gz",
@@ -45,4 +45,4 @@ rule bcftools_stats:
         mem_mb="8000",
         qname="small",
     shell:
-        "bcftools stats -E {input.bed_gz} -F {input.fasta} {input.vcf} > {output.stats}"
+        "bcftools stats -E {input.bed_gz} -F {input.fasta} -I {input.vcf} > {output.stats}"
