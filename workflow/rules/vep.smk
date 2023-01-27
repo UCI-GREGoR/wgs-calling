@@ -90,7 +90,8 @@ rule vep_format_annotation_file:
     shell:
         "gunzip -c {input} | awk '! /#/' | cut -f 1,13 | sed 's/_/\\t/g ; s/\\//\\t/g ; s/,/\\t/g' | "
         "awk '{{OFS = \"\\t\" ; for (i = 5 ; i <= NF ; i++) print $1,$2,$3,$4,$i}}' | "
-        "awk '/\\trs/' | bgzip -c > {output.tsv} && tabix -s 1 -b 2 -e 2 {output.tsv}"
+        "awk '/\\trs/' | sort -k 1,1 -k 2,2g | "
+        "gzip -c > {output.tsv} && tabix -s 1 -b 2 -e 2 {output.tsv}"
 
 
 rule annotate_rsids:
