@@ -55,7 +55,8 @@ rule vep_annotate:
         vcf="results/{prefix}.vcf.gz",
         tbi="results/{prefix}.vcf.gz.tbi",
     output:
-        temp("results/{prefix}.vcf.vep-annotated.gz"),
+        gz=temp("results/{prefix}.vcf.vep-annotated.gz"),
+        html=temp("results/{prefix}.vcf.vep-annotated.gz_summary.html"),
     params:
         reference_build=sm.format_reference_build(reference_build),
         vep_prefix="/opt/vep/src",
@@ -66,7 +67,7 @@ rule vep_annotate:
         mem_mb="4000",
         qname="small",
     shell:
-        "{params.vep_prefix}/ensembl-vep/vep --input_file {input.vcf} --output_file {output} --force_overwrite "
+        "{params.vep_prefix}/ensembl-vep/vep --input_file {input.vcf} --output_file {output.gz} --force_overwrite "
         "--compress_output=gzip --cache --dir_cache resources/vep/{params.reference_build} --offline "
         "--assembly={params.reference_build} --check_existing"
 
