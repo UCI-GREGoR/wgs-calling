@@ -71,12 +71,35 @@ rule vep_annotate:
         "--assembly={params.reference_build} --check_existing"
 
 
+rule vep_format_annotation_file:
+    """
+    Report annotations from VEP in bcftools-friendly format
+    """
+    input:
+        "results/{prefix}.vcf.vep-annotated.gz",
+    output:
+        tsv=temp("results/{prefix}.bcftools-annotation-source.tsv.gz"),
+        tbi=temp("results/{prefix}.bcftools-annotation-source.tsv.gz.tbi"),
+    conda:
+        "../envs/bcftools.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    shell:
+        "gunzip -c {input} | cut -f 1,13 | sed 's/_/\\t/g ; s/\\//\\t/g ; s/,/\\t/g' | "
+        "awk '{{OFS = \"\\t\" ; for (i = 5 ; i <= NF ; i++) print $1,$2,$3,$4,$i}}' | "
+        "awk '/\\trs/' | bgzip -c > {output.tsv} && tabix -s 1 -b 2 -e 2 {output.tsv}"
+
+
 rule annotate_rsids:
     """
     Modify vep vcf outputs to place variant IDs in marker ID field
     """
     input:
-        "results/{prefix}.vcf.vep-annotated.gz",
+        vcf="results/{prefix}.vcf.gz",
+        annotations="results/{prefix}.bcftools-annotation-source.tsv.gz",
+        tbi="results/{prefix}.bcftools-annotation-source.tsv.gz.tbi",
     output:
         "results/{prefix}.annotated.vcf.gz",
     conda:
@@ -86,4 +109,4 @@ rule annotate_rsids:
         mem_mb="2000",
         qname="small",
     shell:
-        "bcftools annotate ..."
+        "bcftools annotate -a {input.annotations} -c CHROM,POS,REF,ALT,ID -O z -o {output} {input.vcf}"
