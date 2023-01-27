@@ -88,7 +88,7 @@ rule vep_format_annotation_file:
         mem_mb="2000",
         qname="small",
     shell:
-        "gunzip -c {input} | cut -f 1,13 | sed 's/_/\\t/g ; s/\\//\\t/g ; s/,/\\t/g' | "
+        "gunzip -c {input} | awk '! /#/' | cut -f 1,13 | sed 's/_/\\t/g ; s/\\//\\t/g ; s/,/\\t/g' | "
         "awk '{{OFS = \"\\t\" ; for (i = 5 ; i <= NF ; i++) print $1,$2,$3,$4,$i}}' | "
         "awk '/\\trs/' | bgzip -c > {output.tsv} && tabix -s 1 -b 2 -e 2 {output.tsv}"
 
