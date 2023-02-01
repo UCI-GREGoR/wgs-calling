@@ -1,3 +1,19 @@
+localrules:
+    multiqc_link_ids,
+
+
+rule multiqc_link_ids:
+    """
+    Link SQ IDs to PMGRC IDs for user convenience in multiqc reports
+    """
+    input:
+        "results/export/linker.tsv",
+    output:
+        "results/multiqc/{projectid}/linker.tsv",
+    shell:
+        "awk '/{wildcards.projectid}/ {{print $4\"\\t\"$1}}' {input} > {output}"
+
+
 rule run_multiqc_fastq:
     """
     Run multiqc on fastqc and fastp output for input fastqs
@@ -9,6 +25,7 @@ rule run_multiqc_fastq:
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         multiqc_config=config["multiqc-read-config"],
+        id_linker="results/multiqc/{projectid}/linker.tsv",
     output:
         html="results/multiqc/{projectid}/multiqc.fastq.html",
         data_zip="results/multiqc/{projectid}/multiqc.fastq_data.zip",
@@ -32,6 +49,7 @@ rule run_multiqc_fastq:
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
+        "--replace-names {input.id_linker} "
         "-m fastqc -m fastp "
         "-x '*.fastq.gz' -x '*.fastq' "
         "--profile-runtime --zip-data-dir "
@@ -55,6 +73,7 @@ rule run_multiqc_alignment:
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
         multiqc_config=config["multiqc-alignment-config"],
+        id_linker="results/multiqc/{projectid}/linker.tsv",
     output:
         html="results/multiqc/{projectid}/multiqc.alignment.html",
         data_zip="results/multiqc/{projectid}/multiqc.alignment_data.zip",
@@ -89,6 +108,7 @@ rule run_multiqc_alignment:
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
+        "--replace-names {input.id_linker} "
         "-m fastqc -m fastp -m verifybamid -m picard -m somalier -m mosdepth -m custom_content "
         "--interactive "
         "-x '*.js' "
@@ -115,6 +135,7 @@ rule run_multiqc_calling:
             wildcards, manifest, checkpoints, "snv.vcf.stats"
         ),
         multiqc_config=config["multiqc-calling-config"],
+        id_linker="results/multiqc/{projectid}/linker.tsv",
     output:
         html="results/multiqc/{projectid}/multiqc.calling.html",
         data_zip="results/multiqc/{projectid}/multiqc.calling_data.zip",
@@ -141,6 +162,7 @@ rule run_multiqc_calling:
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
+        "--replace-names {input.id_linker} "
         "-m bcftools "
         "--interactive "
         "-f -i 'MultiQC for Variant Calling' "

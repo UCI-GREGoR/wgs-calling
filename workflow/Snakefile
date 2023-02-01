@@ -154,4 +154,5 @@ include: "rules/somalier.smk"
 include: "rules/svaba.smk"
 include: "rules/svdb.smk"
 
+include: "rules/vep.smk"
 include: "rules/verifybamid2.smk"
