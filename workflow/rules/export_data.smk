@@ -157,9 +157,9 @@ rule checksum:
     Create checksum files to go along with transported files
     """
     input:
-        "results/export/{projectid}/{prefix}",
+        "results/{export_status}/{projectid}/{prefix}",
     output:
-        "results/export/{projectid}/{prefix}.md5",
+        "results/{export_status}/{projectid}/{prefix}.md5",
     threads: 1
     resources:
         mem_mb="1000",
