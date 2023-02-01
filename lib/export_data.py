@@ -47,7 +47,12 @@ def construct_nonexport_files(
     ]
     nonexport_targets = []
     for subjectid in subjectids:
-        if subjectid not in targets.to_list():
+        in_targets = False
+        for target in targets.to_list():
+            if subjectid in target:
+                in_targets = True
+                break
+        if not in_targets:
             nonexport_targets.append(subjectid)
     res = expand(
         "results/nonexport/{projectid}/{file_prefix}.{file_suffix}",
