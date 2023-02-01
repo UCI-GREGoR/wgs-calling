@@ -111,9 +111,12 @@ properties:
             type: string
           exclusion-regions-bed:
             type: string
+          exons-gtf-gz:
+            type: string
         required:
           - fasta
           - exclusion-regions-bed
+          - exons-gtf-gz
         additionalProperties: no
     required:
       - grch37

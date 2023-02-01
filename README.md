@@ -26,7 +26,11 @@ Configure the workflow according to your needs via editing the files in the `con
 The following settings are recognized in `config/config.yaml`. Note that each reference data option below exists under an arbitrary tag denoting desired reference genome build. This tag is completely arbitrary and will be used to recognize the requested build for the current pipeline run.
 
 - `manifest`: relative path to run manifest
-- `multiqc-config`: relative path to configuration settings for post-alignment multiQC report
+- `sample-logbook`: local Excel spreadsheet clone of sample manifest information from Google docs
+  - this is upstream input. a local cloned file is preferred due to the possibility of uncontrolled upstream changes
+- `multiqc-read-config`: relative path to configuration settings for pre-alignment multiQC report
+- `multiqc-alignment-config`: relative path to configuration settings for post-alignment multiQC report
+- `multiqc-calling-config`: relative path to configuration settings for post-calling multiQC report
 - `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
 - `behaviors`: user-configurable modifiers to how the pipeline will run
   - `aligner`: which alignment tool to use. permitted values: `bwa-mem2`
@@ -56,11 +60,12 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 	  non-standard contigs present in the no-alt version of GRCh38, for example. unfortunately, TIDDIT does not directly support calling regions
 - `references`: human genome reference data applicable to multiple tools
   - `fasta`: human sequence fasta file
-  - note that the other bwa-style index files attached to this fasta used to be imported by the nextflow workflow. however, presumably by accident,
-    these annotation files were getting pulled from various different directories in a way that suggested that they might be delinked from their
-	source fasta. in reality, the source reference fastas were probably the same; but to avoid any difficulties downstream, now only the fasta
-	itself is pulled in from remote, and the index files are regenerated. this also substantially cleans up the configuration.
+    - note that the other bwa-style index files attached to this fasta used to be imported by the nextflow workflow. however, presumably by accident,
+      these annotation files were getting pulled from various different directories in a way that suggested that they might be delinked from their
+	  source fasta. in reality, the source reference fastas were probably the same; but to avoid any difficulties downstream, now only the fasta
+	  itself is pulled in from remote, and the index files are regenerated. this also substantially cleans up the configuration.
   - `exclusion-regions-bed`: set of bed regions to be excluded from output SNV data. expected to be from https://doi.org/10.1038/s41598-019-45839-z
+  - `exons-gtf-gz`: gene annotations for genome build. used to extract a bedfile of exon positions
 - `bsqr`: reference files for base quality score recalibration from GATK4
   - `known-indels-vcf-gz`: VCF of "gold standard" indels for BQSR. intended to be pulled from Broad's cloud files
   - `known-indels-vcf-gz-tbi`: tabix index for above known indels vcf

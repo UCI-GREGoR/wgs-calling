@@ -157,15 +157,15 @@ rule checksum:
     Create checksum files to go along with transported files
     """
     input:
-        "{prefix}",
+        "results/export/{projectid}/{prefix}",
     output:
-        "{prefix}.md5",
+        "results/export/{projectid}/{prefix}.md5",
     threads: 1
     resources:
         mem_mb="1000",
         qname="small",
     shell:
-        "md5sum {input} > {output}"
+        "md5sum {input} | sed 's|results/export/{wildcards.projectid}/||' > {output}"
 
 
 localrules:
