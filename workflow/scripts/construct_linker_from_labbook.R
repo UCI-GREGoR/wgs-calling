@@ -27,6 +27,9 @@ run.construct.linker <- function(input.fn, output.fn) {
       ls.col <- which(stringr::str_detect(colnames(df), "ls\\.id"))
       ru.col <- which(stringr::str_detect(colnames(df), "ru\\.id"))
       sex.col <- which(stringr::str_detect(colnames(df), "biological\\.sex"))
+      if (length(jira.col) == 0) {
+        jira.col <- which(stringr::str_detect(colnames(df), "^jira\\.ticket\\(s\\)\\.\\("))
+      }
       if (length(jira.col) != 1) {
         next
       }

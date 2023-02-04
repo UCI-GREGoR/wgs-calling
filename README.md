@@ -47,6 +47,8 @@ The following settings are recognized in `config/config.yaml`. Note that each re
   - `assume-last-sample-sex`: upstream convention is to include a low-depth NA24385 as the final sample in every flowcell. that sample is not annotated
     in the logbook in a way that the parser understands. to maintain compatibility with Somalier sexcheck, set this to `female`. if no sex should be assumed
 	for the sample, delete this configuration option
+  - `export-directory`: top-level path to where output files should be moved after release run is complete. this is only required if using the special `export_data`
+    target outside of the standard DAG (see below for description)
 - `parameters`: tool-specific parameters. note that this section is a work in progress, somewhat more than the rest
   - `deepvariant`: parameters specific to [deepvariant](https://github.com/google/deepvariant)
     - `number-shards`: how many shards to break calling into. needs to be at most the number of available threads in the submission queue
@@ -213,6 +215,28 @@ When the pipeline is run in `release` mode, postprocessed output files for each 
 - a plaintext `manifest.tsv` containing a list of the above data files
 - an immutable `methods_summary.html` representing the rendered version of the above methods description for the version of the pipeline that created the release
 - SVs TBD
+
+#### (optional) Move Data to External Release Directory
+
+A convenience rule exists for exporting data out of the workflow and into some sort of persistent storage location.
+This rule is executed by running `snakemake -j1 export_data`. This rule has the following assumptions:
+
+- it assumes the current working directory has a JIRA ticket formatted `RT-\d{4}` somewhere in its absolute path
+- it assumes the current working directory has a flowcell ID formatted `RU\d{5}` somewhere in its absolute path
+- it assumes a target export directory has been defined in `config/config.yaml` under `behaviors::export-directory`
+- it assumes the workflow has already been run to completion in `release` mode
+
+If the above assumptions are met, the rule will do the following:
+
+- construct a subdirectory under `export-directory` named `{JIRA ticket}/{flowcell ID}`
+- move all `PMGRC-.*` files from `results/export` to that directory
+- move the methods summary from `results/export` to that directory
+- edit the checksum files that were in `results/export` to no longer contain the relative paths specific to the workflow results directory structure
+- run `md5sum -c` on all files with checksums (cram, crai, vcf.gz, tbi) and report the results to `results/export/md5_checks.txt`
+
+These behaviors are controlled by the utility shell script in `workflow/scripts/export_data.bash`, which can be called outside of the pipeline if
+desired as `./export_data.bash {export_directory} {md5_check_outfile.txt}`. This is just included for convenience as this file export step is required
+for all runs of the pipeline for my particular use case, and can be ignored if desired.
 
 ### Step 6: Commit changes
 

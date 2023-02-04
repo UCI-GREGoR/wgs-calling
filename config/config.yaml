@@ -23,6 +23,7 @@ behaviors:
   symlink-fastqs: no
   trim-adapters-before-alignment: yes
   assume-last-sample-sex: "female"
+  export-directory: "/locus/data/external_data/research_experiments/pmgrc_u01"
 
 parameters:
   deepvariant:

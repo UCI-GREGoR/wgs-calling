@@ -247,3 +247,22 @@ rule create_export_methods_summary:
         qname="small",
     shell:
         "python -m markdown {input} > {output}"
+
+
+rule export_data:
+    """
+    Lossily move results/export data contents to deployment directory
+    somewhere else
+    """
+    input:
+        "workflow/scripts/export_data.bash",
+    output:
+        "results/export/md5_checks.txt",
+    params:
+        export_directory=config["behaviors"]["export-directory"],
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    shell:
+        "{input} {params.export_directory} {output}"
