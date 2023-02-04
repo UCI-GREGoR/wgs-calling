@@ -55,6 +55,8 @@ properties:
       assume-last-sample-sex:
         type: string
         pattern: "^[fF]emale$|^[mM]ale$"
+      export-directory:
+        type: string
     required:
       - aligner
       - snv-caller
