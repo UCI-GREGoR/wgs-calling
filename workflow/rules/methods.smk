@@ -1,15 +1,18 @@
 rule summarize_methods:
     """
-    For end user consumption, generate a markdown description
+    For end user consumption, generate an html description
     of the methods and user configuration settings in effect
     for an instance of the workflow.
     """
     input:
+        jinja_template="workflow/scripts/summarize_workflow.jinja",
         manta_config=config["parameters"]["manta"]["config-ini"],
     output:
-        markdown="results/reports/methods_summary.md",
+        html="{prefix}/methods_summary.html",
     params:
         config=config,
+    conda:
+        "../envs/python_jinja.yaml"
     threads: 1
     resources:
         mem_mb="2000",

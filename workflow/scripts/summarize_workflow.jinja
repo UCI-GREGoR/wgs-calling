@@ -1,0 +1,253 @@
+<article>
+
+{% markdown %}
+
+# wgs-pipeline Methods Summary
+
+## Overview
+
+This instance of [wgs-pipeline](https://gitlab.com/lightning.auriga1/wgs-pipeline)
+is based on git version {{ pipeline_git_version }}. What follows is a prose-style
+description both of the general methodology of the pipeline, and of the effect of the user
+configuration settings currently in effect in this pipeline instance. Software version data
+are derived from [conda](https://docs.conda.io/en/latest/) package versions. Note that this
+information is only as accurate as the correspondence between the data in this workflow instance
+and the settings currently present in the user configuration file (config/config.yaml), and
+delinking will occur if these files are retroactively modified after the run is complete.
+
+## Input Read Quality Control
+
+{% if config.behaviors.symlink_fastqs %} Input fastqs were symlinked from external sources hosted locally. {% else %} Input fastqs were copied from external sources to results/fastqs. Though this is costly in terms of space utilization, it prevents instances of upstream files being removed before analysis is complete. {% endif %}
+Fastqs were processed by [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) {{ get_conda_version_string("fastqc") }} with default parameters.
+Fastqs were concurrently processed by [fastp](https://github.com/OpenGene/fastp) {{ get_conda_version_string("fastp") }} with the following relevant parameter settings: `-q 10 --trim_poly_g --overrepresentation_analysis --overrepresentation_sampling 100 -5 -3`. Paired, passing reads are passed through fastqc as above for inspection (as post-trimmed reads) in [multiqc](https://multiqc.info/).
+
+{% if config.behaviors.outcome == "calling" or config.behaviors.outcome == "alignment" or config.behaviors.outcome == "release" %}
+
+## Read Alignment
+
+Reads are aligned to human reference genome {{ config["genome-build"] }} with {{ config.behaviors.aligner }}.
+Aside from standard defaults, softclipping of alts (`-Y`) and a fixed `-K` are provided to stabilize output across
+repeated runs. {% if config["behaviors"]["trim-adapters-before-alignment"] %} Following best practices, reads trimmed for the residual Illumina adapter content are used for
+alignment. Note that this differs from prior CLO workflow behavior but matches field standards. {% else %} Untrimmed reads (that is, not the output of fastp) are used for alignment. This does not match field standards, but effective soft clipping will likely limit the impact of this discrepancy on downstream performance. {% endif %}
+Following best practices, duplicate reads are annotated with [GATK](https://github.com/broadinstitute/gatk)
+{{ get_conda_version_string("gatk4") }} MarkDuplicates. 
+Furthermore, duplicate reads are actually removed from the bam output of this step.
+This improves compatibility with downstream tools that cannot handle marked duplicate annotations (e.g.
+[Sentieon products](https://support.sentieon.com/versions/201808.06/manual/DNAscope_usage/dnascope/)).
+Again following best practices, quality scores are recalibrated with GATK {{ get_conda_version_string("gatk4") }}
+BaseRecalibrator/ApplyBQSR.
+
+Following BQSR, aligned reads are analyzed with GATK {{ get_conda_version_string("gatk4") }} CollectMultipleMetrics, modules
+CollectAlignmentSummaryMetrics, CollectInsertSizeMetrics, QualityScoreDistribution, CollectSequencingArtifactMetrics,
+CollectQualityYieldMetrics; CollectGcBiasMetrics; and CollectWgsMetrics. {% if config["behaviors"]["trim-adapters-before-alignment"] %} CollectMultipleMetrics is run with INCLUDE_UNPAIRED active, but due to the use of fastp before alignment, these reads should be prefiltered. {% else %} CollectMultipleMetrics is run with INCLUDE_UNPAIRED active. {% endif %} CollectWgsMetrics is run genome-wide. Reads are further analyzed with [alignstats](https://github.com/jfarek/alignstats) {{ get_conda_version_string("alignstats") }}; [VerifyBamID](https://github.com/Griffan/VerifyBamID) {{ get_conda_version_string("verifybamid2") }}; and [somalier](https://github.com/brentp/somalier) {{ get_conda_version_string("somalier") }}. Note that currently self-reported sex information is pulled from the upstream 'labbook' sheet, and as such the completeness of this sexcheck assessment is only as good as the completeness of the 'labbook' annotations. Furthermore, the relatedness information encoded in the subject ID is not parsed out for direct relatedness checking, as this is flagged for inclusion in a downstream inter-flowcell QC workflow.
+
+{% endif %}
+
+{% if config.behaviors.outcome == "calling" or config.behaviors.outcome == "release" %}
+
+## SNV Calling
+
+{% if config["behaviors"]["snv-caller"] == "octopus" %}
+
+SNVs were called from aligned bams using octopus. Due to the orphaning of the octopus project, the version of octopus run
+is built from [this repository's](https://github.com/invitae-internal/invitae-octopus) commit 17a597d192bcd5192689bf38c5836a98b824867a.
+This does not represent an official release version of the software, but rather represents the most recent representation of
+the code base before the abandonment of the project. Confidence in this version of the software should be limited. Note that
+prior runs of the CLO workflow were using an unreleased version of octopus, but a different unreleased version that the one used
+in this workflow; as such, an undefined set of changes may be introduced into the output based on this discrepancy.
+
+{% elif config["behaviors"]["snv-caller"] == "deepvariant" %}
+
+SNVs were called from aligned bams using [deepvariant](https://github.com/google/deepvariant), with the authors' docker image version
+{{ config["parameters"]["deepvariant"]["docker-version"]|string }}. Runs were split into {{ config["parameters"]["deepvariant"]["number-shards"]|string }}
+shards based on the authors' recommendations. To improve integration with UGE/HPC embarrassingly parallel models, the deepvariant
+workflow was run as successive steps `make_examples`, `call_variants`, and `postprocess_variants`, followed by a concatenation across shards
+using [bcftools](https://github.com/samtools/bcftools) {{ get_conda_version_string("bcftools") }}.
+
+{% endif %}
+
+## SV Calling
+
+This pipeline is designed to perform ensemble SV calling, combining and filtering the
+results of multiple short read callers.
+
+{% if (config["behaviors"]["sv-callers"]|length) == 1 %}
+
+Note that because only one caller was used in this run, the benefits of ensemble
+calling will be very limited, and the results will reflect the single tool's results with
+duphold filters applied as appropriate.
+
+{% endif %}
+
+{% if "delly" in config["behaviors"]["sv-callers"] %}
+### Delly
+
+[Delly](https://github.com/dellytools/delly) {{ get_conda_version_string("delly") }} was run with default settings.
+{% endif %}
+
+{% if "manta" in config["behaviors"]["sv-callers"] %}
+### Manta
+
+{% if "manta" in cp %}
+
+[Manta](https://github.com/Illumina/manta) {{ get_conda_version_string("manta") }} was run with default settings,
+with the following exceptions.
+
+{% for setting in manta_settings["manta"].keys() %}
+
+{% if setting == "enableremotereadretrievalforinsertionsingermlinecallingmodes" %}
+
+{% if manta_settings["manta"][setting] == "0" %}
+
+  - Manual observation has shown that, in spite of internal embarrassingly parallel dispatch,
+    Manta gets stuck waiting for hours for a single process to return.
+    A [GitHub issue](https://github.com/Illumina/manta/issues/130) concerning this problem suggested
+    disabling the parameter 'enableRemoteReadRetrievalForInsertionsInGermlineCallingModes', which
+    evidently may degrade sensitivity of certain types of insertions, but by observation drastically
+    improves runtime (e.g. reduces runtime by ~75%).
+
+{% else %}
+
+  - The current manta configuration has 'enableRemoteReadRetrievalForInsertionsInGermlineCallingModes'
+    activated. This is fine, though observation and a
+    [GitHub issue](https://github.com/Illumina/manta/issues/130) suggest that disabling this setting can
+    drastically improve overall runtime at the cost of some degradation of sensitivity of certain types of insertions.
+
+{% endif %}
+
+{% else %}
+
+  - {{ setting }}: {{ manta_settings["manta"][setting] }}
+
+{% endif %}
+
+{% endfor %}
+
+{% else %}
+
+[Manta](https://github.com/Illumina/manta) {{ get_conda_version_string("manta") }} was run with default settings.
+
+{% endif %}
+
+{% endif %}
+
+
+{% if "tiddit" in config["behaviors"]["sv-callers"] %}
+### TIDDIT
+
+{% if get_conda_version_string("tiddit").startswith("3") %}
+
+[TIDDIT](https://github.com/SciLifeLab/TIDDIT) {{ get_conda_version_string("tiddit") }}
+was run with default settings.
+
+There are certain incompatibilities between TIDDIT >=3 TIDDIT 2. The relevant
+workflow modifications are as follows:
+
+  - TIDDIT uses an internal python fasta parser that implicitly requires the only instance of the '>' character to be
+    the first character of the sequence description line.
+    Conservatively, all fastas are sanitized to remove extra '>' characters when ingested into the pipeline.
+
+  - TIDDIT features local realignment of reads, and for this purpose calls bwa.
+    By default,, the reference fasta has indices that are expected by bwa-mem2, specifically the
+    modified `*.bwt.2bit.64` file, which differs from the older `*.bwt` file expected by traditional bwa. When the `*.bwt` file is absent,
+    TIDDIT >=3 fails with a cryptic error. Based on this observation, the `*.bwt` file is separately prepared whenever TIDDIT >=3 is
+    invoked in this version of the workflow.
+
+{% else %}
+
+TIDDIT {{ get_conda_version_string("tiddit") }} was run with default settings.
+
+{% endif %}
+
+{% endif %}
+
+{% if "svaba" in config["behaviors"]["sv-callers"] %}
+### SvABA
+
+[SvABA](https://github.com/walaj/svaba) {{ get_conda_version_string("svaba") }} was run with default settings.
+{% endif %}
+
+{% if "lumpy" in config["behaviors"]["sv-callers"] %}
+### lumpy
+
+[lumpy](https://github.com/arq5x/lumpy-sv) {{ get_conda_version_string("lumpy-sv") }} was run according to the project's
+instructions, under the wrapper program [smoove](https://github.com/brentp/smoove) {{ get_conda_version_string("smoove") }}.
+As this pipeline is focused on single sample calling, only the first `smoove call` step is run for each sample. The relevant
+exclusion bedfile for this reference genome is [here]({{ config["lumpy"][config["genome-build"]]["exclude-bed"] }}).
+{% endif %}
+
+### Depth Annotation and Filtering
+
+The results of all SV callers were annotated with depth annotations from [duphold](https://github.com/brentp/duphold)
+{{ get_conda_version_string("duphold") }}. Per the tool's recommendations, variants were filtered by the following
+criteria: deletion variants required to have at least 0.7X fold change of variant depth
+relative to flanking regions, and duplication variants required to have at least 1.3X fold change
+of variant depth relative to bins in the genome with similar GC content. Variants are furthermore
+required to be annotated with PASS filter status for tools that emit such data. Variants not fitting
+in the above descriptions (e.g. interchromosomal breakends) are preserved at this step.
+
+### Variant Ensemble Calling
+
+{% if (config["behaviors"]["sv-callers"]|length) == 1 %}
+
+The duphold-filtered results of the tool are then merged within-tool with [svdb](https://github.com/J35P312/SVDB)
+{{ get_conda_version_string("svdb") }} with default parameters.
+
+{% else %}
+
+The duphold-filtered results of each SV tool are then merged with [svdb](https://github.com/J35P312/SVDB)
+{{ get_conda_version_string("svdb") }} with default parameters.
+In brief, svdb first merges similar variants within each tool's individual
+output, and then performs a similar merge of variants across the remaining variants from each tool. After
+the merge is complete, this instance of the pipeline is configured to filter variants based on the following
+criteria: {{ ensemble_filtering_criteria|join("; ") }}.
+
+{% endif %}
+
+{% endif %}
+
+{% if config.behaviors.outcome == "release" %}
+
+## Data Preparation for Release
+
+### Aligned Reads
+
+Aligned bam files are mapped to generic sample IDs {PMGRCID_LSID_SQID} and converted to lossless crams.
+For recordkeeping, this pipeline's version is added to the bam header as a comment (@CO) tag.
+For additional recordkeeping, the source path for the input reference fasta used for this pipeline
+is also added to the cram header. For posterity, that same information is reported here:
+{{ config["references"][config["genome-build"]]["fasta"] }}.
+
+### SNV Calls
+
+SNV VCFs are mapped to generic sample IDs {PMGRCID_LSID_SQID}, both in filename and in vcf sample header.
+SNVs are filtered based on the following criteria (derived from [Pedersen _et al._](https://doi.org/10.1038/s41525-021-00227-3)):
+
+  - filter status PASS
+
+  - genotype quality >= 20
+
+  - genotype total depth >= 10
+
+  - allele balance (heterozygotes) between 0.2 and 0.8, inclusive
+
+  - allele balance (homozygous alts) less than 0.05
+
+    - this is the only meaningful deviation from the above citation,
+      and is based on the observation that a meaningful proportion of
+      calls have exactly one reference read, and at least by observation
+      it seems like these variants don't deserve to be filtered out at this step
+
+  - not intersecting with ENCODE "blacklist V2" regions [here](https://github.com/Boyle-Lab/Blacklist)
+
+  - not intersecting telomeres or centromeres, as annotated in the UCSC table browser
+
+Multiallelics are split with [bcftools norm -m -both](https://samtools.github.io/bcftools/bcftools.html#norm).
+For recordkeeping purposes, this pipeline's version is added to the vcf header. For compatibility with Moon,
+the genome reference code provided in configuration ({{ config["genome-build"] }}) is added to the vcf header.
+
+{% endif %}
+
+{% endmarkdown %}
+
+</article>

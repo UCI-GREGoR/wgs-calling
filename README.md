@@ -186,11 +186,12 @@ gvcf output is not supported by Octopus and so is not possible in this pipeline.
 
 Some users may be interested in a specific breakdown of workflow methods, relevant software versions pulled from
 conda, and the effects of certain important user configuration settings. This information can be generated upon
-completion of a workflow with the command `snakemake -j1 summarize_methods`. This will create an additional output
-file, `results/reports/methods_summary.md`, that contains the best description of the workflow as was actually run.
-Note that this information focuses on methodology as opposed to results, and only requires the relevant conda
-environments be installed; so if you want to predict what the workflow will do before actually running it,
-complete user configuration, run `snakemake -j1 --use-conda --conda-create-envs-only`, and then run the `summarize_methods`
+completion of a workflow with the command `snakemake -j1 --use-conda results/reports/methods_summary.html`.
+This will create an additional output file, `results/reports/methods_summary.html`, that contains the best
+description of the workflow as was actually run. Note that this information focuses on methodology as opposed to
+results, and only requires the relevant conda environments be installed; so if you want to predict what the
+workflow will do before actually running it, complete user configuration, run
+`snakemake -j1 --use-conda --conda-create-envs-only`, and then run the aforementioned snakemake command
 target to generate a markdown description of what _would_ happen if the pipeline were deployed.
 
 #### Data Release

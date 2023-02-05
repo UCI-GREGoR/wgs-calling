@@ -11,7 +11,7 @@ rule multiqc_link_ids:
     output:
         "results/multiqc/{projectid}/linker.tsv",
     shell:
-        "awk '/{wildcards.projectid}/ {{print $4\"\\t\"$1}}' {input} > {output}"
+        'awk -F"\\t" \'/{wildcards.projectid}/ {{print $4"\\t"$1}}\' {input} > {output}'
 
 
 rule run_multiqc_fastq:
