@@ -1,0 +1,6 @@
+channels:
+  - conda-forge
+dependencies:
+  - jinja2
+  - pip:
+    - jinja_markdown

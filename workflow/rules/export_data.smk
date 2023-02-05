@@ -231,24 +231,6 @@ rule create_nonexported_manifest:
         "echo {input.vcf} {input.tbi} | sed 's/ /\\n/g' > {output}"
 
 
-rule create_export_methods_summary:
-    """
-    For export tracking, report methods summary in immutable form
-    """
-    input:
-        "results/reports/methods_summary.md",
-    output:
-        "results/export/{projectid}/methods_summary.html",
-    conda:
-        "../envs/python_markdown.yaml"
-    threads: 1
-    resources:
-        mem_mb="1000",
-        qname="small",
-    shell:
-        "python -m markdown {input} > {output}"
-
-
 rule export_data:
     """
     Lossily move results/export data contents to deployment directory
