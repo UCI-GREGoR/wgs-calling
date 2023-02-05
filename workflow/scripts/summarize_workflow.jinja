@@ -17,11 +17,7 @@ delinking will occur if these files are retroactively modified after the run is 
 
 ## Input Read Quality Control
 
-{% if config.behaviors.symlink_fastqs %}
-Input fastqs were symlinked from external sources hosted locally.
-{% else %}
-Input fastqs were copied from external sources to results/fastqs. Though this is costly in terms of space utilization, it prevents instances of upstream files being removed before analysis is complete.
-{% endif %}
+{% if config.behaviors.symlink_fastqs %} Input fastqs were symlinked from external sources hosted locally. {% else %} Input fastqs were copied from external sources to results/fastqs. Though this is costly in terms of space utilization, it prevents instances of upstream files being removed before analysis is complete. {% endif %}
 Fastqs were processed by [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) {{ get_conda_version_string("fastqc") }} with default parameters.
 Fastqs were concurrently processed by [fastp](https://github.com/OpenGene/fastp) {{ get_conda_version_string("fastp") }} with the following relevant parameter settings: `-q 10 --trim_poly_g --overrepresentation_analysis --overrepresentation_sampling 100 -5 -3`. Paired, passing reads are passed through fastqc as above for inspection (as post-trimmed reads) in [multiqc](https://multiqc.info/).
 
@@ -31,15 +27,8 @@ Fastqs were concurrently processed by [fastp](https://github.com/OpenGene/fastp)
 
 Reads are aligned to human reference genome {{ config["genome-build"] }} with {{ config.behaviors.aligner }}.
 Aside from standard defaults, softclipping of alts (`-Y`) and a fixed `-K` are provided to stabilize output across
-repeated runs.
-{% if config["behaviors"]["trim-adapters-before-alignment"] %}
-Following best practices, reads trimmed for the residual Illumina adapter content are used for
-alignment. Note that this differs from prior CLO workflow behavior but matches field standards.
-{% else %}
-Untrimmed reads (that is, not the output of fastp) are
-used for alignment. This does not match field standards, but effective soft clipping will likely limit
-the impact of this discrepancy on downstream performance.
-{% endif %}
+repeated runs. {% if config["behaviors"]["trim-adapters-before-alignment"] %} Following best practices, reads trimmed for the residual Illumina adapter content are used for
+alignment. Note that this differs from prior CLO workflow behavior but matches field standards. {% else %} Untrimmed reads (that is, not the output of fastp) are used for alignment. This does not match field standards, but effective soft clipping will likely limit the impact of this discrepancy on downstream performance. {% endif %}
 Following best practices, duplicate reads are annotated with [GATK](https://github.com/broadinstitute/gatk)
 {{ get_conda_version_string("gatk4") }} MarkDuplicates. 
 Furthermore, duplicate reads are actually removed from the bam output of this step.
@@ -50,24 +39,8 @@ BaseRecalibrator/ApplyBQSR.
 
 Following BQSR, aligned reads are analyzed with GATK {{ get_conda_version_string("gatk4") }} CollectMultipleMetrics, modules
 CollectAlignmentSummaryMetrics, CollectInsertSizeMetrics, QualityScoreDistribution, CollectSequencingArtifactMetrics,
-CollectQualityYieldMetrics; CollectGcBiasMetrics; and CollectWgsMetrics.
-{% if config["behaviors"]["trim-adapters-before-alignment"] %}
-Following prior CLO workflow conventions, CollectMultipleMetrics is run with INCLUDE_UNPAIRED active, but
-due to the use of fastp before alignment, these reads should be prefiltered.
-{% else %}
-Following prior CLO workflow conventions, CollectMultipleMetrics is run with INCLUDE_UNPAIRED active.
-{% endif %}
-CollectWgsMetrics is run genome-wide. In the legacy implementation of the pipeline, this step was run
-exclusively in the targeted intervals of the NA12878 'reportable regions.' Note that this selection
-of regions based on a single HG reference subject is neither appropriate nor evidently originally intended for prior CLO workflow.
-This functionality is flagged for additional consideration at a later date.
-Reads are further analyzed with [alignstats](https://github.com/jfarek/alignstats) {{ get_conda_version_string("alignstats") }};
-[VerifyBamID](https://github.com/Griffan/VerifyBamID) {{ get_conda_version_string("verifybamid2") }}; and
-[somalier](https://github.com/brentp/somalier) {{ get_conda_version_string("somalier") }}.
-Note that currently self-reported sex information is pulled from the upstream 'labbook' sheet, and as such
-the completeness of this sexcheck assessment is only as good as the completeness of the 'labbook' annotations.
-Furthermore, the relatedness information encoded in the subject ID is not parsed out for direct relatedness checking,
-as this is flagged for inclusion in a downstream inter-flowcell QC workflow.
+CollectQualityYieldMetrics; CollectGcBiasMetrics; and CollectWgsMetrics. {% if config["behaviors"]["trim-adapters-before-alignment"] %} CollectMultipleMetrics is run with INCLUDE_UNPAIRED active, but due to the use of fastp before alignment, these reads should be prefiltered. {% else %} CollectMultipleMetrics is run with INCLUDE_UNPAIRED active. {% endif %} CollectWgsMetrics is run genome-wide. Reads are further analyzed with [alignstats](https://github.com/jfarek/alignstats) {{ get_conda_version_string("alignstats") }}; [VerifyBamID](https://github.com/Griffan/VerifyBamID) {{ get_conda_version_string("verifybamid2") }}; and [somalier](https://github.com/brentp/somalier) {{ get_conda_version_string("somalier") }}. Note that currently self-reported sex information is pulled from the upstream 'labbook' sheet, and as such the completeness of this sexcheck assessment is only as good as the completeness of the 'labbook' annotations. Furthermore, the relatedness information encoded in the subject ID is not parsed out for direct relatedness checking, as this is flagged for inclusion in a downstream inter-flowcell QC workflow.
+
 {% endif %}
 
 {% if config.behaviors.outcome == "calling" or config.behaviors.outcome == "release" %}
