@@ -34,6 +34,7 @@ apply.id.mappings <- function(df, vec) {
     new.ids <- rep(NA, length(vec))
     for (j in seq_len(length(known.patterns))) {
       has.pattern <- stringr::str_detect(df[, i], names(known.patterns)[j])
+      has.pattern[is.na(has.pattern)] <- FALSE
       new.ids[has.pattern] <- stringr::str_replace(
         df[has.pattern, i],
         names(known.patterns)[j],
