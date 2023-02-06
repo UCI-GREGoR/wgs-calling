@@ -51,7 +51,7 @@ custom_data:
 
 sp:
   alignstats:
-    fn: "alignstats_summary_mqc.tsv"
+    fn: "alignstats_summary_mqc.yaml"
   picard/gcbias:
     fn_re: ".*gc_bias_metrics.*"
   picard/markdups:

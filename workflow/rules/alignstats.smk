@@ -33,7 +33,7 @@ rule merge_alignstats:
     input:
         json=lambda wildcards: tc.construct_alignstats_targets(wildcards, manifest),
     output:
-        tsv="results/alignstats/{projectid}/alignstats_summary_mqc.tsv",
+        yaml="results/alignstats/{projectid}/alignstats_summary_mqc.yaml",
     benchmark:
         "results/performance_benchmarks/merge_alignstats/{projectid}/alignstats_summary_mqc.tsv"
     threads: 1
@@ -41,4 +41,4 @@ rule merge_alignstats:
         mem_mb="2000",
         qname="small",
     script:
-        "../scripts/alignstats_json_to_tsv.py"
+        "../scripts/alignstats_json_to_yaml.py"

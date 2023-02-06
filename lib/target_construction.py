@@ -97,7 +97,7 @@ def construct_combined_alignstats_targets(wildcards: Namedlist) -> list:
     """
     ## this is somewhat idiosyncratic, but similar functions all return lists, and snakemake
     ## doesn't care, but having this return a list as well is helpful for consistency's sake.
-    result = ["results/alignstats/{}/alignstats_summary_mqc.tsv".format(wildcards.projectid)]
+    result = ["results/alignstats/{}/alignstats_summary_mqc.yaml".format(wildcards.projectid)]
     return result
 
 
