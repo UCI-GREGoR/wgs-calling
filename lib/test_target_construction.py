@@ -124,7 +124,7 @@ def test_construct_combined_alignstats_targets(wildcards_without_lane):
     Test that construct_combined_alignstats_targets can determine
     the (post-merge) output of alignstats for a project.
     """
-    expected = ["results/alignstats/PROJ1/alignstats_summary_mqc.tsv"]
+    expected = ["results/alignstats/PROJ1/alignstats_summary_mqc.yaml"]
     observed = tc.construct_combined_alignstats_targets(wildcards_without_lane)
     assert observed == expected
 
