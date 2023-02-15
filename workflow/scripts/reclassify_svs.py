@@ -44,7 +44,7 @@ def reclassify_svs(variant: str) -> str:
         parsed_variant[15] = "."
         parsed_variant[16] = "."
         parsed_variant[17] = "."
-        updated_info = "SVTYPE={};POS={};SVLEN={};END={}".format(
+        updated_info = "SVTYPE={};POS={};SVLEN={};END={};".format(
             updated_svtype,
             parsed_variant[1],
             int(parsed_variant[4]) - int(parsed_variant[1]),
