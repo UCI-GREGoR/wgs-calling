@@ -56,6 +56,17 @@ def reclassify_svs(variant: str) -> str:
     return "\t".join(parsed_variant)
 
 
+def clean_header(line: str) -> str:
+    """
+    svtools appears to introduce problems into the regurgitated vcf header
+    when creating a bedpe file, and then chokes on that header when it tries
+    to convert it back to vcf. this needs to be intercepted.
+    """
+    res = line
+    res = re.sub('""', '"', res)
+    return res
+
+
 def run_reclassify_svs(infn: str, outfn: str) -> None:
     """
     Parse an input file, and emit its reclassified SV status
@@ -67,7 +78,7 @@ def run_reclassify_svs(infn: str, outfn: str) -> None:
     with open(outfn, "w") as f:
         for variant in variants:
             if variant.startswith("#"):
-                f.writelines([variant])
+                f.writelines([clean_header(variant)])
             else:
                 f.writelines([reclassify_svs(variant)])
 
