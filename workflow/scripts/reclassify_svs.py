@@ -39,19 +39,20 @@ def reclassify_svs(variant: str) -> str:
     svtype = parsed_variant[10]
     if svtype == "BND":
         updated_svtype = get_svtype(parsed_variant[0], parsed_variant[14])
-        parsed_variant[10] = updated_svtype
-        parsed_variant[14] = "<{}>".format(updated_svtype)
-        parsed_variant[15] = "."
-        parsed_variant[16] = "."
-        parsed_variant[17] = "."
-        updated_info = "SVTYPE={};POS={};SVLEN={};END={};".format(
-            updated_svtype,
-            parsed_variant[1],
-            int(parsed_variant[4]) - int(parsed_variant[1]),
-            parsed_variant[4],
-        )
-        parsed_variant[18] = re.sub("SVTYPE=[^;]+;POS=[^;]+;", updated_info, parsed_variant[18])
-        parsed_variant[19] = "."
+        if updated_svtype != "BND":
+            parsed_variant[10] = updated_svtype
+            parsed_variant[14] = "<{}>".format(updated_svtype)
+            parsed_variant[15] = "."
+            parsed_variant[16] = "."
+            parsed_variant[17] = "."
+            updated_info = "SVTYPE={};POS={};SVLEN={};END={};".format(
+                updated_svtype,
+                parsed_variant[1],
+                int(parsed_variant[4]) - int(parsed_variant[1]),
+                parsed_variant[4],
+            )
+            parsed_variant[18] = re.sub("SVTYPE=[^;]+;POS=[^;]+;", updated_info, parsed_variant[18])
+            parsed_variant[19] = "."
 
     return "\t".join(parsed_variant)
 
