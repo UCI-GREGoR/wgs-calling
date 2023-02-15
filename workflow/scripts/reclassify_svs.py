@@ -67,9 +67,9 @@ def run_reclassify_svs(infn: str, outfn: str) -> None:
     with open(outfn, "w") as f:
         for variant in variants:
             if variant.startswith("#"):
-                f.writeline(variant)
+                f.writelines([variant])
             else:
-                f.writeline(reclassify_svs(variant))
+                f.writelines([reclassify_svs(variant)])
 
 
 run_reclassify_svs(
