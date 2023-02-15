@@ -58,6 +58,10 @@ rule svaba_select_output_variants:
     that happens before bcftools gets to the file
     - the output vcf FORMAT definition for PL is '.' but bcftools complains that it should be 'G';
     that is, one value per genotype
+
+    Furthermore, with the intention of providing this file to svtools for parsing, entries with
+    missing breakend pair seem to cause svtools much distress, and as such, those are removed
+    before being passed along.
     """
     input:
         vcf="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.sv.vcf",
@@ -81,7 +85,7 @@ rule svaba_select_output_variants:
         "echo -e '{params.bam}\\t{wildcards.sampleid}' > {output.linker} && "
         'awk -v blacklist="{params.blacklist_definition}" \'/^#CHROM/ {{OFS="\\t" ; print blacklist"\\n"$0}} ; ! /^#CHROM/\' {input.vcf} | '
         'awk -F"\\t" \'/^#/ ; ! /^#/ {{OFS = "\\t" ; print $1,$2,$3,$4,$5,$6,$7,$8,$9,$13}}\' | '
-        "sed 's/<ID=PL,Number=.,/<ID=PL,Number=G,/' | "
+        "sed 's/<ID=PL,Number=.,/<ID=PL,Number=G,/' | awk '$7 != \"MISSING\"' | "
         "bcftools reheader -s {output.linker} | "
         "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf}"
 
