@@ -62,7 +62,7 @@ rule svaba_select_output_variants:
     input:
         vcf="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.sv.vcf",
     output:
-        vcf="results/svaba/{projectid}/{sampleid}.svaba.vcf.gz",
+        vcf="results/svaba/{projectid}/{sampleid}.svaba.as_bnd.vcf.gz",
         linker=temp("results/svaba/{projectid}/{sampleid}.svaba.reheader_linker.tsv"),
     params:
         tmpdir="temp",
@@ -84,3 +84,59 @@ rule svaba_select_output_variants:
         "sed 's/<ID=PL,Number=.,/<ID=PL,Number=G,/' | "
         "bcftools reheader -s {output.linker} | "
         "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf}"
+
+
+rule vcf_to_bedpe:
+    """
+    Use svtools to convert vcf to flattened bedpe format
+    """
+    input:
+        "{prefix}.svaba.as_bnd.vcf.gz",
+    output:
+        "{prefix}.svaba.as_bnd.bedpe",
+    conda:
+        "../envs/svtools.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    shell:
+        "gunzip -c {input} > {output} && "
+        "svtools vcftobedpe -i {input} -o {output} && "
+        "rm {output}.tmp"
+
+
+rule svaba_resolve_breakends:
+    """
+    Try to represent SvABA BND format variants as other, more specific SV types
+    """
+    input:
+        "{prefix}.svaba.as_bnd.bedpe",
+    output:
+        "{prefix}.svaba.resolved.bedpe",
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    script:
+        "../scripts/reclassify_svs.py"
+
+
+rule bedpe_to_vcf:
+    """
+    Use svtools to convert flattened bedpe to vcf format
+    """
+    input:
+        "{prefix}.svaba.resolved.bedpe",
+    output:
+        "{prefix}.svaba.vcf.gz",
+    conda:
+        "../envs/svtools.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    shell:
+        "svtools bedpetovcf -i {input} -o {output}.tmp && "
+        "bgzip -c {output}.tmp > {output} && "
+        "rm {output}.tmp"
