@@ -143,7 +143,7 @@ rule bedpe_to_vcf:
         qname="small",
         tmpdir="temp",
     shell:
-        "mkdir -p {params.tmpdir} && "
+        "mkdir -p temp && "
         "svtools bedpetovcf -i {input} -o {output}.tmp && "
         "bcftools sort -O z --temp-dir {params.tmpdir} -o {output} {output}.tmp && "
         "rm {output}.tmp"
