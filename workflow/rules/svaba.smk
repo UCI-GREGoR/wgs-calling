@@ -85,7 +85,7 @@ rule svaba_select_output_variants:
         "echo -e '{params.bam}\\t{wildcards.sampleid}' > {output.linker} && "
         'awk -v blacklist="{params.blacklist_definition}" \'/^#CHROM/ {{OFS="\\t" ; print blacklist"\\n"$0}} ; ! /^#CHROM/\' {input.vcf} | '
         'awk -F"\\t" \'/^#/ ; ! /^#/ {{OFS = "\\t" ; print $1,$2,$3,$4,$5,$6,$7,$8,$9,$13}}\' | '
-        "sed 's/<ID=PL,Number=.,/<ID=PL,Number=G,/' | awk '$7 != \"MISSING\"' | "
+        "sed 's/<ID=PL,Number=.,/<ID=PL,Number=G,/' | awk '$7 == \"PASS\"' | "
         "bcftools reheader -s {output.linker} | "
         "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf}"
 
