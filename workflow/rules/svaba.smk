@@ -145,5 +145,5 @@ rule bedpe_to_vcf:
     shell:
         "mkdir -p temp && "
         "svtools bedpetovcf -i {input} -o {output}.tmp && "
-        "bcftools sort -O z --temp-dir {params.tmpdir} -o {output} {output}.tmp && "
+        "bcftools sort -O z --temp-dir temp -o {output} {output}.tmp && "
         "rm {output}.tmp"
