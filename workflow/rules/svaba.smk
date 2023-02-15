@@ -140,7 +140,9 @@ rule bedpe_to_vcf:
     resources:
         mem_mb="2000",
         qname="small",
+        tmpdir="temp",
     shell:
+        "mkdir -p {params.tmpdir} && "
         "svtools bedpetovcf -i {input} -o {output}.tmp && "
-        "bgzip -c {output}.tmp > {output} && "
+        "bcftools sort -O z --temp-dir {params.tmpdir} -o {output} {output}.tmp && "
         "rm {output}.tmp"
