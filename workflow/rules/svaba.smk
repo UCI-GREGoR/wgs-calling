@@ -101,8 +101,8 @@ rule vcf_to_bedpe:
         mem_mb="2000",
         qname="small",
     shell:
-        "gunzip -c {input} > {output} && "
-        "svtools vcftobedpe -i {input} -o {output} && "
+        "gunzip -c {input} > {output}.tmp && "
+        "svtools vcftobedpe -i {output}.tmp -o {output} && "
         "rm {output}.tmp"
 
 
