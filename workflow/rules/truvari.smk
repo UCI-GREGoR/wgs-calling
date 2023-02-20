@@ -62,8 +62,8 @@ use rule truvari_merge_within_caller as truvari_merge_between_callers with:
             config["behaviors"]["aligner"], reference_build
         ),
     output:
-        vcf=temp("results/final/{projectid}/{sampleid}.truvari-raw.vcf.gz"),
-        collapsed=temp("results/final/{projectid}/{sampleid}.truvari-raw.collapsed.vcf.gz"),
+        vcf=temp("results/final/{projectid}/{sampleid}.sv.truvari-raw.vcf.gz"),
+        collapsed=temp("results/final/{projectid}/{sampleid}.sv.truvari-raw.collapsed.vcf.gz"),
     benchmark:
         "results/performance_benchmarks/truvari_merge_between_callers/{projectid}/{sampleid}.tsv"
 
