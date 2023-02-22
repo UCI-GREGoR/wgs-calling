@@ -35,7 +35,7 @@ rule ensemble_sv_vcf:
     output:
         "results/final/{projectid}/{sampleid}.sv.vcf.gz",
     params:
-        bcftools_filter_count="INFO/FOUNDBY = {}".format(
+        bcftools_filter_count="INFO/FOUNDBY >= {}".format(
             config["behaviors"]["sv-ensemble"]["min-count"]
         ),
         bcftools_filter_sources=" & INFO/svdb_origin ~ '"
