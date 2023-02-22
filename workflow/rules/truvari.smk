@@ -51,7 +51,7 @@ rule bcftools_concat_sv_callers:
         mem_mb="4000",
         qname="small",
     shell:
-        "bcftools concat -a -d exact -O u | bcftools sort -O z -o {output.vcf}"
+        "bcftools concat -a -d exact -O v {input.vcf} | bcftools sort -O z -o {output.vcf}"
 
 
 use rule truvari_merge_within_caller as truvari_merge_between_callers with:
@@ -79,14 +79,10 @@ rule truvari_ensemble_sv_vcf:
     output:
         "results/final/{projectid}/{sampleid}.sv.vcf.gz",
     params:
-        bcftools_filter_count="INFO/FOUNDBY = {}".format(
+        bcftools_filter_count="( INFO/NumCollapsed = {} | INFO/NumCollapsed = '.' )".format(
             config["behaviors"]["sv-ensemble"]["min-count"]
         ),
-        bcftools_filter_sources=" & INFO/svdb_origin ~ '"
-        + "' & INFO/svdb_origin ~ '".join(config["behaviors"]["sv-ensemble"]["required-callers"])
-        + "'"
-        if "required-callers" in config["behaviors"]["sv-ensemble"]
-        else "",
+        bcftools_filter_sources="",
     benchmark:
         "results/performance_benchmarks/truvari_ensemble_sv_vcf/{projectid}/{sampleid}.tsv"
     conda:
@@ -99,22 +95,22 @@ rule truvari_ensemble_sv_vcf:
         'bcftools filter -i "{params.bcftools_filter_count} {params.bcftools_filter_sources}" -O z -o {output} {input}'
 
 
-rule truvari_summarize_sv_variant_sources:
+rule truvari_add_variant_sources:
     """
-    For a raw merge output from truvari, use bcftools to extract reasonable summary information about
-    the variant from its info content, with the goal of getting this information into an Rmd report
+    Truvari does not add explicit input source information to its info content, because it doesn't merge
+    across callsets the same way svdb does. We nevertheless need that information, and it can be extracted
+    from the auxiliary vcf that truvari emits alongside the actual output vcf
     """
     input:
-        "results/final/{projectid}/{sampleid}.sv.truvari-raw.vcf.gz",
+        vcf="results/final/{projectid}/{sampleid}.sv.truvari-raw.vcf.gz",
+        collapsed="results/final/{projectid}/{sampleid}.sv.truvari-raw.collapsed.vcf.gz",
     output:
-        "results/reports/sv_data/{projectid}/{sampleid}.sv.truvari-raw.tsv",
+        tsv="results/reports/sv_data/{projectid}/{sampleid}.sv.truvari-raw.tsv",
     benchmark:
-        "results/performance_benchmarks/truvari_summarize_sv_variant_sources/{projectid}/{sampleid}.tsv"
-    conda:
-        "../envs/bcftools.yaml"
+        "results/performance_benchmarks/truvari_add_variant_sources/{projectid}/{sampleid}.tsv"
     threads: 1
     resources:
-        mem_mb="2000",
+        mem_mb="1000",
         qname="small",
-    shell:
-        "bcftools query -f '%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO/SVTYPE\\t%INFO/svdb_origin\\n' {input} > {output}"
+    script:
+        "../scripts/truvari_add_variant_sources.py"

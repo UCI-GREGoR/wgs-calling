@@ -32,18 +32,26 @@ load.data <- function(filenames, sv.callers) {
       res <- rbind(res, h)
     }
   }
-  colnames(res) <- c(
-    "CHROM", "POS", "ID", "REF", "ALT",
-    "QUAL", "FILTER", "SVTYPE", "svdb_origin"
-  )
+  if (length(colnames(res)) == 2) {
+    colnames(res) <- c("SVTYPE", "variant_origin")
+  } else {
+    colnames(res) <- c(
+      "CHROM", "POS", "ID", "REF", "ALT",
+      "QUAL", "FILTER", "SVTYPE", "variant_origin"
+    )
+  }
   ## So, there are two questions one can ask about source information for each output variant.
   ## There's the question of whether a particular caller contributed to a variant at all;
   ## and then in addition there's the question of how many variants were collapsed into a single
   ## variant from each caller output file. svdb seems to report a non-unique list of source files
   ## in INFO/svdb_origin, and so both questions can be addressed, if messily.
+  ## 
+  ## Since writing the above, truvari support has been added, and this tracking information is
+  ## coming from a somewhat different source. The column header has been updated to reflect this
+  ## more generic origin.
   for (sv.caller in sv.callers) {
-    res[, paste("in", sv.caller, sep = ".")] <- grepl(sv.caller, res[, "svdb_origin"])
-    res[, paste("count", sv.caller, sep = ".")] <- stringr::str_count(res[, "svdb_origin"], sv.caller)
+    res[, paste("in", sv.caller, sep = ".")] <- grepl(sv.caller, res[, "variant_origin"])
+    res[, paste("count", sv.caller, sep = ".")] <- stringr::str_count(res[, "variant_origin"], sv.caller)
   }
   res
 }
