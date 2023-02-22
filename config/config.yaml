@@ -17,7 +17,7 @@ behaviors:
     - "delly"
   sv-ensemble:
     merge-tool: "svdb"
-    min-count: 3
+    min-count: 2
   outcome: "release"
   symlink-fastqs: no
   trim-adapters-before-alignment: yes
