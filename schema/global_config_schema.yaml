@@ -31,6 +31,9 @@ properties:
       sv-ensemble:
         type: object
         properties:
+          merge-tool:
+            type: string
+            pattern: "^truvari$|^svdb$"
           min-count:
             type: integer
             min: 1
@@ -40,6 +43,7 @@ properties:
               type: string
               pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
         required:
+          - merge-tool
           - min-count
         additionalProperties: no
       outcome:

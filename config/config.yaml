@@ -12,12 +12,13 @@ behaviors:
   aligner: "bwa"
   snv-caller: "deepvariant"
   sv-callers:
-    - "delly"
-    - "lumpy"
     - "manta"
+    - "lumpy"
+    - "delly"
     - "tiddit"
     - "svaba"
   sv-ensemble:
+    merge-tool: "truvari"
     min-count: 3
   outcome: "release"
   symlink-fastqs: no
@@ -96,6 +97,9 @@ svaba:
   grch38:
     exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/exclude.cnvnator_100bp.GRCh38.20170403.bed"
 manta:
+  grch37:
+    calling-range-bed-gz: "resources/manta_calling_ranges_grch37.bed.gz"
+    calling-range-bed-gz-tbi: "resources/manta_calling_ranges_grch37.bed.gz.tbi"
   grch38:
     calling-range-bed-gz: "resources/manta_calling_ranges_grch38.bed.gz"
     calling-range-bed-gz-tbi: "resources/manta_calling_ranges_grch38.bed.gz.tbi"

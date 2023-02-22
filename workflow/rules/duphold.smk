@@ -55,5 +55,6 @@ rule duphold_apply:
         'bcftools view -i \'(FILTER = "PASS" | FILTER = ".") & '
         '((FMT/DHFFC[0] = ".") | '
         ' (SVTYPE = "DEL" & FMT/DHFFC[0] < 0.7) | '
-        ' (SVTYPE != "DEL" & FMT/DHBFC[0] > 1.3)) \' '
+        ' (SVTYPE != "DEL" & SVTYPE != "INS" & FMT/DHBFC[0] > 1.3) | '
+        ' (SVTYPE = "INS")) \' '
         "--threads {threads} -O z -o {output.vcf} {input.bcf}"

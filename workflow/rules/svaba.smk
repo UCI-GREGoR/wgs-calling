@@ -58,11 +58,15 @@ rule svaba_select_output_variants:
     that happens before bcftools gets to the file
     - the output vcf FORMAT definition for PL is '.' but bcftools complains that it should be 'G';
     that is, one value per genotype
+
+    Furthermore, with the intention of providing this file to svtools for parsing, entries with
+    missing breakend pair seem to cause svtools much distress, and as such, those are removed
+    before being passed along.
     """
     input:
         vcf="results/svaba/{projectid}/{sampleid}.svaba.unfiltered.sv.vcf",
     output:
-        vcf="results/svaba/{projectid}/{sampleid}.svaba.vcf.gz",
+        vcf="results/svaba/{projectid}/{sampleid}.svaba.as_bnd.vcf.gz",
         linker=temp("results/svaba/{projectid}/{sampleid}.svaba.reheader_linker.tsv"),
     params:
         tmpdir="temp",
@@ -82,5 +86,64 @@ rule svaba_select_output_variants:
         'awk -v blacklist="{params.blacklist_definition}" \'/^#CHROM/ {{OFS="\\t" ; print blacklist"\\n"$0}} ; ! /^#CHROM/\' {input.vcf} | '
         'awk -F"\\t" \'/^#/ ; ! /^#/ {{OFS = "\\t" ; print $1,$2,$3,$4,$5,$6,$7,$8,$9,$13}}\' | '
         "sed 's/<ID=PL,Number=.,/<ID=PL,Number=G,/' | "
+        "bcftools view -f 'PASS' | "
         "bcftools reheader -s {output.linker} | "
         "bcftools sort -O z --temp-dir {params.tmpdir} -o {output.vcf}"
+
+
+rule vcf_to_bedpe:
+    """
+    Use svtools to convert vcf to flattened bedpe format
+    """
+    input:
+        "{prefix}.svaba.as_bnd.vcf.gz",
+    output:
+        "{prefix}.svaba.as_bnd.bedpe",
+    conda:
+        "../envs/svtools.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    shell:
+        "gunzip -c {input} > {output}.tmp && "
+        "svtools vcftobedpe -i {output}.tmp -o {output} && "
+        "rm {output}.tmp"
+
+
+rule svaba_resolve_breakends:
+    """
+    Try to represent SvABA BND format variants as other, more specific SV types
+    """
+    input:
+        "{prefix}.svaba.as_bnd.bedpe",
+    output:
+        "{prefix}.svaba.resolved.bedpe",
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    script:
+        "../scripts/reclassify_svs.py"
+
+
+rule bedpe_to_vcf:
+    """
+    Use svtools to convert flattened bedpe to vcf format
+    """
+    input:
+        "{prefix}.svaba.resolved.bedpe",
+    output:
+        "{prefix}.svaba.vcf.gz",
+    conda:
+        "../envs/svtools.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+        tmpdir="temp",
+    shell:
+        "mkdir -p temp && "
+        "svtools bedpetovcf -i {input} -o {output}.tmp && "
+        "bcftools sort -O z --temp-dir temp -o {output} {output}.tmp && "
+        "rm {output}.tmp"
