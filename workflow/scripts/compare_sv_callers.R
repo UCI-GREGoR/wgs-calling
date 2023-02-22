@@ -45,7 +45,7 @@ load.data <- function(filenames, sv.callers) {
   ## and then in addition there's the question of how many variants were collapsed into a single
   ## variant from each caller output file. svdb seems to report a non-unique list of source files
   ## in INFO/svdb_origin, and so both questions can be addressed, if messily.
-  ## 
+  ##
   ## Since writing the above, truvari support has been added, and this tracking information is
   ## coming from a somewhat different source. The column header has been updated to reflect this
   ## more generic origin.

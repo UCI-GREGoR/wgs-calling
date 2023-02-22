@@ -42,7 +42,9 @@ def process_vcf(fn: str):
             if svtype_match is not None:
                 svtype.append(svtype_match[1])
             else:
-                raise ValueError("cannot extract SVTYPE from vcf record info field {}".format(tokens[7]))
+                raise ValueError(
+                    "cannot extract SVTYPE from vcf record info field {}".format(tokens[7])
+                )
     return tool, svtype
 
 
@@ -59,7 +61,7 @@ def truvari_add_variant_sources(vcf_fn: str, collapsed_fn: str, out_fn: str) -> 
             "tool": [y for x in [tool1, tool2] for y in x],
         }
     )
-    df.to_csv(out_fn, header=False, sep="\t", index = False)
+    df.to_csv(out_fn, header=False, sep="\t", index=False)
 
 
 truvari_add_variant_sources(
