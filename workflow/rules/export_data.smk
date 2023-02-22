@@ -264,7 +264,7 @@ rule create_export_manifest:
     output:
         "results/export/{projectid}/manifest.tsv",
     shell:
-        "echo {input.cram} {input.crai} {input.vcf} {input.tbi} | sed 's/ /\\n/g' > {output}"
+        "echo {input.cram} {input.crai} {input.vcf} {input.tbi} {input.sv_vcf} {input.sv_tbi} | sed 's/ /\\n/g' > {output}"
 
 
 rule create_nonexported_manifest:
