@@ -99,15 +99,6 @@ if config["behaviors"]["outcome"] == "release":
             projectid=list(set(manifest["projectid"])),
         )
     )
-    TARGETS.append(
-        [
-            expand(
-                "results/multiqc/{projectid}/multiqc.{runtype}.html",
-                projectid=list(manifest["projectid"].unique()),
-                runtype="calling",
-            )
-        ]
-    )
 
 
 ## To deal with the fact that s3 remote provider service is very slow
