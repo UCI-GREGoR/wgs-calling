@@ -15,11 +15,9 @@ behaviors:
     - "manta"
     - "lumpy"
     - "delly"
-    - "tiddit"
-    - "svaba"
   sv-ensemble:
-    merge-tool: "truvari"
-    min-count: 3
+    merge-tool: "svdb"
+    min-count: 2
   outcome: "release"
   symlink-fastqs: no
   trim-adapters-before-alignment: yes

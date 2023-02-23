@@ -152,6 +152,56 @@ rule remove_snv_region_exclusions:
         "bedtools intersect -a {input.vcf} -b {input.bed} -wa -v -header | bgzip -c > {output}"
 
 
+rule create_sv_vcf_export:
+    """
+    Take sv vcf output and turn it into something to release
+
+    Note the following things that have nothing to do with actual vcf spec compliance:
+
+    - Moon, the first intended downstream user of this file, has some truly absurd logic
+    for determining reference genome build that involves sniffing the vcf header for the
+    case-sensitive strings 'GRCh38' 'hg38' 'GRCh37' 'hg19'. as such, the user configuration
+    genome build tag is modified to try to meet that format restriction
+
+    - Moon commits the cardinal sin of reimplementing a vcf parser. It does not seem
+    to bother to implement a handler for unphased heterozygotes encoded as '1/0', even
+    though they are completely valid and equivalent to hets encoded as '0/1'. I don't
+    know at this time whether this is actually causing any particular issue with Moon,
+    but I'm going to resentfully change these genotypes manually in anticipation.
+    """
+    input:
+        "results/final/{projectid}/{sqid}.sv.vcf.gz",
+    output:
+        "results/export/{projectid}/{sampleid}_{lsid}_{sqid}.sv.vcf.gz",
+    params:
+        pipeline_version=pipeline_version,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
+        exportid="{sampleid}_{lsid}_{sqid}",
+    benchmark:
+        "results/performance_benchmarks/create_sv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
+    conda:
+        "../envs/bcftools.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    shell:
+        'bcftools annotate -h <(echo -e "##wgs-pipelineVersion={params.pipeline_version}\\n##reference={params.reference_build}") -O v {input} | '
+        'bcftools reheader -s <(echo -e "{wildcards.sqid}\\t{params.exportid}") | '
+        "sed 's|\\t1/0:|\\t0/1:|' | bgzip -c > {output}"
+
+
+use rule create_sv_vcf_export as create_sv_vcf_nonexport with:
+    output:
+        temp("results/nonexport/{projectid}/{sqid}.sv.vcf.gz"),
+    params:
+        pipeline_version=pipeline_version,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
+        exportid="{sqid}",
+    benchmark:
+        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
+
+
 rule checksum:
     """
     Create checksum files to go along with transported files
@@ -187,6 +237,12 @@ rule create_export_manifest:
         tbi=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.vcf.gz.tbi"
         ),
+        sv_vcf=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz"
+        ),
+        sv_tbi=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi"
+        ),
         cram_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "cram.md5"
         ),
@@ -199,10 +255,16 @@ rule create_export_manifest:
         tbi_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.vcf.gz.tbi.md5"
         ),
+        sv_vcf_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz.md5"
+        ),
+        sv_tbi_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi.md5"
+        ),
     output:
         "results/export/{projectid}/manifest.tsv",
     shell:
-        "echo {input.cram} {input.crai} {input.vcf} {input.tbi} | sed 's/ /\\n/g' > {output}"
+        "echo {input.cram} {input.crai} {input.vcf} {input.tbi} {input.sv_vcf} {input.sv_tbi} | sed 's/ /\\n/g' > {output}"
 
 
 rule create_nonexported_manifest:
@@ -225,10 +287,22 @@ rule create_nonexported_manifest:
         tbi_md5=lambda wildcards: ed.construct_nonexport_files(
             wildcards, manifest, checkpoints, "snv.vcf.gz.tbi.md5"
         ),
+        sv_vcf=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz"
+        ),
+        sv_tbi=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi"
+        ),
+        sv_vcf_md5=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz.md5"
+        ),
+        sv_tbi_md5=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi.md5"
+        ),
     output:
         "results/nonexport/{projectid}/manifest.tsv",
     shell:
-        "echo {input.vcf} {input.tbi} | sed 's/ /\\n/g' > {output}"
+        "echo {input.vcf} {input.tbi} {input.sv_vcf} {input.sv_tbi} | sed 's/ /\\n/g' > {output}"
 
 
 rule export_data:
