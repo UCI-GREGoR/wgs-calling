@@ -14,6 +14,20 @@ rule multiqc_link_ids:
         'awk -F"\\t" \'/{wildcards.projectid}/ {{print $4"\\t"$1}}\' {input} > {output}'
 
 
+rule multiqc_link_ids_index_sortorder:
+    """
+    Link SQ IDs to PMGRC IDs for user convenience in multiqc reports,
+    but due to user feedback, have it be sorted by SQ index code instead
+    of study ID.
+    """
+    input:
+        "results/export/linker.tsv",
+    output:
+        "results/multiqc/{projectid}/linker_index_sortorder.tsv",
+    shell:
+        'awk -F"\\t" \'/{wildcards.projectid}/ {{print $4"\\t"$4"_"$1}}\' {input} > {output}'
+
+
 rule run_multiqc_fastq:
     """
     Run multiqc on fastqc and fastp output for input fastqs
@@ -55,6 +69,26 @@ rule run_multiqc_fastq:
         "--profile-runtime --zip-data-dir "
         "-f -i 'MultiQC for Pre-alignment Data' "
         "-n {output.html}"
+
+
+use rule run_multiqc_fastq as run_multiqc_fastq_index_sortorder with:
+    input:
+        fastqc=lambda wildcards: tc.construct_fastqc_targets(wildcards, manifest),
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_targets(
+            wildcards, manifest
+        ),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
+        multiqc_config=config["multiqc-read-config"],
+        id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
+    output:
+        html="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.fastq.html".format(jira),
+        data_zip="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.fastq_data.zip".format(
+            jira
+        ),
+    benchmark:
+        "results/performance_benchmarks/run_multiqc_fastq_index_sortorder/{}.{{projectid}}.tsv".format(
+            jira
+        )
 
 
 rule run_multiqc_alignment:
@@ -118,6 +152,31 @@ rule run_multiqc_alignment:
         "-f -i 'MultiQC for Read Alignment' "
         "-n {output.html} "
         "--profile-runtime --zip-data-dir"
+
+
+use rule run_multiqc_alignment as run_multiqc_alignment_index_sortorder with:
+    input:
+        fastqc=lambda wildcards: tc.construct_fastqc_combined_targets(wildcards, manifest),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_combined_targets(
+            wildcards, manifest
+        ),
+        verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
+        alignstats=tc.construct_combined_alignstats_targets,
+        somalier=tc.construct_somalier_relate_targets,
+        picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
+        mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
+        multiqc_config=config["multiqc-alignment-config"],
+        id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
+    output:
+        html="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.alignment.html".format(jira),
+        data_zip="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.alignment_data.zip".format(
+            jira
+        ),
+    benchmark:
+        "results/performance_benchmarks/run_multiqc_alignment_index_sortorder/{}.{{projectid}}.tsv".format(
+            jira
+        )
 
 
 rule run_multiqc_calling:
