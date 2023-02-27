@@ -48,7 +48,7 @@ aligner_index_suffixes["bwa-mem2"] = ["ann", "amb", "bwt.2bit.64", "pac", "sa"]
 
 caller_num_intervals = tc.caller_interval_file_count(config)
 
-jira = re.search("/(RT[0-9]{4})/", pathlib.Path.cwd())
+jira = re.search("/(RT[0-9]{4})/", str(pathlib.Path.cwd()))
 if jira is None:
     jira = "RT"
 else:
