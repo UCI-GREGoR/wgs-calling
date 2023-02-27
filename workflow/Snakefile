@@ -54,7 +54,7 @@ if jira is None:
 else:
     jira = jira.group(1)
 
-unique_projects = list(manifest["projectid"]).unique()
+unique_projects = list(manifest["projectid"].unique())
 
 TARGETS = [
     [
