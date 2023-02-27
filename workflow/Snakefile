@@ -48,22 +48,33 @@ aligner_index_suffixes["bwa-mem2"] = ["ann", "amb", "bwt.2bit.64", "pac", "sa"]
 
 caller_num_intervals = tc.caller_interval_file_count(config)
 
+jira = re.search("/(RT-[0-9]{4})/", str(pathlib.Path.cwd()))
+if jira is None:
+    jira = "RT"
+else:
+    jira = jira.group(1)
+
+unique_projects = list(manifest["projectid"].unique())
+
 TARGETS = [
-    expand(
-        "results/multiqc/{projectid}/multiqc.{runtype}.html",
-        projectid=list(manifest["projectid"].unique()),
-        runtype="fastq",
-    ),
+    [
+        "results/multiqc/{}/multiqc.{}.{}.fastq.html".format(projectid, jira, projectid)
+        for projectid in unique_projects
+    ],
+    ["results/multiqc/{}/multiqc.fastq.html".format(projectid) for projectid in unique_projects],
 ]
 
 if config["behaviors"]["outcome"] != "fastqc":
     TARGETS.append(
         [
-            expand(
-                "results/multiqc/{projectid}/multiqc.{runtype}.html",
-                projectid=list(manifest["projectid"].unique()),
-                runtype="alignment",
-            )
+            [
+                "results/multiqc/{}/multiqc.{}.{}.alignment.html".format(projectid, jira, projectid)
+                for projectid in unique_projects
+            ],
+            [
+                "results/multiqc/{}/multiqc.alignment.html".format(projectid)
+                for projectid in unique_projects
+            ],
         ]
     )
 
