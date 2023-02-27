@@ -1,5 +1,6 @@
 localrules:
     multiqc_link_ids,
+    multiqc_link_ids_index_sortorder,
 
 
 rule multiqc_link_ids:
