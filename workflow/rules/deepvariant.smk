@@ -186,10 +186,6 @@ rule deepvariant_combine_regions:
 
 
 use rule deepvariant_combine_regions as deepvariant_combine_gvcfs with:
-    """
-    Combine per-region deepvariant gvcfs
-    into a single mega gvcf.
-    """
     input:
         expand(
             "results/deepvariant/{{projectid}}/postprocess_variants/{{sampleid}}.{splitnum}.g.vcf.gz",
