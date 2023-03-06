@@ -1,4 +1,4 @@
-rule bqsr_base_recalibrator_spark:
+rule bqsr_base_recalibrator:
     """
     Recalibrate base quality scores, but with the spark implementation and run locally.
 
@@ -29,7 +29,9 @@ rule bqsr_base_recalibrator_spark:
         java_opts="-XX:+UseParallelGC -XX:ParallelGCThreads=2",
         extra="--known-sites reference_data/bqsr/{}/ref.known.indels.vcf.gz".format(reference_build),
     benchmark:
-        "results/performance_benchmarks/bqsr_base_recalibrator_spark/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/bqsr_base_recalibrator/{projectid}/{sampleid}.tsv"
+    conda:
+        "../envs/gatk4.yaml"
     threads: 8
     resources:
         mem_mb="16000",
@@ -38,7 +40,7 @@ rule bqsr_base_recalibrator_spark:
         "v1.22.0/bio/gatk/baserecalibratorspark"
 
 
-rule bqsr_apply_bqsr_spark:
+rule bqsr_apply_bqsr:
     """
     Apply BQSR to sample, but with the spark implementation and run locally.
 
