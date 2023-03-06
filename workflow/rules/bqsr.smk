@@ -42,35 +42,40 @@ rule bqsr_base_recalibrator:
 
 rule bqsr_apply_bqsr:
     """
-    Apply BQSR to sample, but with the spark implementation and run locally.
-
-    Not sure exactly how this is gonna go but I think it's worth a shot.
+    Apply BQSR to sample
     """
     input:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
         bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
-        ref="reference_data/{}/{}/ref.fasta".format(config["behaviors"]["aligner"], reference_build),
-        dict=expand(
-            "reference_data/{aligner}/{genome}/ref.dict",
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        index_files=expand(
+            "reference_data/{aligner}/{genome}/ref.fasta.{suffix}",
             aligner=config["behaviors"]["aligner"],
             genome=reference_build,
+            suffix=["dict", "fai"],
         ),
-        fai=expand(
-            "reference_data/{aligner}/{genome}/ref.fasta.fai",
-            aligner=config["behaviors"]["aligner"],
-            genome=reference_build,
-        ),
-        recal_table="results/bqsr/{projectid}/{sampleid}.recal_table",
+        table="results/bqsr/{projectid}/{sampleid}.recal_table",
     output:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
         bai="results/bqsr/{projectid}/{sampleid}.bai",
     params:
         tmpdir="temp",
+        java_args="-Xmx10000m",
     benchmark:
-        "results/performance_benchmarks/bqsr_apply_bqsr_spark/{projectid}/{sampleid}.tsv"
-    threads: 8
+        "results/performance_benchmarks/bqsr_base_recalibrator/{projectid}/{sampleid}.tsv"
+    conda:
+        "../envs/gatk4.yaml"
+    threads: 1
     resources:
         mem_mb="20000",
         qname="large",
-    wrapper:
-        "v1.22.0/bio/gatk/applybqsrspark"
+    shell:
+        "mkdir -p {params.tmpdir} && "
+        'gatk --java-options "{params.java_args}" ApplyBQSR '
+        "--tmp-dir {params.tmpdir} "
+        "-R {input.fasta} "
+        "-I {input.bam} "
+        "--bqsr-recal-file {input.table} "
+        "-O {output.bam}"
