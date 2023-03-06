@@ -1,43 +1,47 @@
 rule bqsr_base_recalibrator:
     """
-    Recalibrate base quality scores, but with the spark implementation and run locally.
-
-    Not sure exactly how this is gonna go but I think it's worth a shot.
+    Recalibrate base quality scores
     """
     input:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
         bai="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam.bai",
-        ref="reference_data/{}/{}/ref.fasta".format(config["behaviors"]["aligner"], reference_build),
-        dict=expand(
-            "reference_data/{aligner}/{genome}/ref.dict",
+        fasta="reference_data/{}/{}/ref.fasta".format(
+            config["behaviors"]["aligner"], reference_build
+        ),
+        index_files=expand(
+            "reference_data/{aligner}/{genome}/ref.{suffix}",
             aligner=config["behaviors"]["aligner"],
             genome=reference_build,
+            suffix=["dict", "fasta.fai"],
         ),
-        fai=expand(
-            "reference_data/{aligner}/{genome}/ref.fasta.fai",
-            aligner=config["behaviors"]["aligner"],
-            genome=reference_build,
+        known_indels="reference_data/bqsr/{}/ref.known.indels.vcf.gz".format(reference_build),
+        known_indels_tbi="reference_data/bqsr/{}/ref.known.indels.vcf.gz.tbi".format(
+            reference_build
         ),
-        extra="reference_data/bqsr/{}/ref.known.indels.vcf.gz".format(reference_build),
-        extra_tbi="reference_data/bqsr/{}/ref.known.indels.vcf.gz.tbi".format(reference_build),
-        known="reference_data/bqsr/{}/ref.dbsnp138.vcf".format(reference_build),
-        known_idx="reference_data/bqsr/{}/ref.dbsnp138.vcf.idx".format(reference_build),
+        dbsnp138="reference_data/bqsr/{}/ref.dbsnp138.vcf".format(reference_build),
+        dbsnp138_idx="reference_data/bqsr/{}/ref.dbsnp138.vcf.idx".format(reference_build),
     output:
-        recal_table="results/bqsr/{projectid}/{sampleid}.recal_table",
+        table="results/bqsr/{projectid}/{sampleid}.recal_table",
     params:
         tmpdir="temp",
-        java_opts="-XX:+UseParallelGC -XX:ParallelGCThreads=2",
-        extra="--known-sites reference_data/bqsr/{}/ref.known.indels.vcf.gz".format(reference_build),
+        java_args="-Xmx8000m -XX:+UseParallelGC -XX:ParallelGCThreads=2",
     benchmark:
         "results/performance_benchmarks/bqsr_base_recalibrator/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/gatk4.yaml"
-    threads: 8
+    threads: 2
     resources:
         mem_mb="16000",
         qname="large",
-    wrapper:
-        "v1.22.0/bio/gatk/baserecalibratorspark"
+    shell:
+        "mkdir -p {params.tmpdir} && "
+        'gatk --java-options "{params.java_args}" BaseRecalibrator '
+        "--tmp-dir {params.tmpdir} "
+        "-R {input.fasta} "
+        "-I {input.bam} "
+        "-O {output.table} "
+        "--known-sites {input.known_indels} "
+        "--known-sites {input.dbsnp138}"
 
 
 rule bqsr_apply_bqsr:
