@@ -11,7 +11,7 @@ rule samtools_index_fasta:
     conda:
         "../envs/samtools.yaml"
     container:
-        "apptainer_images/samtools.sif"
+        "apptainer_images/bwa.sif"
     threads: 1
     resources:
         mem_mb="4000",
