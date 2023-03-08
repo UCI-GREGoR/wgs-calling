@@ -24,6 +24,8 @@ rule manta_configure:
         tmpdir="temp/manta_workdir/{projectid}/{sampleid}",
     conda:
         "../envs/manta.yaml"
+    container:
+        "apptainer_images/manta.sif"
     threads: 1
     resources:
         mem_mb="2000",
@@ -75,6 +77,8 @@ rule manta_run:
         tmpdir="temp/manta_workdir/{projectid}/{sampleid}",
     conda:
         "../envs/manta.yaml"
+    container:
+        "apptainer_images/manta.sif"
     threads: 4
     resources:
         mem_mb="24000",
@@ -101,6 +105,8 @@ rule manta_sort_output:
         tmpdir="temp/manta_workdir/{projectid}/{sampleid}",
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "apptainer_images/bcftools.sif"
     threads: 4
     resources:
         mem_mb="16000",

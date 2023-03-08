@@ -11,6 +11,8 @@ checkpoint generate_linker:
         "results/performance_benchmarks/generate_linker/linker.tsv"
     conda:
         "../envs/r.yaml"
+    container:
+        "docker://rocker/tidyverse:latest"
     threads: 1
     resources:
         mem_mb="2000",
@@ -37,6 +39,8 @@ rule create_cram_export:
         "results/performance_benchmarks/create_cram_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/samtools.yaml"
+    container:
+        "apptainer_images/bwa.sif"
     threads: 1
     resources:
         mem_mb="2000",
@@ -64,6 +68,8 @@ rule create_crai_export:
         "results/performance_benchmarks/create_crai_export/{prefix}.tsv"
     conda:
         "../envs/samtools.yaml"
+    container:
+        "apptainer_images/bwa.sif"
     threads: 4
     resources:
         mem_mb="8000",
@@ -104,6 +110,8 @@ rule create_snv_vcf_export:
         "results/performance_benchmarks/create_snv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "apptainer_images/bcftools.sif"
     threads: 1
     resources:
         mem_mb="2000",
@@ -144,6 +152,8 @@ rule remove_snv_region_exclusions:
         "results/remove_snv_region_exclusions/{prefix}.tsv"
     conda:
         "../envs/bedtools.yaml"
+    container:
+        "apptainer_images/bedtools.sif"
     threads: 1
     resources:
         mem_mb="2000",
@@ -181,6 +191,8 @@ rule create_sv_vcf_export:
         "results/performance_benchmarks/create_sv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "apptainer_images/bcftools.sif"
     threads: 1
     resources:
         mem_mb="2000",

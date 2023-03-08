@@ -17,6 +17,8 @@ rule create_sequence_dictionary:
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: 1
     resources:
         mem_mb="10000",
@@ -66,6 +68,8 @@ rule mark_duplicates:
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx3000m",
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: 2
     resources:
         mem_mb="12000",
@@ -91,6 +95,8 @@ rule sort_bam:
         "results/performance_benchmarks/sort_bam/{prefix}.sort.bam"
     conda:
         "../envs/samtools.yaml"
+    container:
+        "apptainer_images/samtools.sif"
     threads: 4
     resources:
         mem_mb="8000",
@@ -111,6 +117,8 @@ rule samtools_create_bai:
         "results/performance_benchmarks/samtools_create_bai/{prefix}.sort.tsv"
     conda:
         "../envs/samtools.yaml"
+    container:
+        "apptainer_images/samtools.sif"
     threads: 4
     resources:
         mem_mb="8000",
@@ -161,6 +169,8 @@ rule picard_collectmultiplemetrics:
         metric_accumulation_level="SAMPLE",
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: 1
     resources:
         mem_mb="10000",
@@ -212,6 +222,8 @@ rule picard_collectgcbiasmetrics:
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: 1
     resources:
         mem_mb="10000",
@@ -253,6 +265,8 @@ rule picard_collectwgsmetrics:
         java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx10000m",
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: 1
     resources:
         mem_mb="16000",

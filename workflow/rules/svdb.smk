@@ -13,6 +13,8 @@ rule merge_sv_vcfs:
         "results/performance_benchmarks/merge_sv_vcfs/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/svdb.yaml"
+    container:
+        "apptainer_images/svdb.sif"
     threads: 1
     resources:
         mem_mb="4000",
@@ -47,6 +49,8 @@ rule ensemble_sv_vcf:
         "results/performance_benchmarks/ensemble_sv_vcf/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "apptainer_images/bcftools.sif"
     threads: 1
     resources:
         mem_mb="2000",
@@ -68,6 +72,8 @@ rule summarize_sv_variant_sources:
         "results/performance_benchmarks/summarize_sv_variant_sources/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "apptainer_images/bcftools.sif"
     threads: 1
     resources:
         mem_mb="2000",

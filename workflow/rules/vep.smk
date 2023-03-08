@@ -83,6 +83,8 @@ rule vep_format_annotation_file:
         tbi=temp("results/{prefix}.bcftools-annotation-source.tsv.gz.tbi"),
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "apptainer_images/bcftools.sif"
     threads: 1
     resources:
         mem_mb="2000",
@@ -106,6 +108,8 @@ rule annotate_rsids:
         "results/{prefix}.annotated.vcf.gz",
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "apptainer_images/bcftools.sif"
     threads: 1
     resources:
         mem_mb="2000",

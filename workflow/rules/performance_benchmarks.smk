@@ -34,5 +34,7 @@ rule performance_benchmarks:
         rule_threads=lambda wildcards: get_rule_threads(workflow),
     conda:
         "../envs/r.yaml"
+    container:
+        "docker://rocker/tidyverse:latest"
     script:
         "../scripts/aggregate_performance_metrics.Rmd"

@@ -16,6 +16,8 @@ rule delly_run:
         vcf="results/delly/{projectid}/{sampleid}.delly.vcf.gz",
     conda:
         "../envs/delly.yaml"
+    container:
+        "docker://dellytools/delly:latest"
     benchmark:
         "results/performance_benchmarks/delly_run/{projectid}/{sampleid}.tsv"
     threads: 1

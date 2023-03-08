@@ -23,6 +23,8 @@ rule estimate_contamination:
         db_prefix="reference_data/verifybamid2/{}/ref.db".format(reference_build),
     conda:
         "../envs/verifybamid2.yaml"
+    container:
+        "docker://griffan/verifybamid2:v2.0.1"
     threads: 4
     resources:
         mem_mb="8000",

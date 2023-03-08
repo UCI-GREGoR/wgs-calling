@@ -12,6 +12,8 @@ rule create_exon_bedfile:
         "results/performance_benchmarks/bcftools_stats/exons.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "apptainer_images/bcftools.sif"
     threads: 1
     resources:
         mem_mb="1000",
@@ -40,6 +42,8 @@ rule bcftools_stats:
         "results/performance_benchmarks/bcftools_stats/{prefix}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "apptainer_images/bcftools.sif"
     threads: 1
     resources:
         mem_mb="8000",

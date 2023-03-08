@@ -57,6 +57,8 @@ rule run_multiqc_fastq:
         ),
     conda:
         "../envs/multiqc.yaml"
+    container:
+        "docker://ewels/multiqc:v1.14"
     threads: 1
     resources:
         mem_mb="4000",
@@ -136,6 +138,8 @@ rule run_multiqc_alignment:
         ),
     conda:
         "../envs/multiqc.yaml"
+    container:
+        "docker://ewels/multiqc:v1.14"
     threads: 1
     resources:
         mem_mb="4000",
@@ -215,6 +219,8 @@ rule run_multiqc_calling:
         ),
     conda:
         "../envs/multiqc.yaml"
+    container:
+        "docker://ewels/multiqc:v1.14"
     threads: 1
     resources:
         mem_mb="4000",

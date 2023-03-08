@@ -13,6 +13,8 @@ rule run_alignstats:
         min_qual=20,
     conda:
         "../envs/alignstats.yaml"
+    container:
+        "apptainer_images/alignstats.sif"
     threads: 4
     resources:
         mem_mb="8000",

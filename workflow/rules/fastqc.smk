@@ -16,6 +16,8 @@ rule run_fastqc_pretrimming:
         outdir="results/fastqc/{projectid}",
     conda:
         "../envs/fastqc.yaml"
+    container:
+        "apptainer_images/fastqc.sif"
     threads: 4
     resources:
         mem_mb="8000",
@@ -42,6 +44,8 @@ rule run_fastqc_posttrimming:
         outdir="results/fastqc_posttrimming/{projectid}",
     conda:
         "../envs/fastqc.yaml"
+    container:
+        "apptainer_images/fastqc.sif"
     threads: 4
     resources:
         mem_mb="8000",

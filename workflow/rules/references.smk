@@ -20,6 +20,8 @@ rule download_reference_data:
         "results/performance_benchmarks/download_reference_data/{reference_file}.tsv"
     conda:
         "../envs/awscli.yaml"
+    container:
+        "docker://amazon/aws-cli:2.11.0"
     threads: 1
     resources:
         mem_mb="2000",
@@ -45,6 +47,8 @@ rule index_vcf:
         "results/performance_benchmarks/index_vcf/{prefix}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "apptainer_images/bcftools.sif"
     threads: 1
     resources:
         mem_mb="2000",

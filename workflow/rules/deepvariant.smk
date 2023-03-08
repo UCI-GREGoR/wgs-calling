@@ -177,6 +177,8 @@ rule deepvariant_combine_regions:
         "results/performance_benchmarks/deepvariant_combine_regions/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "apptainer_images/bcftools.sif"
     threads: 4
     resources:
         mem_mb="4000",

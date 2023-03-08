@@ -20,6 +20,8 @@ rule run_fastp:
         quality=10,
     conda:
         "../envs/fastp.yaml"
+    container:
+        "apptainer_images/fastq.sif"
     threads: 2
     resources:
         mem_mb="8000",

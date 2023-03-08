@@ -29,6 +29,8 @@ rule bqsr_base_recalibrator:
         "results/performance_benchmarks/bqsr_base_recalibrator/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: 2
     resources:
         mem_mb="16000",
@@ -71,6 +73,8 @@ rule bqsr_apply_bqsr:
         "results/performance_benchmarks/bqsr_base_recalibrator/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: 1
     resources:
         mem_mb="20000",
