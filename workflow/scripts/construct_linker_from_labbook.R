@@ -1,4 +1,11 @@
-library(openxlsx)
+if (!require(openxlsx, quietly = TRUE)) {
+  install.packages("openxlsx", repos = c(
+    "https://cran.case.edu/",
+    "http://lib.stat.cmu.edu/R/CRAN/",
+    "https://cran.yu.ac.kr/"
+  ))
+  require(openxlsx, quietly = TRUE)
+}
 library(stringr)
 
 construct.output.stems <- function(df) {

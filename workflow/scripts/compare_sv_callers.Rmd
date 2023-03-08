@@ -27,7 +27,14 @@ suppressPackageStartupMessages(library(ggplot2, quietly = TRUE))
 suppressPackageStartupMessages(library(RColorBrewer, quietly = TRUE))
 suppressPackageStartupMessages(library(knitr, quietly = TRUE))
 suppressPackageStartupMessages(library(kableExtra, quietly = TRUE))
-suppressPackageStartupMessages(library(UpSetR, quietly = TRUE))
+if (!library(UpSetR, quietly = TRUE)) {
+  install.packages("UpSetR", repos = c(
+    "https://cran.case.edu/",
+    "http://lib.stat.cmu.edu/R/CRAN/",
+    "https://cran.yu.ac.kr/"
+  ))
+  suppressPackageStartupMessages(require(UpSetR))
+}
 ```
 
 ***
