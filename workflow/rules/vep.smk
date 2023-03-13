@@ -84,7 +84,7 @@ rule vep_format_annotation_file:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",
@@ -109,7 +109,7 @@ rule annotate_rsids:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",

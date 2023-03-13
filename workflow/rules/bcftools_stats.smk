@@ -13,7 +13,7 @@ rule create_exon_bedfile:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="1000",
@@ -43,7 +43,7 @@ rule bcftools_stats:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="8000",

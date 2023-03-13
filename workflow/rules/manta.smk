@@ -25,7 +25,7 @@ rule manta_configure:
     conda:
         "../envs/manta.yaml"
     container:
-        "apptainer_images/manta.sif"
+        "{}/manta.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",
@@ -78,7 +78,7 @@ rule manta_run:
     conda:
         "../envs/manta.yaml"
     container:
-        "apptainer_images/manta.sif"
+        "{}/manta.sif".format(apptainer_images)
     threads: 4
     resources:
         mem_mb="24000",
@@ -106,7 +106,7 @@ rule manta_sort_output:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 4
     resources:
         mem_mb="16000",

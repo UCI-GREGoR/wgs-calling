@@ -178,7 +178,7 @@ rule deepvariant_combine_regions:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 4
     resources:
         mem_mb="4000",

@@ -48,7 +48,7 @@ rule index_vcf:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",

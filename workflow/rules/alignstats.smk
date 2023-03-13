@@ -14,7 +14,7 @@ rule run_alignstats:
     conda:
         "../envs/alignstats.yaml"
     container:
-        "apptainer_images/alignstats.sif"
+        "{}/alignstats.sif".format(apptainer_images)
     threads: 4
     resources:
         mem_mb="8000",

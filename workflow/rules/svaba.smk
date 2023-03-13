@@ -32,7 +32,7 @@ rule svaba_run:
     conda:
         "../envs/svaba.yaml"
     container:
-        "apptainer_images/svaba.sif"
+        "{}/svaba.sif".format(apptainer_images)
     threads: 8
     resources:
         mem_mb="32000",
@@ -79,7 +79,7 @@ rule svaba_select_output_variants:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 4
     resources:
         mem_mb="16000",

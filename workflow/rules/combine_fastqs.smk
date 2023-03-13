@@ -23,7 +23,7 @@ rule combine_input_fastqs_by_lane:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",

@@ -14,7 +14,7 @@ rule summarize_methods:
     conda:
         "../envs/python_jinja.yaml"
     container:
-        "apptainer_images/python_jinja.sif"
+        "{}/python_jinja.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",

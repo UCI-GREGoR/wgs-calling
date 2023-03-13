@@ -18,7 +18,7 @@ rule truvari_merge_within_caller:
     conda:
         "../envs/truvari.yaml"
     container:
-        "apptainer_images/truvari.sif"
+        "{}/truvari.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="4000",
@@ -49,7 +49,7 @@ rule bcftools_concat_sv_callers:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="4000",
@@ -92,7 +92,7 @@ rule truvari_ensemble_sv_vcf:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",

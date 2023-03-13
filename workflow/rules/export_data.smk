@@ -40,7 +40,7 @@ rule create_cram_export:
     conda:
         "../envs/samtools.yaml"
     container:
-        "apptainer_images/bwa.sif"
+        "{}/bwa.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",
@@ -69,7 +69,7 @@ rule create_crai_export:
     conda:
         "../envs/samtools.yaml"
     container:
-        "apptainer_images/bwa.sif"
+        "{}/bwa.sif".format(apptainer_images)
     threads: 4
     resources:
         mem_mb="8000",
@@ -111,7 +111,7 @@ rule create_snv_vcf_export:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",
@@ -153,7 +153,7 @@ rule remove_snv_region_exclusions:
     conda:
         "../envs/bedtools.yaml"
     container:
-        "apptainer_images/bedtools.sif"
+        "{}/bedtools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",
@@ -192,7 +192,7 @@ rule create_sv_vcf_export:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",

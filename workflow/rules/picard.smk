@@ -96,7 +96,7 @@ rule sort_bam:
     conda:
         "../envs/samtools.yaml"
     container:
-        "apptainer_images/bwa.sif"
+        "{}/bwa.sif".format(apptainer_images)
     threads: 4
     resources:
         mem_mb="8000",
@@ -118,7 +118,7 @@ rule samtools_create_bai:
     conda:
         "../envs/samtools.yaml"
     container:
-        "apptainer_images/bwa.sif"
+        "{}/bwa.sif".format(apptainer_images)
     threads: 4
     resources:
         mem_mb="8000",

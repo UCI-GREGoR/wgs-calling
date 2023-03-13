@@ -11,7 +11,7 @@ rule samtools_index_fasta:
     conda:
         "../envs/samtools.yaml"
     container:
-        "apptainer_images/bwa.sif"
+        "{}/bwa.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="4000",
@@ -47,7 +47,7 @@ rule bwa_index:
     conda:
         "../envs/{}.yaml".format(config["behaviors"]["aligner"])
     container:
-        "apptainer_images/{}.sif".format(config["behaviors"]["aligner"])
+        "{}/{}.sif".format(apptainer_images, config["behaviors"]["aligner"])
     threads: 1
     resources:
         mem_mb="64000",
@@ -97,7 +97,7 @@ rule bwa_map_and_sort:
     conda:
         lambda wildcards: "../envs/{}.yaml".format(config["behaviors"]["aligner"])
     container:
-        "apptainer_images/{}.sif".format(config["behaviors"]["aligner"])
+        "{}/{}.sif".format(apptainer_images, config["behaviors"]["aligner"])
     threads: 12
     resources:
         mem_mb="500000",

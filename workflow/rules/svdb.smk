@@ -14,7 +14,7 @@ rule merge_sv_vcfs:
     conda:
         "../envs/svdb.yaml"
     container:
-        "apptainer_images/svdb.sif"
+        "{}/svdb.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="4000",
@@ -50,7 +50,7 @@ rule ensemble_sv_vcf:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",
@@ -73,7 +73,7 @@ rule summarize_sv_variant_sources:
     conda:
         "../envs/bcftools.yaml"
     container:
-        "apptainer_images/bcftools.sif"
+        "{}/bcftools.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",

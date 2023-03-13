@@ -21,7 +21,7 @@ rule lumpy_run:
     conda:
         "../envs/smoove.yaml"
     container:
-        "apptainer_images/smoove.sif"
+        "{}/smoove.sif".format(apptainer_images)
     threads: 2
     resources:
         mem_mb="16000",
