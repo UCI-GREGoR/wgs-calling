@@ -55,7 +55,9 @@ def run_construct_somalier_pedfile(
     parent_data = {}
     for pmgrcid, ruid, sqid in zip(linker_data["pmgrc"], linker_data["ru"], linker_data["sq"]):
         parsed_sample_id = pmgrcid.split("-")
-        parent_data["{}_{}-{}".format(ruid, parsed_sample_id[2], parsed_sample_id[3])] = sqid
+        ## new: permit non-compliant IDs to not actually break everything
+        if len(parsed_sample_id) == 4:
+            parent_data["{}_{}-{}".format(ruid, parsed_sample_id[2], parsed_sample_id[3])] = sqid
 
     for ruid, sampleid in zip(ids["ruid"], ids["sampleid"]):
         sample_sex = linker_data.loc[
@@ -65,7 +67,11 @@ def run_construct_somalier_pedfile(
             (linker_data["ru"] == ruid) & (linker_data["sq"] == sampleid), "pmgrc"
         ]
         if len(sample_sex) == 1:
-            parsed_sample_id = pmgrc_id.to_list()[0].split("-")
+            ## new: deal with IDs that don't actually look like "PMGRC-\d+-\d+-\d"
+            if pmgrc_id.to_list()[0].startswith("PMGRC"):
+                parsed_sample_id = pmgrc_id.to_list()[0].split("-")
+            else:
+                parsed_sample_id = ["notPMGRC", pmgrc_id.to_list()[0], pmgrc_id.to_list()[0], "0"]
             invalid_family_structure = False
             if parsed_sample_id[1] == parsed_sample_id[2] and parsed_sample_id[3] != "0":
                 problems = add_problem(
