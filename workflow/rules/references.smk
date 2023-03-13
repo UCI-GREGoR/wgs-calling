@@ -21,7 +21,7 @@ rule download_reference_data:
     conda:
         "../envs/awscli.yaml"
     container:
-        "docker://amazon/aws-cli:2.11.0"
+        "{}/awscli.sif".format(apptainer_images)
     threads: 1
     resources:
         mem_mb="2000",
