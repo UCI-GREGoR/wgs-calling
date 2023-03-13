@@ -183,3 +183,15 @@ rule deepvariant_combine_regions:
         qname="small",
     shell:
         "bcftools concat --threads {threads} -O z -o {output} {input}"
+
+
+use rule deepvariant_combine_regions as deepvariant_combine_gvcfs with:
+    input:
+        expand(
+            "results/deepvariant/{{projectid}}/postprocess_variants/{{sampleid}}.{splitnum}.g.vcf.gz",
+            splitnum=[i + 1 for i in range(caller_num_intervals)],
+        ),
+    output:
+        "results/deepvariant/{projectid}/{sampleid}.sorted.g.vcf.gz",
+    benchmark:
+        "results/performance_benchmarks/deepvariant_combine_gvcfs/{projectid}/{sampleid}.tsv"
