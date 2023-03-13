@@ -21,7 +21,7 @@ rule run_fastp:
     conda:
         "../envs/fastp.yaml"
     container:
-        "{}/fastq.sif".format(apptainer_images)
+        "{}/fastp.sif".format(apptainer_images)
     threads: 2
     resources:
         mem_mb="8000",
