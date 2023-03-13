@@ -27,7 +27,7 @@ behaviors:
 parameters:
   deepvariant:
     number-shards: 16
-    docker-version: "1.4.0"
+    docker-version: "1.5.0"
   manta:
     config-ini: "config/configManta.py.ini"
   tiddit:
