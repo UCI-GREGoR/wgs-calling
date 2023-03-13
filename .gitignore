@@ -2,6 +2,10 @@
 .parallel
 .keras
 
+# infrastructure related to containers
+.cache
+.java
+
 # Testing refuse
 .coverage
 
