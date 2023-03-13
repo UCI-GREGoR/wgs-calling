@@ -5,6 +5,7 @@
 # infrastructure related to containers
 .cache
 .java
+.wget-hsts
 
 # Testing refuse
 .coverage
