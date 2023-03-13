@@ -80,8 +80,14 @@ rule bwa_map_and_sort:
     params:
         exec_name=config["behaviors"]["aligner"],
         K="1000000",
-        readgroup=lambda wildcards: "@RG\\tID:{}\\tSM:{}\\tLB:{}\\tPL:{}\\tPU:{}".format(
-            "RG1", wildcards.sampleid, wildcards.sampleid, "Illumina", wildcards.sampleid
+        readgroup=lambda wildcards: "@RG\\tID:{}\\tSM:{}\\tLB:{}\\tPL:{}\\tPU:{}.{}.{}".format(
+            "RG" + wildcards.lane,
+            wildcards.sampleid,
+            wildcards.sampleid,
+            "ILLUMINA",
+            wildcards.projectid,
+            wildcards.lane,
+            wildcards.sampleid,
         ),
         tmpdir="temp",
     conda:

@@ -139,6 +139,12 @@ def construct_snv_targets(config: dict, manifest: pd.DataFrame) -> list:
         "results/{}/{}/{}.sorted.vcf.gz".format(config["behaviors"]["snv-caller"], x[0], x[1])
         for x in zip(manifest["projectid"], manifest["sampleid"])
     ]
+    result.extend(
+        [
+            "results/{}/{}/{}.sorted.g.vcf.gz".format(config["behaviors"]["snv-caller"], x[0], x[1])
+            for x in zip(manifest["projectid"], manifest["sampleid"])
+        ]
+    )
     return list(set(result))
 
 
