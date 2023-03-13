@@ -25,7 +25,7 @@ rule run_fastqc_pretrimming:
         qname="small",
     shell:
         "mkdir -p {params.outdir} && "
-        "mkdir -p {params.tmp} && "
+        "mkdir -p {params.tmpdir} && "
         "fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir} -d {params.tmpdir}"
 
 
