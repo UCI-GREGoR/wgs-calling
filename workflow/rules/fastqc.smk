@@ -21,7 +21,7 @@ rule run_fastqc_pretrimming:
         "{}/fastqc.sif".format(apptainer_images)
     threads: 4
     resources:
-        mem_mb="8000",
+        mem_mb="16000",
         qname="small",
     shell:
         "mkdir -p {params.outdir} && "
@@ -52,7 +52,7 @@ rule run_fastqc_posttrimming:
         "{}/fastqc.sif".format(apptainer_images)
     threads: 4
     resources:
-        mem_mb="8000",
+        mem_mb="16000",
         qname="small",
     shell:
         "mkdir -p {params.outdir} && "
