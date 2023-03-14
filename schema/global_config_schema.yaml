@@ -14,7 +14,7 @@ properties:
   genome-build:
     type: string
     pattern: "^grch[0-9]+$"
-  apptainer-images:
+  apptainer-image-dir:
     type: string
   behaviors:
     type: object
