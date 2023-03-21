@@ -46,6 +46,8 @@ properties:
           - merge-tool
           - min-count
         additionalProperties: no
+      sv-remove-breakends:
+        type: boolean
       outcome:
         type: string
         pattern: "^fastqc$|^alignment$|^calling$|^release$"
@@ -61,11 +63,22 @@ properties:
         pattern: "^[fF]emale$|^[mM]ale$"
       export-directory:
         type: string
+      export-s3:
+        type: object
+        properties:
+          bucket-name:
+            type: string
+          profile-name:
+            type: string
+        required:
+          - bucket-name
+        additionalProperties: false
     required:
       - aligner
       - snv-caller
       - sv-callers
       - sv-ensemble
+      - sv-remove-breakends
       - outcome
       - symlink-fastqs
       - trim-adapters-before-alignment
