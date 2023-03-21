@@ -39,6 +39,7 @@ The following settings are recognized in `config/config.yaml`. Note that each re
   - `sv-ensemble`: settings controlling SV ensemble calling. note that the below settings can be applied in combination
 	- `min-count`: the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering
 	- `required-callers`: a list of which tools, if any, a variant absolutely must appear in to survive ensemble filtering
+  - `sv-remove-breakends`: whether or not to filter `SVTYPE=BND` variants from ensemble calling output
   - `outcome`: which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`; or `release` to prepare results for distribution
   - `symlink-fastqs`: whether to copy (no) or symlink (yes) input fastqs into workspace. symlinking is faster and more memory-efficient, but
     less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch.
@@ -49,6 +50,9 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 	for the sample, delete this configuration option
   - `export-directory`: top-level path to where output files should be moved after release run is complete. this is only required if using the special `export_data`
     target outside of the standard DAG (see below for description)
+  - `export-s3`: parameters for controlling optional upload to s3
+    - `bucket-name`: name of s3 bucket to which to sync data
+    - `profile-name`: optional name of aws profile to use for data sync
 - `parameters`: tool-specific parameters. note that this section is a work in progress, somewhat more than the rest
   - `deepvariant`: parameters specific to [deepvariant](https://github.com/google/deepvariant)
     - `number-shards`: how many shards to break calling into. needs to be at most the number of available threads in the submission queue
