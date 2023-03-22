@@ -104,6 +104,17 @@ rule create_snv_gvcf_export:
         "sed 's|\\t1/0:|\\t0/1:|' | bgzip -c > {output}"
 
 
+use rule create_snv_gvcf_export as create_snv_gvcf_nonexport with:
+    output:
+        temp("results/nonexport/{projectid}/{sqid}.snv.g.vcf.gz"),
+    params:
+        pipeline_version=pipeline_version,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
+        exportid="{sqid}",
+    benchmark:
+        "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
+
+
 rule create_snv_vcf_export:
     """
     Take snv vcf output and turn it into something to release
