@@ -456,7 +456,7 @@ rule export_data_remote:
         ),
         manifest="results/export/{projectid}/manifest.tsv",
     output:
-        "results/export/s3_transfer_complete.txt",
+        "results/export/{projectid}/s3_transfer_complete.txt",
     params:
         export_dir="results/export/{projectid}",
         bucketname=config["behaviors"]["export-s3"]["bucket-name"],
@@ -466,8 +466,8 @@ rule export_data_remote:
     conda:
         "../envs/awscli.yaml"
     shell:
-        'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" {params.export_dir} {params.bucketname}/crams && '
-        'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/snv_vcfs && '
-        'aws s3 sync {params.profile} --exclude="*" --include="*.snv.g.vcf*" {params.export_dir} {params.bucketname}/snv_gvcfs && '
-        'aws s3 sync {params.profile} --exclude="*" --include="*.sv.vcf*" {params.export_dir} {params.bucketname}/sv_vcfs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/crams && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/snv_vcfs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.snv.g.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/snv_gvcfs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.sv.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/sv_vcfs && '
         "touch {output}"
