@@ -34,7 +34,7 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
 - `behaviors`: user-configurable modifiers to how the pipeline will run
   - `aligner`: which alignment tool to use. permitted values: `bwa-mem2`
-  - `snv-caller`: which calling tool to use for SNVs. permitted values: `octopus`
+  - `snv-caller`: which calling tool to use for SNVs. permitted values: `deepvariant`
   - `sv-callers`: which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`
   - `sv-ensemble`: settings controlling SV ensemble calling. note that the below settings can be applied in combination
 	- `min-count`: the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering
@@ -88,13 +88,6 @@ The following settings are recognized in `config/config.yaml`. Note that each re
   - `db-UD`: filename for assorted Verify annotation files
   - `db-mu`: filename for assorted Verify annotation files
   - `db-bed`: filename for assorted Verify annotation files
-- `octopus`: reference data files specific to [octopus](https://github.com/luntergroup/octopus)
-  - `forest-model`: forest model annotation file for `--forest-model` [note: this is independent of genome build (probably)]
-  - `error-model`: error model annotation file for `--sequence-error-model` [note: this is independent of genome build (probably)]
-  - `skip-regions`: region annotation for `--skip-regions-file`
-  - `calling-ranges`: list of files containing chromosomal intervals for embarrassingly parallel analysis. these are currently effectively
-    placeholders that just contain the standard human chromosomes, but at some point, this will be extended to contain actual
-	balanced calling intervals
 - `deepvariant`: reference data files specific to [deepvariant](https://github.com/google/deepvariant)
   - `calling-ranges`: list of files containing chromosomal intervals for embarrassingly parallel analysis. these are currently effectively
     placeholders that just contain the standard human chromosomes, but at some point, this will be extended to contain actual
@@ -172,19 +165,17 @@ under active modification, and should only be used for considering alignment QC 
 #### Variant Calling
 
 All variant calling in this pipeline is conducted per-subject, ignoring batch data. SNV calls from the user-configured tool
-(e.g. DeepVariant, Octopus) are aggregated in `results/{toolname}/{projectid}/{sampleid}.sorted.vcf.gz`. SV calls from
+(e.g. DeepVariant) are aggregated in `results/{toolname}/{projectid}/{sampleid}.sorted.vcf.gz`. SV calls from
 ensemble calling based on user-configured tools and exclusion criteria are aggregated in `results/final/{projectid}/{sampleid}.sv.vcf.gz`.
 Note that these paths and filenames are subject to change before stabilization of the workflow.
 
-#### (DeepVariant only) GVCFs for Batch Calling
+#### GVCFs for Batch Calling
 
-If the user has selected DeepVariant for SNV calling, gvcf files per-subject will be collected at
+If the user has selected a compatible tool for SNV calling, gvcf files per-subject will be collected at
 `results/deepvariant/{projectid}/{sampleid}.g.vcf.gz`. These files are not used in the pipeline itself,
 and represent the raw output of `deepvariant postprocess_variants`. At some point, these will likely receive
 further processing in anticipation of use with e.g. GLnexus in a different pipeline. Also at some point,
 I'll probably add a flag for disabling the production of gvcf output, but that's not urgent.
-
-gvcf output is not supported by Octopus and so is not possible in this pipeline.
 
 #### Optional: emit methods description and software version data
 

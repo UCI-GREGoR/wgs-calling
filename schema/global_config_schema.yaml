@@ -22,7 +22,7 @@ properties:
         pattern: "^bwa-mem2$|^bwa$"
       snv-caller:
         type: string
-        pattern: "^octopus$|^deepvariant$"
+        pattern: "^deepvariant$"
       sv-callers:
         type: array
         items:
@@ -208,29 +208,6 @@ properties:
         additionalProperties: no
     required:
       - grch37
-  octopus:
-    type: object
-    properties:
-      forest-model:
-        type: string
-      error-model:
-        type: string
-    patternProperties:
-      "^grch[0-9]+$":
-        type: object
-        properties:
-          skip-regions:
-            type: string
-          calling-ranges:
-            type: string
-        required:
-          - skip-regions
-          - calling-ranges
-        additionalProperties: no
-    required:
-      - forest-model
-      - error-model
-      - grch37
   deepvariant:
     type: object
     patternProperties:
@@ -303,7 +280,6 @@ required:
   - somalier
   - dnascope
   - verifybamid2
-  - octopus
   - deepvariant
   - delly
   - lumpy

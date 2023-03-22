@@ -127,7 +127,6 @@ ruleorder: samtools_index_fasta > download_reference_data
 ruleorder: index_vcf > download_reference_data
 ruleorder: create_sequence_dictionary > download_reference_data
 ruleorder: adjust_fasta_formatting > download_reference_data
-ruleorder: octopus_run_task > index_vcf
 ruleorder: manta_run > index_vcf
 
 
@@ -154,7 +153,6 @@ include: "rules/manta.smk"
 include: "rules/methods.smk"
 include: "rules/mosdepth.smk"
 include: "rules/multiqc.smk"
-
 include: "rules/performance_benchmarks.smk"
 include: "rules/picard.smk"
 include: "rules/references.smk"

@@ -5,7 +5,7 @@ localrules:
 rule caller_scatter_tasks:
     """
     For scatter-gather: take input set of range annotations
-    and prepare for individual octopus runs
+    and prepare for individual caller runs
     """
     input:
         lambda wildcards: config[wildcards.caller][reference_build]["calling-ranges"],
