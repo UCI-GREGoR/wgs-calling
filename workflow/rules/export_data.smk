@@ -477,6 +477,10 @@ rule export_data_remote:
         else "",
     conda:
         "../envs/awscli.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
     shell:
         'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/crams && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/snv_vcfs && '
