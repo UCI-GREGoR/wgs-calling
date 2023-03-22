@@ -72,6 +72,38 @@ rule create_crai_export:
         "samtools index -@ {threads} -o {output.crai} {input.cram}"
 
 
+rule create_snv_gvcf_export:
+    """
+    Take snv g.vcf output and turn it into something to release
+
+    *Some* of the modifications applied to snv vcfs are applied here, but
+    filtering is deferred to downstream calling.
+    """
+    input:
+        expand(
+            "results/{toolname}/{{projectid}}/{{sqid}}.sorted.g.vcf.gz",
+            toolname=config["behaviors"]["snv-caller"],
+        ),
+    output:
+        temp("results/export/{projectid}/{sampleid}_{lsid}_{sqid}.snv.g.vcf.gz"),
+    params:
+        pipeline_version=pipeline_version,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
+        exportid="{sampleid}_{lsid}_{sqid}",
+    benchmark:
+        "results/performance_benchmarks/create_snv_gvcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
+    conda:
+        "../envs/bcftools.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    shell:
+        'bcftools annotate -h <(echo -e "##wgs-pipelineVersion={params.pipeline_version}\\n##reference={params.reference_build}") -O v {input} | '
+        'bcftools reheader -s <(echo -e "{wildcards.sqid}\\t{params.exportid}") | '
+        "sed 's|\\t1/0:|\\t0/1:|' | bgzip -c > {output}"
+
+
 rule create_snv_vcf_export:
     """
     Take snv vcf output and turn it into something to release
@@ -259,6 +291,12 @@ rule create_export_manifest:
         tbi=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.vcf.gz.tbi"
         ),
+        gvcf=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz"
+        ),
+        gvcf_tbi=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi"
+        ),
         sv_vcf=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "sv.vcf.gz"
         ),
@@ -277,6 +315,12 @@ rule create_export_manifest:
         tbi_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.vcf.gz.tbi.md5"
         ),
+        gvcf_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.md5"
+        ),
+        gvcf_tbi_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi.md5"
+        ),
         sv_vcf_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "sv.vcf.gz.md5"
         ),
@@ -286,7 +330,9 @@ rule create_export_manifest:
     output:
         temp("results/export/{projectid}/manifest.tsv"),
     shell:
-        "echo {input.cram} {input.crai} {input.vcf} {input.tbi} {input.sv_vcf} {input.sv_tbi} | sed 's/ /\\n/g' > {output}"
+        "echo {input.cram} {input.crai} {input.vcf} {input.tbi} "
+        "{input.gvcf} {input.gvcf_tbi} {input.sv_vcf} {input.sv_tbi} | "
+        "sed 's/ /\\n/g' > {output}"
 
 
 rule create_nonexported_manifest:
@@ -309,6 +355,18 @@ rule create_nonexported_manifest:
         tbi_md5=lambda wildcards: ed.construct_nonexport_files(
             wildcards, manifest, checkpoints, "snv.vcf.gz.tbi.md5"
         ),
+        gvcf=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz"
+        ),
+        gvcf_tbi=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi"
+        ),
+        gvcf_md5=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.md5"
+        ),
+        gvcf_tbi_md5=lambda wildcards: ed.construct_nonexport_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi.md5"
+        ),
         sv_vcf=lambda wildcards: ed.construct_nonexport_files(
             wildcards, manifest, checkpoints, "sv.vcf.gz"
         ),
@@ -324,7 +382,8 @@ rule create_nonexported_manifest:
     output:
         temp("results/nonexport/{projectid}/manifest.tsv"),
     shell:
-        "echo {input.vcf} {input.tbi} {input.sv_vcf} {input.sv_tbi} | sed 's/ /\\n/g' > {output}"
+        "echo {input.vcf} {input.tbi} {input.gvcf} {input.gvcf_tbi} "
+        "{input.sv_vcf} {input.sv_tbi} | sed 's/ /\\n/g' > {output}"
 
 
 rule export_data_local:
@@ -359,6 +418,12 @@ rule export_data_remote:
         tbi=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.vcf.gz.tbi"
         ),
+        gvcf=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz"
+        ),
+        gvcf_tbi=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi"
+        ),
         sv_vcf=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "sv.vcf.gz"
         ),
@@ -376,6 +441,12 @@ rule export_data_remote:
         ),
         tbi_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.vcf.gz.tbi.md5"
+        ),
+        gvcf_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.md5"
+        ),
+        gvcf_tbi_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi.md5"
         ),
         sv_vcf_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "sv.vcf.gz.md5"
@@ -397,5 +468,6 @@ rule export_data_remote:
     shell:
         'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" {params.export_dir} {params.bucketname}/crams && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/snv_vcfs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.snv.g.vcf*" {params.export_dir} {params.bucketname}/snv_gvcfs && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.sv.vcf*" {params.export_dir} {params.bucketname}/sv_vcfs && '
         "touch {output}"
