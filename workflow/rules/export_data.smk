@@ -264,7 +264,8 @@ rule remove_breakends:
     shell:
         'if [[ "{params.remove_breakends}" == "True" ]] ; then '
         "bcftools filter -i 'SVTYPE != \"BND\"' -O z -o {output} {input} ; else "
-        "cp {input} {output}"
+        "cp {input} {output} ; "
+        "fi"
 
 
 rule checksum:
