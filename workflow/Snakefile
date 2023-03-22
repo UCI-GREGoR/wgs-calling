@@ -110,6 +110,12 @@ if config["behaviors"]["outcome"] == "release":
             projectid=list(set(manifest["projectid"])),
         )
     )
+    if "export-directory" in config["behaviors"]:
+        if config["behaviors"]["export-directory"] is not None:
+            TARGETS.append("results/export/md5_checks.txt")
+    if "export-s3" in config["behaviors"]:
+        if config["behaviors"]["export-s3"] is not None:
+            TARGETS.append("results/export/s3_transfer_complete.txt")
 
 
 ## To deal with the fact that s3 remote provider service is very slow
