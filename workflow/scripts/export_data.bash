@@ -22,8 +22,6 @@ cp results/export/${FLOWCELL}/PMGRC* results/export/${FLOWCELL}/methods* "${TARG
 # return here later. this probably doesn't matter much
 RETURN_LOCATION="$(pwd)"
 cd "${TARGET_DIR}"
-# clean out contents of checksum files
-sed -i "s|results/export/${FLOWCELL}/||" *md5
 # run checksums
 for file in $(ls *md5) ; do
     md5sum -c ${file} >> "${RESULTS_FILE}"

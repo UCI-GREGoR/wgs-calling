@@ -269,7 +269,7 @@ rule checksum:
         mem_mb="1000",
         qname="small",
     shell:
-        "md5sum {input} | sed 's|results/export/{wildcards.projectid}/||' > {output}"
+        "md5sum {input} | sed -r 's|( +)[^/ ]+/([^/ ]+)$|\\1\\2|' > {output}"
 
 
 localrules:
