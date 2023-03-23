@@ -112,7 +112,12 @@ if config["behaviors"]["outcome"] == "release":
     )
     if "export-directory" in config["behaviors"]:
         if config["behaviors"]["export-directory"] is not None:
-            TARGETS.append("results/export/md5_checks.txt")
+            TARGETS.append(
+                expand(
+                    "results/export/{projectid}/md5_checks.txt",
+                    projectid=list(set(manifest["projectid"])),
+                )
+            )
     if "export-s3" in config["behaviors"]:
         if config["behaviors"]["export-s3"] is not None:
             TARGETS.append(
