@@ -527,10 +527,10 @@ rule export_data_remote:
         mem_mb="2000",
         qname="small",
     shell:
-        'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" --include="*.crai*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/crams && '
-        'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/snv_vcfs && '
-        'aws s3 sync {params.profile} --exclude="*" --include="*.snv.g.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/snv_gvcfs && '
-        'aws s3 sync {params.profile} --exclude="*" --include="*.sv.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/sv_vcfs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" --include="*.crai*" {params.export_dir} {params.bucketname}/wgs/{wildcards.projectid}/crams && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/wgs/{wildcards.projectid}/snv_vcfs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.snv.g.vcf*" {params.export_dir} {params.bucketname}/wgs/{wildcards.projectid}/snv_gvcfs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.sv.vcf*" {params.export_dir} {params.bucketname}/wgs/{wildcards.projectid}/sv_vcfs && '
         "touch {output}"
 
 
@@ -571,5 +571,5 @@ rule export_fastqs_remote:
         mem_mb="2000",
         qname="small",
     shell:
-        'aws s3 sync {params.profile} --exclude="*" --include="*.fastq.gz" {params.export_dir} {params.bucketname}/{wildcards.projectid}/fastqs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.fastq.gz" {params.export_dir} {params.bucketname}/wgs/{wildcards.projectid}/fastqs && '
         "touch {output}"
