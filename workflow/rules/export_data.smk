@@ -482,7 +482,7 @@ rule export_data_remote:
         mem_mb="2000",
         qname="small",
     shell:
-        'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/crams && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" --include="*.crai*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/crams && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/snv_vcfs && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.g.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/snv_gvcfs && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.sv.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/sv_vcfs && '
