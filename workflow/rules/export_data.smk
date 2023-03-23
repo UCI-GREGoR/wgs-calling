@@ -532,3 +532,44 @@ rule export_data_remote:
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.g.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/snv_gvcfs && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.sv.vcf*" {params.export_dir} {params.bucketname}/{wildcards.projectid}/sv_vcfs && '
         "touch {output}"
+
+
+rule export_fastqs_remote:
+    """
+    Sync fastqs to remote deployment s3 bucket
+
+    I'm not currently certain that this is exactly how I want this process to work,
+    so consider this rule somewhat WIP
+    """
+    input:
+        fastqs_r1=lambda wildcards: [
+            "results/fastqs/{}/{}_{}_R1_001.fastq.gz".format(wildcards.projectid, sampleid, lane)
+            for projectid, sampleid, lane in zip(
+                manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                manifest.loc[manifest["projectid"] == wildcards.projectid, "lane"],
+            )
+        ],
+        fastqs_r2=lambda wildcards: [
+            "results/fastqs/{}/{}_{}_R2_001.fastq.gz".format(wildcards.projectid, sampleid, lane)
+            for projectid, sampleid, lane in zip(
+                manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                manifest.loc[manifest["projectid"] == wildcards.projectid, "lane"],
+            )
+        ],
+    output:
+        "results/fastqs/{projectid}/s3_transfer_complete.txt",
+    params:
+        export_dir="results/fastqs/{projectid}",
+        bucketname=config["behaviors"]["export-s3"]["bucket-name"],
+        profile="--profile {}".format(config["behaviors"]["export-s3"]["profile-name"])
+        if "profile-name" in config["behaviors"]["export-s3"]
+        else "",
+    conda:
+        "../envs/awscli.yaml"
+    threads: 1
+    resources:
+        mem_mb="2000",
+        qname="small",
+    shell:
+        'aws s3 sync {params.profile} --exclude="*" --include="*.fastq.gz" {params.export_dir} {params.bucketname}/{wildcards.projectid}/fastqs && '
+        "touch {output}"

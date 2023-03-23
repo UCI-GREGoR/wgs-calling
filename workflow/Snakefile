@@ -117,7 +117,8 @@ if config["behaviors"]["outcome"] == "release":
         if config["behaviors"]["export-s3"] is not None:
             TARGETS.append(
                 expand(
-                    "results/export/{projectid}/s3_transfer_complete.txt",
+                    "results/{resultdir}/{projectid}/s3_transfer_complete.txt",
+                    resultdir=["export", "fastqs"],
                     projectid=list(set(manifest["projectid"])),
                 )
             )
