@@ -404,7 +404,52 @@ rule export_data_local:
     somewhere else
     """
     input:
-        "workflow/scripts/export_data.bash",
+        bash="workflow/scripts/export_data.bash",
+        cram=lambda wildcards: ed.construct_export_files(wildcards, manifest, checkpoints, "cram"),
+        crai=lambda wildcards: ed.construct_export_files(wildcards, manifest, checkpoints, "crai"),
+        vcf=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz"
+        ),
+        tbi=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz.tbi"
+        ),
+        gvcf=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz"
+        ),
+        gvcf_tbi=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi"
+        ),
+        sv_vcf=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz"
+        ),
+        sv_tbi=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi"
+        ),
+        cram_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "cram.md5"
+        ),
+        crai_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "crai.md5"
+        ),
+        vcf_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz.md5"
+        ),
+        tbi_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz.tbi.md5"
+        ),
+        gvcf_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.md5"
+        ),
+        gvcf_tbi_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi.md5"
+        ),
+        sv_vcf_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz.md5"
+        ),
+        sv_tbi_md5=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi.md5"
+        ),
+        manifest="results/export/{projectid}/manifest.tsv",
     output:
         "results/export/md5_checks.txt",
     params:
@@ -414,7 +459,7 @@ rule export_data_local:
         mem_mb="2000",
         qname="small",
     shell:
-        "{input} {params.export_directory} {output}"
+        "{input.bash} {params.export_directory} {output}"
 
 
 rule export_data_remote:
