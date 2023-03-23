@@ -3,6 +3,22 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- optional automated data export to s3
+- container support for all rules with existing conda environments
+
+### Changed
+- `export_data` target still exists, but local (and optionally s3) export are now linked
+  to the standard `release` endpoint
+
+### Fixed
+- increased memory provisions to assorted rules
+
+### Removed
+- Octopus
+
 ## [0.3.0] - Ensemble SV Calling
 
 ### Added

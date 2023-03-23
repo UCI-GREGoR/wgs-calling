@@ -110,6 +110,17 @@ if config["behaviors"]["outcome"] == "release":
             projectid=list(set(manifest["projectid"])),
         )
     )
+    if "export-directory" in config["behaviors"]:
+        if config["behaviors"]["export-directory"] is not None:
+            TARGETS.append("results/export/md5_checks.txt")
+    if "export-s3" in config["behaviors"]:
+        if config["behaviors"]["export-s3"] is not None:
+            TARGETS.append(
+                expand(
+                    "results/export/{projectid}/s3_transfer_complete.txt",
+                    projectid=list(set(manifest["projectid"])),
+                )
+            )
 
 
 ## To deal with the fact that s3 remote provider service is very slow
@@ -121,7 +132,6 @@ ruleorder: samtools_index_fasta > download_reference_data
 ruleorder: index_vcf > download_reference_data
 ruleorder: create_sequence_dictionary > download_reference_data
 ruleorder: adjust_fasta_formatting > download_reference_data
-ruleorder: octopus_run_task > index_vcf
 ruleorder: manta_run > index_vcf
 
 
@@ -148,7 +158,6 @@ include: "rules/manta.smk"
 include: "rules/methods.smk"
 include: "rules/mosdepth.smk"
 include: "rules/multiqc.smk"
-
 include: "rules/performance_benchmarks.smk"
 include: "rules/picard.smk"
 include: "rules/references.smk"

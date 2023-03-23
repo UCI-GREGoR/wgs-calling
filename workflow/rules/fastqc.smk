@@ -18,7 +18,7 @@ rule run_fastqc_pretrimming:
         "../envs/fastqc.yaml"
     threads: 4
     resources:
-        mem_mb="8000",
+        mem_mb="16000",
         qname="small",
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
@@ -44,7 +44,7 @@ rule run_fastqc_posttrimming:
         "../envs/fastqc.yaml"
     threads: 4
     resources:
-        mem_mb="8000",
+        mem_mb="16000",
         qname="small",
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"

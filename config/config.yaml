@@ -18,11 +18,15 @@ behaviors:
   sv-ensemble:
     merge-tool: "svdb"
     min-count: 2
+  sv-remove-breakends: yes
   outcome: "release"
   symlink-fastqs: no
   trim-adapters-before-alignment: yes
   assume-last-sample-sex: "female"
   export-directory: "/locus/data/external_data/research_experiments/pmgrc_u01"
+  export-s3:
+    bucket-name: "s3://pmgrc-gregor-data"
+    profile-name: "ucigrant"
 
 parameters:
   deepvariant:
@@ -68,12 +72,6 @@ verifybamid2:
     db-UD: "https://raw.githubusercontent.com/Griffan/VerifyBamID/master/resource/1000g.phase3.100k.b38.vcf.gz.dat.UD"
     db-mu: "https://raw.githubusercontent.com/Griffan/VerifyBamID/master/resource/1000g.phase3.100k.b38.vcf.gz.dat.mu"
     db-bed: "https://raw.githubusercontent.com/Griffan/VerifyBamID/master/resource/1000g.phase3.100k.b38.vcf.gz.dat.bed"
-octopus:
-  error-model: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/octopus/octopus_err_models/novaseq.4a38e55.model"
-  forest-model: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/octopus/forests/individual.v0.7.0.v2.forest"
-  grch37:
-    skip-regions: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/octopus/b37_all_gaps_octo.txt"
-    calling-ranges: "resources/octopus_calling_ranges_grch37.tsv"
 deepvariant:
   grch37:
     calling-ranges: "resources/deepvariant_calling_ranges_grch37.tsv"

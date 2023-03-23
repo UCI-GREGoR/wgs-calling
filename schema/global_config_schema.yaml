@@ -22,7 +22,7 @@ properties:
         pattern: "^bwa-mem2$|^bwa$"
       snv-caller:
         type: string
-        pattern: "^octopus$|^deepvariant$"
+        pattern: "^deepvariant$"
       sv-callers:
         type: array
         items:
@@ -46,6 +46,8 @@ properties:
           - merge-tool
           - min-count
         additionalProperties: no
+      sv-remove-breakends:
+        type: boolean
       outcome:
         type: string
         pattern: "^fastqc$|^alignment$|^calling$|^release$"
@@ -61,11 +63,22 @@ properties:
         pattern: "^[fF]emale$|^[mM]ale$"
       export-directory:
         type: string
+      export-s3:
+        type: object
+        properties:
+          bucket-name:
+            type: string
+          profile-name:
+            type: string
+        required:
+          - bucket-name
+        additionalProperties: false
     required:
       - aligner
       - snv-caller
       - sv-callers
       - sv-ensemble
+      - sv-remove-breakends
       - outcome
       - symlink-fastqs
       - trim-adapters-before-alignment
@@ -195,29 +208,6 @@ properties:
         additionalProperties: no
     required:
       - grch37
-  octopus:
-    type: object
-    properties:
-      forest-model:
-        type: string
-      error-model:
-        type: string
-    patternProperties:
-      "^grch[0-9]+$":
-        type: object
-        properties:
-          skip-regions:
-            type: string
-          calling-ranges:
-            type: string
-        required:
-          - skip-regions
-          - calling-ranges
-        additionalProperties: no
-    required:
-      - forest-model
-      - error-model
-      - grch37
   deepvariant:
     type: object
     patternProperties:
@@ -290,7 +280,6 @@ required:
   - somalier
   - dnascope
   - verifybamid2
-  - octopus
   - deepvariant
   - delly
   - lumpy

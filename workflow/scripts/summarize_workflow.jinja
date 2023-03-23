@@ -47,16 +47,7 @@ CollectQualityYieldMetrics; CollectGcBiasMetrics; and CollectWgsMetrics. {% if c
 
 ## SNV Calling
 
-{% if config["behaviors"]["snv-caller"] == "octopus" %}
-
-SNVs were called from aligned bams using octopus. Due to the orphaning of the octopus project, the version of octopus run
-is built from [this repository's](https://github.com/invitae-internal/invitae-octopus) commit 17a597d192bcd5192689bf38c5836a98b824867a.
-This does not represent an official release version of the software, but rather represents the most recent representation of
-the code base before the abandonment of the project. Confidence in this version of the software should be limited. Note that
-prior runs of the CLO workflow were using an unreleased version of octopus, but a different unreleased version that the one used
-in this workflow; as such, an undefined set of changes may be introduced into the output based on this discrepancy.
-
-{% elif config["behaviors"]["snv-caller"] == "deepvariant" %}
+{% if config["behaviors"]["snv-caller"] == "deepvariant" %}
 
 SNVs were called from aligned bams using [deepvariant](https://github.com/google/deepvariant), with the authors' docker image version
 {{ config["parameters"]["deepvariant"]["docker-version"]|string }}. Runs were split into {{ config["parameters"]["deepvariant"]["number-shards"]|string }}

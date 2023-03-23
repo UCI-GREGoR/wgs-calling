@@ -1,3 +1,22 @@
+localrules:
+    caller_scatter_tasks,
+
+
+rule caller_scatter_tasks:
+    """
+    For scatter-gather: take input set of range annotations
+    and prepare for individual caller runs
+    """
+    input:
+        lambda wildcards: config[wildcards.caller][reference_build]["calling-ranges"],
+    output:
+        "results/{caller}/split_ranges/{splitnum}.ssv",
+    benchmark:
+        "results/performance_benchmarks/{caller}/split_ranges/{splitnum}.tsv"
+    shell:
+        "cat $(awk 'NR == {wildcards.splitnum}' {input}) | tr '\\n' ' ' > {output}"
+
+
 rule deepvariant_make_examples:
     """
     Run deepvariant make_examples in a hybrid
