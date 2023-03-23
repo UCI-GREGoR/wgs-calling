@@ -38,7 +38,6 @@ rule mark_duplicates:
     Note that the following tools are confirmed OK with marked but
     non-deduped reads:
     - deepvariant
-    - octopus
     - manta
     - tiddit (? https://github.com/SciLifeLab/TIDDIT/blob/2bd94921ef2df4b08967e8f76fb10bc94730715d/tiddit/tiddit_signal.pyx#L160)
     - svaba

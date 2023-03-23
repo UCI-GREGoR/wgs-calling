@@ -34,11 +34,12 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
 - `behaviors`: user-configurable modifiers to how the pipeline will run
   - `aligner`: which alignment tool to use. permitted values: `bwa-mem2`
-  - `snv-caller`: which calling tool to use for SNVs. permitted values: `octopus`
+  - `snv-caller`: which calling tool to use for SNVs. permitted values: `deepvariant`
   - `sv-callers`: which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`
   - `sv-ensemble`: settings controlling SV ensemble calling. note that the below settings can be applied in combination
 	- `min-count`: the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering
 	- `required-callers`: a list of which tools, if any, a variant absolutely must appear in to survive ensemble filtering
+  - `sv-remove-breakends`: whether or not to filter `SVTYPE=BND` variants from ensemble calling output
   - `outcome`: which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`; or `release` to prepare results for distribution
   - `symlink-fastqs`: whether to copy (no) or symlink (yes) input fastqs into workspace. symlinking is faster and more memory-efficient, but
     less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch.
@@ -49,6 +50,9 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 	for the sample, delete this configuration option
   - `export-directory`: top-level path to where output files should be moved after release run is complete. this is only required if using the special `export_data`
     target outside of the standard DAG (see below for description)
+  - `export-s3`: parameters for controlling optional upload to s3
+    - `bucket-name`: name of s3 bucket to which to sync data
+    - `profile-name`: optional name of aws profile to use for data sync
 - `parameters`: tool-specific parameters. note that this section is a work in progress, somewhat more than the rest
   - `deepvariant`: parameters specific to [deepvariant](https://github.com/google/deepvariant)
     - `number-shards`: how many shards to break calling into. needs to be at most the number of available threads in the submission queue
@@ -84,13 +88,6 @@ The following settings are recognized in `config/config.yaml`. Note that each re
   - `db-UD`: filename for assorted Verify annotation files
   - `db-mu`: filename for assorted Verify annotation files
   - `db-bed`: filename for assorted Verify annotation files
-- `octopus`: reference data files specific to [octopus](https://github.com/luntergroup/octopus)
-  - `forest-model`: forest model annotation file for `--forest-model` [note: this is independent of genome build (probably)]
-  - `error-model`: error model annotation file for `--sequence-error-model` [note: this is independent of genome build (probably)]
-  - `skip-regions`: region annotation for `--skip-regions-file`
-  - `calling-ranges`: list of files containing chromosomal intervals for embarrassingly parallel analysis. these are currently effectively
-    placeholders that just contain the standard human chromosomes, but at some point, this will be extended to contain actual
-	balanced calling intervals
 - `deepvariant`: reference data files specific to [deepvariant](https://github.com/google/deepvariant)
   - `calling-ranges`: list of files containing chromosomal intervals for embarrassingly parallel analysis. these are currently effectively
     placeholders that just contain the standard human chromosomes, but at some point, this will be extended to contain actual
@@ -168,19 +165,17 @@ under active modification, and should only be used for considering alignment QC 
 #### Variant Calling
 
 All variant calling in this pipeline is conducted per-subject, ignoring batch data. SNV calls from the user-configured tool
-(e.g. DeepVariant, Octopus) are aggregated in `results/{toolname}/{projectid}/{sampleid}.sorted.vcf.gz`. SV calls from
+(e.g. DeepVariant) are aggregated in `results/{toolname}/{projectid}/{sampleid}.sorted.vcf.gz`. SV calls from
 ensemble calling based on user-configured tools and exclusion criteria are aggregated in `results/final/{projectid}/{sampleid}.sv.vcf.gz`.
 Note that these paths and filenames are subject to change before stabilization of the workflow.
 
-#### (DeepVariant only) GVCFs for Batch Calling
+#### GVCFs for Batch Calling
 
-If the user has selected DeepVariant for SNV calling, gvcf files per-subject will be collected at
+If the user has selected a compatible tool for SNV calling, gvcf files per-subject will be collected at
 `results/deepvariant/{projectid}/{sampleid}.g.vcf.gz`. These files are not used in the pipeline itself,
 and represent the raw output of `deepvariant postprocess_variants`. At some point, these will likely receive
 further processing in anticipation of use with e.g. GLnexus in a different pipeline. Also at some point,
 I'll probably add a flag for disabling the production of gvcf output, but that's not urgent.
-
-gvcf output is not supported by Octopus and so is not possible in this pipeline.
 
 #### Optional: emit methods description and software version data
 

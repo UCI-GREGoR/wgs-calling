@@ -289,7 +289,7 @@ def construct_fastp_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> lis
     return results_r1
 
 
-def map_reference_file(wildcards: Namedlist, config: dict) -> str | AnnotatedString:
+def map_reference_file(wildcards: Namedlist, config: dict):
     """
     Use wildcard information to figure out what configured
     reference file is needed, and then wrap that file in a
