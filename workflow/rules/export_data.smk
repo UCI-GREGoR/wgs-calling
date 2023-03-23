@@ -451,7 +451,7 @@ rule export_data_local:
         ),
         manifest="results/export/{projectid}/manifest.tsv",
     output:
-        "results/export/md5_checks.txt",
+        "results/export/{projectid}/md5_checks.txt",
     params:
         export_directory=config["behaviors"]["export-directory"],
     threads: 1
