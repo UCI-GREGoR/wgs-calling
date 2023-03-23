@@ -544,14 +544,14 @@ rule export_fastqs_remote:
     input:
         fastqs_r1=lambda wildcards: [
             "results/fastqs/{}/{}_{}_R1_001.fastq.gz".format(wildcards.projectid, sampleid, lane)
-            for projectid, sampleid, lane in zip(
+            for sampleid, lane in zip(
                 manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
                 manifest.loc[manifest["projectid"] == wildcards.projectid, "lane"],
             )
         ],
         fastqs_r2=lambda wildcards: [
             "results/fastqs/{}/{}_{}_R2_001.fastq.gz".format(wildcards.projectid, sampleid, lane)
-            for projectid, sampleid, lane in zip(
+            for sampleid, lane in zip(
                 manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
                 manifest.loc[manifest["projectid"] == wildcards.projectid, "lane"],
             )
