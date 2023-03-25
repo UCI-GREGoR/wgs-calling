@@ -87,7 +87,7 @@ rule sort_bam:
     output:
         bam="{prefix}.sort.bam",
     benchmark:
-        "results/performance_benchmarks/sort_bam/{prefix}.sort.bam"
+        "results/performance_benchmarks/sort_bam/{prefix}.sort.bam.tsv"
     conda:
         "../envs/samtools.yaml"
     threads: 4
