@@ -20,10 +20,10 @@ rule download_reference_data:
         "results/performance_benchmarks/download_reference_data/{reference_file}.tsv"
     conda:
         "../envs/awscli.yaml"
-    threads: 1
+    threads: config_resources["awscli"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["awscli"]["memory"],
+        qname=rc.select_queue(config_resources["awscli"]["queue"]),
         tmpdir="temp/",
     shell:
         'if [[ "{params}" == "s3://"* ]] ; then aws s3 cp {params} {output}.staging ; '
@@ -45,10 +45,10 @@ rule index_vcf:
         "results/performance_benchmarks/index_vcf/{prefix}.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: 1
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"]),
     shell:
         "tabix -p vcf {input}"
 
@@ -63,9 +63,9 @@ rule adjust_fasta_formatting:
         "reference_data/references/{}/ref.fasta".format(reference_build),
     output:
         "reference_data/{{aligner}}/{}/ref.fasta".format(reference_build),
-    threads: 1
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="1000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"]),
     shell:
         "sed 's/>/_/g' {input} | sed 's/^_/>/' > {output}"

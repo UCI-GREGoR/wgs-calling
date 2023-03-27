@@ -10,10 +10,10 @@ rule samtools_index_fasta:
         "results/performance_benchmarks/samtools_index_fasta/{prefix}fasta.fai.tsv"
     conda:
         "../envs/samtools.yaml"
-    threads: 1
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"]),
     shell:
         "samtools faidx {input}"
 
@@ -44,10 +44,10 @@ rule bwa_index:
         )
     conda:
         "../envs/{}.yaml".format(config["behaviors"]["aligner"])
-    threads: 1
+    threads: config_resources["bwa_index"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["bwa_index"]["memory"],
+        qname=rc.select_queue(config_resources["bwa_index"]["queue"]),
     shell:
         "{params.exec_name} index {input.fasta}"
 
@@ -92,10 +92,10 @@ rule bwa_map_and_sort:
         tmpdir="temp",
     conda:
         lambda wildcards: "../envs/{}.yaml".format(config["behaviors"]["aligner"])
-    threads: 12
+    threads: config_resources["bwa_map_and_sort"]["threads"]
     resources:
-        mem_mb="500000",
-        qname="large",
+        mem_mb=config_resources["bwa_map_and_sort"]["memory"],
+        qname=rc.select_queue(config_resources["bwa_map_and_sort"]["queue"]),
         tmpdir="temp",
     shell:
         "mkdir -p {params.tmpdir} && "

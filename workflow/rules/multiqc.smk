@@ -57,10 +57,10 @@ rule run_multiqc_fastq:
         ),
     conda:
         "../envs/multiqc.yaml"
-    threads: 1
+    threads: config_resources["multiqc"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["multiqc"]["memory"],
+        qname=rc.select_queue(config_resources["multiqc"]["queue"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
@@ -136,10 +136,10 @@ rule run_multiqc_alignment:
         ),
     conda:
         "../envs/multiqc.yaml"
-    threads: 1
+    threads: config_resources["multiqc"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["multiqc"]["memory"],
+        qname=rc.select_queue(config_resources["multiqc"]["queue"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
@@ -215,10 +215,10 @@ rule run_multiqc_calling:
         ),
     conda:
         "../envs/multiqc.yaml"
-    threads: 1
+    threads: config_resources["multiqc"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["multiqc"]["memory"],
+        qname=rc.select_queue(config_resources["multiqc"]["queue"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "

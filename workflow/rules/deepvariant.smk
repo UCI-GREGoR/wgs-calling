@@ -37,10 +37,9 @@ rule deepvariant_make_examples:
             expand(
                 "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",
                 shardnum=[
-                    str(i).rjust(5, "0")
-                    for i in range(config["parameters"]["deepvariant"]["number-shards"])
+                    str(i).rjust(5, "0") for i in range(config_resources["deepvariant"]["threads"])
                 ],
-                shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
+                shardmax=str(config_resources["deepvariant"]["threads"]).rjust(5, "0"),
                 suffix=["gz", "gz.example_info.json"],
             )
         ),
@@ -48,10 +47,9 @@ rule deepvariant_make_examples:
             expand(
                 "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord-{shardnum}-of-{shardmax}.gz",
                 shardnum=[
-                    str(i).rjust(5, "0")
-                    for i in range(config["parameters"]["deepvariant"]["number-shards"])
+                    str(i).rjust(5, "0") for i in range(config_resources["deepvariant"]["threads"])
                 ],
-                shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
+                shardmax=str(config_resources["deepvariant"]["threads"]).rjust(5, "0"),
             )
         ),
     benchmark:
@@ -59,20 +57,20 @@ rule deepvariant_make_examples:
     params:
         shard_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
-            shardmax=config["parameters"]["deepvariant"]["number-shards"],
+            shardmax=config_resources["deepvariant"]["threads"],
         ),
         gvcf_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord@{shardmax}.gz",
-            shardmax=config["parameters"]["deepvariant"]["number-shards"],
+            shardmax=config_resources["deepvariant"]["threads"],
         ),
     container:
         "docker://google/deepvariant:{}".format(
             config["parameters"]["deepvariant"]["docker-version"]
         )
-    threads: config["parameters"]["deepvariant"]["number-shards"]
+    threads: config_resources["deepvariant"]["threads"]
     resources:
-        mem_mb="{}".format(12000 * config["parameters"]["deepvariant"]["number-shards"]),
-        qname="large",
+        mem_mb=config_resources["deepvariant"]["make_examples_memory"],
+        qname=rc.select_queue(config_resources["deepvariant"]["queue"]),
         tmpdir="temp",
     shell:
         "mkdir -p temp && "
@@ -93,10 +91,9 @@ rule deepvariant_call_variants:
         expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",
             shardnum=[
-                str(i).rjust(5, "0")
-                for i in range(config["parameters"]["deepvariant"]["number-shards"])
+                str(i).rjust(5, "0") for i in range(config_resources["deepvariant"]["threads"])
             ],
-            shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
+            shardmax=str(config_resources["deepvariant"]["threads"]).rjust(5, "0"),
             suffix=["gz", "gz.example_info.json"],
         ),
     output:
@@ -106,17 +103,17 @@ rule deepvariant_call_variants:
     params:
         shard_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
-            shardmax=config["parameters"]["deepvariant"]["number-shards"],
+            shardmax=config_resources["deepvariant"]["threads"],
         ),
         docker_model="/opt/models/wgs/model.ckpt",
     container:
         "docker://google/deepvariant:{}".format(
             config["parameters"]["deepvariant"]["docker-version"]
         )
-    threads: config["parameters"]["deepvariant"]["number-shards"]
+    threads: config_resources["deepvariant"]["threads"]
     resources:
-        mem_mb="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 10000),
-        qname="large",
+        mem_mb=config_resources["deepvariant"]["call_variants_memory"],
+        qname=rc.select_queue(config_resources["deepvariant"]["queue"]),
     shell:
         "call_variants "
         "--outfile {output.gz} "
@@ -137,10 +134,9 @@ rule deepvariant_postprocess_variants:
         gvcf=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord-{shardnum}-of-{shardmax}.gz",
             shardnum=[
-                str(i).rjust(5, "0")
-                for i in range(config["parameters"]["deepvariant"]["number-shards"])
+                str(i).rjust(5, "0") for i in range(config_resources["deepvariant"]["threads"])
             ],
-            shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
+            shardmax=str(config_resources["deepvariant"]["threads"]).rjust(5, "0"),
         ),
         fai="reference_data/{}/{}/ref.fasta.fai".format(
             config["behaviors"]["aligner"], reference_build
@@ -159,7 +155,7 @@ rule deepvariant_postprocess_variants:
     params:
         gvcf_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord@{shardmax}.gz",
-            shardmax=config["parameters"]["deepvariant"]["number-shards"],
+            shardmax=config_resources["deepvariant"]["threads"],
         ),
     benchmark:
         "results/performance_benchmarks/deepvariant_postprocess_variants/{projectid}/{sampleid}.{splitnum}.tsv"
@@ -169,8 +165,8 @@ rule deepvariant_postprocess_variants:
         )
     threads: 1
     resources:
-        mem_mb="5000",
-        qname="large",
+        mem_mb=config_resources["deepvariant"]["postprocess_variants_memory"],
+        qname=rc.select_queue(config_resources["deepvariant"]["queue"]),
     shell:
         "postprocess_variants "
         "--ref {input.fasta} "
@@ -196,10 +192,10 @@ rule deepvariant_combine_regions:
         "results/performance_benchmarks/deepvariant_combine_regions/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: 4
+    threads: config_resources["bcftools"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=rc.select_queue(config_resources["bcftools"]["queue"]),
     shell:
         "bcftools concat --threads {threads} -O z -o {output} {input}"
 

@@ -27,10 +27,10 @@ rule duphold_run:
         "results/performance_benchmarks/duphold_run/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/duphold.yaml"
-    threads: 4
+    threads: config_resources["duphold"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["duphold"]["memory"],
+        qname=rc.select_queue(config_resources["duphold"]["queue"]),
     shell:
         "duphold -s {input.snv_vcf} -t {threads} -v {input.sv_vcf} -b {input.bam} -f {input.fasta} -o {output.bcf}"
 
@@ -47,10 +47,10 @@ rule duphold_apply:
         "results/performance_benchmarks/duphold_apply/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: 4
+    threads: config_resources["bcftools"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=rc.select_queue(config_resources["bcftools"]["queue"]),
     shell:
         'bcftools view -i \'(FILTER = "PASS" | FILTER = ".") & '
         '((FMT/DHFFC[0] = ".") | '

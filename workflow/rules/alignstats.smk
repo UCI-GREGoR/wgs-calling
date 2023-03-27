@@ -13,10 +13,10 @@ rule run_alignstats:
         min_qual=20,
     conda:
         "../envs/alignstats.yaml"
-    threads: 4
+    threads: config_resources["alignstats"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["alignstats"]["memory"],
+        qname=rc.select_queue(config_resources["alignstats"]["queue"]),
     shell:
         "alignstats -C -U "
         "-i {input.bam} "
@@ -36,9 +36,9 @@ rule merge_alignstats:
         yaml="results/alignstats/{projectid}/alignstats_summary_mqc.yaml",
     benchmark:
         "results/performance_benchmarks/merge_alignstats/{projectid}/alignstats_summary_mqc.tsv"
-    threads: 1
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"]),
     script:
         "../scripts/alignstats_json_to_yaml.py"

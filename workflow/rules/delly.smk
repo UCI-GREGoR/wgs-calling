@@ -18,9 +18,9 @@ rule delly_run:
         "../envs/delly.yaml"
     benchmark:
         "results/performance_benchmarks/delly_run/{projectid}/{sampleid}.tsv"
-    threads: 1
+    threads: config_resources["delly"]["threads"]
     resources:
-        mem_mb="12000",
-        qname="small",
+        mem_mb=config_resources["delly"]["memory"],
+        qname=rc.select_queue(config_resources["delly"]["queue"]),
     shell:
         "delly call -g {input.fasta} -x {input.bed} {input.bam} | bcftools view -i 'F_MISSING<0.5' -O z -o {output.vcf}"

@@ -24,9 +24,9 @@ rule compare_sv_callers:
         sv_callers=config["behaviors"]["sv-callers"],
     conda:
         "../envs/r.yaml"
-    threads: 1
+    threads: config_resources["r"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["r"]["memory"],
+        qname=rc.select_queue(config_resources["r"]["queue"]),
     script:
         "../scripts/compare_sv_callers.Rmd"

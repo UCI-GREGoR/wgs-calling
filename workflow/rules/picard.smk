@@ -14,16 +14,16 @@ rule create_sequence_dictionary:
         "results/performance_benchmarks/create_sequence_dictionary/{prefix}fasta.tsv"
     params:
         tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
+        java_args=config_resources["gatk_create_sequence_dictionary"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
-    threads: 1
+    threads: config_resources["gatk_create_sequence_dictionary"]["threads"]
     resources:
-        mem_mb="10000",
-        qname="small",
+        mem_mb=config_resources["gatk_create_sequence_dictionary"]["memory"],
+        qname=rc.select_queue(config_resources["gatk_create_sequence_dictionary"]["queue"]),
         tmpdir="temp",
     shell:
-        "mkdir -p temp/ && "
+        "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CreateSequenceDictionary '
         "-REFERENCE {input} "
         "-OUTPUT {output.standard} "
@@ -62,16 +62,16 @@ rule mark_duplicates:
         bamlist=lambda wildcards: " -INPUT ".join(
             tc.get_bams_by_lane(wildcards, config, manifest, "bam")
         ),
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=400m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx4000m",
+        java_args=config_resources["gatk_mark_duplicates"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
-    threads: 4
+    threads: config_resources["gatk_mark_duplicates"]["threads"]
     resources:
-        mem_mb="20000",
-        qname="small",
+        mem_mb=config_resources["gatk_mark_duplicates"]["memory"],
+        qname=config_resources["gatk_mark_duplicates"]["queue"],
         tmpdir="temp",
     shell:
-        "mkdir -p temp/ && "
+        "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" MarkDuplicates '
         "-INPUT {params.bamlist} "
         "-OUTPUT {output.bam} "
@@ -90,10 +90,10 @@ rule sort_bam:
         "results/performance_benchmarks/sort_bam/{prefix}.sort.bam.tsv"
     conda:
         "../envs/samtools.yaml"
-    threads: 4
+    threads: config_resources["samtools"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["samtools"]["memory"],
+        qname=rc.select_queue(config_resources["samtools"]["queue"]),
     shell:
         "samtools sort -@ {threads} -o {output.bam} -O bam {input.bam}"
 
@@ -110,10 +110,10 @@ rule samtools_create_bai:
         "results/performance_benchmarks/samtools_create_bai/{prefix}.sort.tsv"
     conda:
         "../envs/samtools.yaml"
-    threads: 4
+    threads: config_resources["samtools"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["samtools"]["memory"],
+        qname=rc.select_queue(config_resources["samtools"]["queue"]),
     shell:
         "samtools index -@ {threads} -b -o {output.bai} {input.bam}"
 
@@ -153,20 +153,20 @@ rule picard_collectmultiplemetrics:
         "results/performance_benchmarks/picard_collectmultiplemetrics/{fileprefix}.tsv"
     params:
         tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx3000m",
+        java_args=config_resources["gatk_collectmultiplemetrics"]["java_args"],
         outprefix="results/collectmultiplemetrics/{fileprefix}.picard",
         extension=".txt",
         validation_stringency="LENIENT",
         metric_accumulation_level="SAMPLE",
     conda:
         "../envs/gatk4.yaml"
-    threads: 1
+    threads: config_resources["gatk_collectmultiplemetrics"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["gatk_collectmultiplemetrics"]["memory"],
+        qname=rc.select_queue(config_resources["gatk_collectmultiplemetrics"]["queue"]),
         tmpdir="temp",
     shell:
-        "mkdir -p temp/ && "
+        "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CollectMultipleMetrics '
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "
@@ -208,16 +208,16 @@ rule picard_collectgcbiasmetrics:
         "results/performance_benchmarks/picard_collectgcbiasmetrics/{fileprefix}.tsv"
     params:
         tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx3000m",
+        java_args=config_resources["gatk_collectgcbiasmetrics"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
-    threads: 1
+    threads: config_resources["gatk_collectgcbiasmetrics"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["gatk_collectgcbiasmetrics"]["memory"],
+        qname=rc.select_queue(config_resources["gatk_collectgcbiasmetrics"]["queue"]),
         tmpdir="temp",
     shell:
-        "mkdir -p temp/ && "
+        "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CollectGcBiasMetrics '
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "
@@ -249,16 +249,16 @@ rule picard_collectwgsmetrics:
         "results/performance_benchmarks/picard_collectwgsmetrics/{fileprefix}.tsv"
     params:
         tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx6000m",
+        java_args=config_resources["gatk_collectwgsmetrics"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
-    threads: 1
+    threads: config_resources["gatk_collectwgsmetrics"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["gatk_collectwgsmetrics"]["memory"],
+        qname=rc.select_queue(config_resources["gatk_collectwgsmetrics"]["queue"]),
         tmpdir="temp",
     shell:
-        "mkdir -p temp/ && "
+        "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CollectWgsMetrics '
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "
