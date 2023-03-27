@@ -20,9 +20,9 @@ rule lumpy_run:
         "results/performance_benchmarks/lumpy_run/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/smoove.yaml"
-    threads: 2
+    threads: 1
     resources:
-        mem_mb="16000",
+        mem_mb="8000",
         qname="large",
     shell:
         "smoove call --outdir {params.outdir} --exclude {input.bed} --name {wildcards.sampleid} --fasta {input.fasta} -p 1 --genotype {input.bam} && "
