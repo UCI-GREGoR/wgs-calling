@@ -11,14 +11,14 @@ rule run_fastqc_pretrimming:
         r1_html="results/fastqc/{projectid}/{prefix}_R1_{suffix}_fastqc.html",
         r2_html="results/fastqc/{projectid}/{prefix}_R2_{suffix}_fastqc.html",
     benchmark:
-        "results/performance_benchmarks/fastqc/{projectid}/{prefix}_{suffix}_fastqc.tsv"
+        "results/performance_benchmarks/run_fastqc_pretrimming/{projectid}/{prefix}_{suffix}_fastqc.tsv"
     params:
         outdir="results/fastqc/{projectid}",
     conda:
         "../envs/fastqc.yaml"
-    threads: 4
+    threads: 2
     resources:
-        mem_mb="16000",
+        mem_mb="12000",
         qname="small",
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
@@ -37,14 +37,14 @@ rule run_fastqc_posttrimming:
         r1_html="results/fastqc_posttrimming/{projectid}/{sampleid}_{lane}_R1_fastp_fastqc.html",
         r2_html="results/fastqc_posttrimming/{projectid}/{sampleid}_{lane}_R2_fastp_fastqc.html",
     benchmark:
-        "results/performance_benchmarks/fastqc_posttrimming/{projectid}/{sampleid}_{lane}_fastp_fastqc.tsv"
+        "results/performance_benchmarks/run_fastqc_posttrimming/{projectid}/{sampleid}_{lane}_fastp_fastqc.tsv"
     params:
         outdir="results/fastqc_posttrimming/{projectid}",
     conda:
         "../envs/fastqc.yaml"
-    threads: 4
+    threads: 2
     resources:
-        mem_mb="16000",
+        mem_mb="12000",
         qname="small",
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
@@ -60,7 +60,7 @@ use rule run_fastqc_pretrimming as run_fastqc_pretrimming_combined with:
         r1_html="results/fastqc_combined/{projectid}/{sampleid}_R1_fastqc.html",
         r2_html="results/fastqc_combined/{projectid}/{sampleid}_R2_fastqc.html",
     benchmark:
-        "results/performance_benchmarks/fastqc_combined/{projectid}/{sampleid}_fastqc.tsv"
+        "results/performance_benchmarks/run_fastqc_pretrimming_combined/{projectid}/{sampleid}_fastqc.tsv"
     params:
         outdir="results/fastqc_combined/{projectid}",
 
@@ -75,6 +75,6 @@ use rule run_fastqc_posttrimming as run_fastqc_posttrimming_combined with:
         r1_html="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R1_fastqc.html",
         r2_html="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R2_fastqc.html",
     benchmark:
-        "results/performance_benchmarks/fastqc_posttrimming_combined/{projectid}/{sampleid}_fastqc.tsv"
+        "results/performance_benchmarks/run_fastqc_posttrimming_combined/{projectid}/{sampleid}_fastqc.tsv"
     params:
         outdir="results/fastqc_posttrimming_combined/{projectid}",

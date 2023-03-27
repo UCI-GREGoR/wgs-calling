@@ -281,7 +281,7 @@ rule checksum:
         mem_mb="1000",
         qname="small",
     shell:
-        "md5sum {input} | sed -r 's|( +)[^/ ]+/([^/ ]+)$|\\1\\2|' > {output}"
+        "md5sum {input} | sed -r 's|  .*/([^/ ]+)$|  \\1|' > {output}"
 
 
 localrules:

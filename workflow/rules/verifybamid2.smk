@@ -23,9 +23,9 @@ rule estimate_contamination:
         db_prefix="reference_data/verifybamid2/{}/ref.db".format(reference_build),
     conda:
         "../envs/verifybamid2.yaml"
-    threads: 4
+    threads: 2
     resources:
-        mem_mb="8000",
+        mem_mb="22000",
         qname="small",
     shell:
         "verifybamid2 "

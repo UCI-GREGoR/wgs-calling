@@ -22,7 +22,7 @@ rule somalier_extract:
         "../envs/somalier.yaml"
     threads: 1
     resources:
-        mem_mb="2000",
+        mem_mb="1000",
         qname="small",
     shell:
         "somalier extract -d {params.extract_dir} "
@@ -50,7 +50,7 @@ rule somalier_relate:
         "../envs/somalier.yaml"
     threads: 1
     resources:
-        mem_mb="4000",
+        mem_mb="1000",
         qname="small",
     shell:
         "somalier relate --ped {input.ped} -o {params.outprefix} {input.somalier}"
