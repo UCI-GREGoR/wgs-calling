@@ -16,9 +16,9 @@ rule run_fastqc_pretrimming:
         outdir="results/fastqc/{projectid}",
     conda:
         "../envs/fastqc.yaml"
-    threads: 4
+    threads: 2
     resources:
-        mem_mb="16000",
+        mem_mb="12000",
         qname="small",
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
@@ -42,9 +42,9 @@ rule run_fastqc_posttrimming:
         outdir="results/fastqc_posttrimming/{projectid}",
     conda:
         "../envs/fastqc.yaml"
-    threads: 4
+    threads: 2
     resources:
-        mem_mb="16000",
+        mem_mb="12000",
         qname="small",
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
