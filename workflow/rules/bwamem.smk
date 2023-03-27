@@ -46,7 +46,7 @@ rule bwa_index:
         "../envs/{}.yaml".format(config["behaviors"]["aligner"])
     threads: 1
     resources:
-        mem_mb="64000",
+        mem_mb="8000",
         qname="small",
     shell:
         "{params.exec_name} index {input.fasta}"
