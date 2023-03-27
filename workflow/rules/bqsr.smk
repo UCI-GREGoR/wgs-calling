@@ -68,7 +68,7 @@ rule bqsr_apply_bqsr:
         tmpdir="temp",
         java_args="-Xmx10000m",
     benchmark:
-        "results/performance_benchmarks/bqsr_base_recalibrator/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/bqsr_apply_bqsr/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/gatk4.yaml"
     threads: 1

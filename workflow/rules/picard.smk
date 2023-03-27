@@ -62,12 +62,12 @@ rule mark_duplicates:
         bamlist=lambda wildcards: " -INPUT ".join(
             tc.get_bams_by_lane(wildcards, config, manifest, "bam")
         ),
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx3000m",
+        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=400m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx4000m",
     conda:
         "../envs/gatk4.yaml"
-    threads: 2
+    threads: 4
     resources:
-        mem_mb="12000",
+        mem_mb="20000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -112,7 +112,7 @@ rule samtools_create_bai:
         "../envs/samtools.yaml"
     threads: 4
     resources:
-        mem_mb="8000",
+        mem_mb="4000",
         qname="small",
     shell:
         "samtools index -@ {threads} -b -o {output.bai} {input.bam}"
@@ -153,7 +153,7 @@ rule picard_collectmultiplemetrics:
         "results/performance_benchmarks/picard_collectmultiplemetrics/{fileprefix}.tsv"
     params:
         tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
+        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx3000m",
         outprefix="results/collectmultiplemetrics/{fileprefix}.picard",
         extension=".txt",
         validation_stringency="LENIENT",
@@ -162,7 +162,7 @@ rule picard_collectmultiplemetrics:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        mem_mb="10000",
+        mem_mb="4000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -208,12 +208,12 @@ rule picard_collectgcbiasmetrics:
         "results/performance_benchmarks/picard_collectgcbiasmetrics/{fileprefix}.tsv"
     params:
         tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
+        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx3000m",
     conda:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        mem_mb="10000",
+        mem_mb="4000",
         qname="small",
         tmpdir="temp",
     shell:
@@ -249,12 +249,12 @@ rule picard_collectwgsmetrics:
         "results/performance_benchmarks/picard_collectwgsmetrics/{fileprefix}.tsv"
     params:
         tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx10000m",
+        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx6000m",
     conda:
         "../envs/gatk4.yaml"
     threads: 1
     resources:
-        mem_mb="16000",
+        mem_mb="8000",
         qname="small",
         tmpdir="temp",
     shell:
