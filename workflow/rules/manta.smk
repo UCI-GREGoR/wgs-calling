@@ -27,7 +27,7 @@ rule manta_configure:
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"]),
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
         tmpdir=lambda wildcards: "temp/manta_workdir/{}/{}".format(
             wildcards.projectid, wildcards.sampleid
         ),
@@ -78,7 +78,7 @@ rule manta_run:
     threads: config_resources["manta"]["threads"]
     resources:
         mem_mb=config_resources["manta"]["memory"],
-        qname=rc.select_queue(config_resources["manta"]["queue"]),
+        qname=rc.select_queue(config_resources["manta"]["queue"], config_resources["queues"]),
         tmpdir=lambda wildcards: "temp/manta_workdir/{}/{}".format(
             wildcards.projectid, wildcards.sampleid
         ),
@@ -104,7 +104,7 @@ rule manta_sort_output:
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
-        qname=rc.select_queue(config_resources["bcftools"]["queue"]),
+        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
         tmpdir=lambda wildcards: "temp/manta_workdir/{}/{}".format(
             wildcards.projectid, wildcards.sampleid
         ),

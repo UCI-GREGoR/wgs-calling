@@ -20,7 +20,10 @@ rule create_sequence_dictionary:
     threads: config_resources["gatk_create_sequence_dictionary"]["threads"]
     resources:
         mem_mb=config_resources["gatk_create_sequence_dictionary"]["memory"],
-        qname=rc.select_queue(config_resources["gatk_create_sequence_dictionary"]["queue"]),
+        qname=rc.select_queue(
+            config_resources["gatk_create_sequence_dictionary"]["queue"],
+            config_resources["queues"],
+        ),
         tmpdir="temp",
     shell:
         "mkdir -p {params.tmpdir} && "
@@ -93,7 +96,7 @@ rule sort_bam:
     threads: config_resources["samtools"]["threads"]
     resources:
         mem_mb=config_resources["samtools"]["memory"],
-        qname=rc.select_queue(config_resources["samtools"]["queue"]),
+        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
     shell:
         "samtools sort -@ {threads} -o {output.bam} -O bam {input.bam}"
 
@@ -113,7 +116,7 @@ rule samtools_create_bai:
     threads: config_resources["samtools"]["threads"]
     resources:
         mem_mb=config_resources["samtools"]["memory"],
-        qname=rc.select_queue(config_resources["samtools"]["queue"]),
+        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
     shell:
         "samtools index -@ {threads} -b -o {output.bai} {input.bam}"
 
@@ -163,7 +166,9 @@ rule picard_collectmultiplemetrics:
     threads: config_resources["gatk_collectmultiplemetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectmultiplemetrics"]["memory"],
-        qname=rc.select_queue(config_resources["gatk_collectmultiplemetrics"]["queue"]),
+        qname=rc.select_queue(
+            config_resources["gatk_collectmultiplemetrics"]["queue"], config_resources["queues"]
+        ),
         tmpdir="temp",
     shell:
         "mkdir -p {params.tmpdir} && "
@@ -214,7 +219,9 @@ rule picard_collectgcbiasmetrics:
     threads: config_resources["gatk_collectgcbiasmetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectgcbiasmetrics"]["memory"],
-        qname=rc.select_queue(config_resources["gatk_collectgcbiasmetrics"]["queue"]),
+        qname=rc.select_queue(
+            config_resources["gatk_collectgcbiasmetrics"]["queue"], config_resources["queues"]
+        ),
         tmpdir="temp",
     shell:
         "mkdir -p {params.tmpdir} && "
@@ -255,7 +262,9 @@ rule picard_collectwgsmetrics:
     threads: config_resources["gatk_collectwgsmetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectwgsmetrics"]["memory"],
-        qname=rc.select_queue(config_resources["gatk_collectwgsmetrics"]["queue"]),
+        qname=rc.select_queue(
+            config_resources["gatk_collectwgsmetrics"]["queue"], config_resources["queues"]
+        ),
         tmpdir="temp",
     shell:
         "mkdir -p {params.tmpdir} && "

@@ -16,7 +16,7 @@ rule vep_download_databases:
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"]),
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         "mkdir -p resources/vep && "
         "perl {params.vep_prefix}/ensembl-vep/INSTALL.pl -a cfp -s homo_sapiens -y {params.reference_build} -c resources/vep/{params.reference_build} -g all && "
@@ -41,7 +41,7 @@ rule vep_convert_cache:
     threads: config_resources["vep"]["threads"]
     resources:
         mem_mb=config_resources["vep"]["memory"],
-        qname=rc.select_queue(config_resources["vep"]["queue"]),
+        qname=rc.select_queue(config_resources["vep"]["queue"], config_resources["queues"]),
     shell:
         "perl {params.vep_prefix}/ensembl-vep/convert_cache.pl -species homo_sapiens --dir resources/vep/{params.reference_build} -version all && touch {output}"
 
@@ -65,7 +65,7 @@ rule vep_annotate:
     threads: config_resources["vep"]["threads"]
     resources:
         mem_mb=config_resources["vep"]["memory"],
-        qname=rc.select_queue(config_resources["vep"]["queue"]),
+        qname=rc.select_queue(config_resources["vep"]["queue"], config_resources["queues"]),
     shell:
         "{params.vep_prefix}/ensembl-vep/vep --input_file {input.vcf} --output_file {output.gz} --force_overwrite "
         "--compress_output=gzip --cache --dir_cache resources/vep/{params.reference_build} --offline "
@@ -86,7 +86,7 @@ rule vep_format_annotation_file:
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"]),
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         "gunzip -c {input} | awk '! /#/' | cut -f 1,13 | sed 's/_/\\t/g ; s/\\//\\t/g ; s/,/\\t/g' | "
         "awk '{{OFS = \"\\t\" ; for (i = 5 ; i <= NF ; i++) print $1,$2,$3,$4,$i}}' | "
@@ -109,6 +109,6 @@ rule annotate_rsids:
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"]),
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         "bcftools annotate -a {input.annotations} -c CHROM,POS,REF,ALT,ID -O z -o {output} {input.vcf}"

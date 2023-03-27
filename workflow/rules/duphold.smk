@@ -30,7 +30,7 @@ rule duphold_run:
     threads: config_resources["duphold"]["threads"]
     resources:
         mem_mb=config_resources["duphold"]["memory"],
-        qname=rc.select_queue(config_resources["duphold"]["queue"]),
+        qname=rc.select_queue(config_resources["duphold"]["queue"], config_resources["queues"]),
     shell:
         "duphold -s {input.snv_vcf} -t {threads} -v {input.sv_vcf} -b {input.bam} -f {input.fasta} -o {output.bcf}"
 
@@ -50,7 +50,7 @@ rule duphold_apply:
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
-        qname=rc.select_queue(config_resources["bcftools"]["queue"]),
+        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
     shell:
         'bcftools view -i \'(FILTER = "PASS" | FILTER = ".") & '
         '((FMT/DHFFC[0] = ".") | '

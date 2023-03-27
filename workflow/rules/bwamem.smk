@@ -13,7 +13,7 @@ rule samtools_index_fasta:
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"]),
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         "samtools faidx {input}"
 
@@ -47,7 +47,7 @@ rule bwa_index:
     threads: config_resources["bwa_index"]["threads"]
     resources:
         mem_mb=config_resources["bwa_index"]["memory"],
-        qname=rc.select_queue(config_resources["bwa_index"]["queue"]),
+        qname=rc.select_queue(config_resources["bwa_index"]["queue"], config_resources["queues"]),
     shell:
         "{params.exec_name} index {input.fasta}"
 
@@ -95,7 +95,9 @@ rule bwa_map_and_sort:
     threads: config_resources["bwa_map_and_sort"]["threads"]
     resources:
         mem_mb=config_resources["bwa_map_and_sort"]["memory"],
-        qname=rc.select_queue(config_resources["bwa_map_and_sort"]["queue"]),
+        qname=rc.select_queue(
+            config_resources["bwa_map_and_sort"]["queue"], config_resources["queues"]
+        ),
         tmpdir="temp",
     shell:
         "mkdir -p {params.tmpdir} && "

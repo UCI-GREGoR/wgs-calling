@@ -19,7 +19,7 @@ rule run_fastqc_pretrimming:
     threads: config_resources["fastqc"]["threads"]
     resources:
         mem_mb=config_resources["fastqc"]["memory"],
-        qname=rc.select_queue(config_resources["fastqc"]["queue"]),
+        qname=rc.select_queue(config_resources["fastqc"]["queue"], config_resources["queues"]),
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
 
@@ -45,7 +45,7 @@ rule run_fastqc_posttrimming:
     threads: config_resources["fastqc"]["threads"]
     resources:
         mem_mb=config_resources["fastqc"]["memory"],
-        qname=rc.select_queue(config_resources["fastqc"]["queue"]),
+        qname=rc.select_queue(config_resources["fastqc"]["queue"], config_resources["queues"]),
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
 

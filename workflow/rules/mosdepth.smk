@@ -35,7 +35,7 @@ rule run_mosdepth:
     threads: config_resources["mosdepth"]["threads"]
     resources:
         mem_mb=config_resources["mosdepth"]["memory"],
-        qname=rc.select_queue(config_resources["mosdepth"]["queue"]),
+        qname=rc.select_queue(config_resources["mosdepth"]["queue"], config_resources["queues"]),
     shell:
         "mosdepth --threads {threads} "
         "--by {params.win_size} "

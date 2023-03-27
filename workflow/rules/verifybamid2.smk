@@ -26,7 +26,7 @@ rule estimate_contamination:
     threads: config_resources["verifybamid2"]["threads"]
     resources:
         mem_mb=config_resources["verifybamid2"]["memory"],
-        qname=rc.select_queue(config_resources["verifybamid2"]["queue"]),
+        qname=rc.select_queue(config_resources["verifybamid2"]["queue"], config_resources["queues"]),
     shell:
         "verifybamid2 "
         "--BamFile {input.bam} "

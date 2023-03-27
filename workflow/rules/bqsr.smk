@@ -32,7 +32,7 @@ rule bqsr_base_recalibrator:
     threads: config_resources["gatk_bqsr_base_recalibrator"]["threads"]
     resources:
         mem_mb=config_resources["gatk_bqsr_base_recalibrator"]["memory"],
-        qname=rc.select_queue(config_resources, "large"),
+        qname=rc.select_queue(config_resources, "large", config_resources["queues"]),
     shell:
         "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" BaseRecalibrator '
@@ -74,7 +74,9 @@ rule bqsr_apply_bqsr:
     threads: config_resources["gatk_bqsr_apply_bqsr"]["threads"]
     resources:
         mem_mb=config_resources["gatk_bqsr_apply_bqsr"]["memory"],
-        qname=rc.select_queue(config_resources["gatk_bqsr_apply_bqsr"]["queue"]),
+        qname=rc.select_queue(
+            config_resources["gatk_bqsr_apply_bqsr"]["queue"], config_resources["queues"]
+        ),
     shell:
         "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" ApplyBQSR '

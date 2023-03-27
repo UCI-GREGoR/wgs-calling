@@ -60,7 +60,7 @@ rule run_multiqc_fastq:
     threads: config_resources["multiqc"]["threads"]
     resources:
         mem_mb=config_resources["multiqc"]["memory"],
-        qname=rc.select_queue(config_resources["multiqc"]["queue"]),
+        qname=rc.select_queue(config_resources["multiqc"]["queue"], config_resources["queues"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
@@ -139,7 +139,7 @@ rule run_multiqc_alignment:
     threads: config_resources["multiqc"]["threads"]
     resources:
         mem_mb=config_resources["multiqc"]["memory"],
-        qname=rc.select_queue(config_resources["multiqc"]["queue"]),
+        qname=rc.select_queue(config_resources["multiqc"]["queue"], config_resources["queues"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
@@ -218,7 +218,7 @@ rule run_multiqc_calling:
     threads: config_resources["multiqc"]["threads"]
     resources:
         mem_mb=config_resources["multiqc"]["memory"],
-        qname=rc.select_queue(config_resources["multiqc"]["queue"]),
+        qname=rc.select_queue(config_resources["multiqc"]["queue"], config_resources["queues"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
