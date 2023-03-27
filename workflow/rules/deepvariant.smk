@@ -115,7 +115,7 @@ rule deepvariant_call_variants:
         )
     threads: config["parameters"]["deepvariant"]["number-shards"]
     resources:
-        mem_mb="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 30000),
+        mem_mb="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 10000),
         qname="large",
     shell:
         "call_variants "
@@ -169,7 +169,7 @@ rule deepvariant_postprocess_variants:
         )
     threads: 1
     resources:
-        mem_mb="32000",
+        mem_mb="5000",
         qname="large",
     shell:
         "postprocess_variants "
