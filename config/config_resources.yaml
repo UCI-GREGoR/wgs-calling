@@ -3,6 +3,7 @@ queues:
     - "small"
   large:
     - "large"
+    - "large"
 
 default:
   threads: 1
