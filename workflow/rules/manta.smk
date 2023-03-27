@@ -77,7 +77,7 @@ rule manta_run:
         "../envs/manta.yaml"
     threads: 4
     resources:
-        mem_mb="24000",
+        mem_mb="4000",
         qname="small",
         tmpdir=lambda wildcards: "temp/manta_workdir/{}/{}".format(
             wildcards.projectid, wildcards.sampleid
@@ -101,9 +101,9 @@ rule manta_sort_output:
         tmpdir="temp/manta_workdir/{projectid}/{sampleid}",
     conda:
         "../envs/bcftools.yaml"
-    threads: 4
+    threads: 1
     resources:
-        mem_mb="16000",
+        mem_mb="1000",
         qname="small",
         tmpdir=lambda wildcards: "temp/manta_workdir/{}/{}".format(
             wildcards.projectid, wildcards.sampleid
