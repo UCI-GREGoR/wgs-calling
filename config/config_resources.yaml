@@ -5,6 +5,8 @@ queues:
     - "large"
     - "large"
 
+tmpdir: "temp"
+
 default:
   threads: 1
   memory: 2000
