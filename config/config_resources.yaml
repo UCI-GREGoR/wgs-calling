@@ -36,8 +36,8 @@ bwa_map_and_sort:
 deepvariant:
   threads: 16
   make_examples_memory: 192000
-  call_variants_memory: 160000
-  postprocess_variants_memory: 5000
+  call_variants_memory: 480000
+  postprocess_variants_memory: 32000
   queue: "large"
 delly:
   threads: 1
