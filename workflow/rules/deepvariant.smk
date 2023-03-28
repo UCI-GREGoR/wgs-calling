@@ -63,6 +63,7 @@ rule deepvariant_make_examples:
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord@{shardmax}.gz",
             shardmax=config_resources["deepvariant"]["threads"],
         ),
+        tmpdir=tempDir,
     container:
         "docker://google/deepvariant:{}".format(
             config["parameters"]["deepvariant"]["docker-version"]
@@ -71,9 +72,9 @@ rule deepvariant_make_examples:
     resources:
         mem_mb=config_resources["deepvariant"]["make_examples_memory"],
         qname=rc.select_queue(config_resources["deepvariant"]["queue"], config_resources["queues"]),
-        tmpdir="temp",
+        tmpdir=tempDir,
     shell:
-        "mkdir -p temp && "
+        "mkdir -p {params.tmpdir} && "
         "seq 0 $(({threads}-1)) | parallel -j{threads} --tmpdir ${{TMPDIR}} "
         "make_examples --mode calling "
         '--ref {input.fasta} --reads {input.bam} --regions "$(cat {input.intervals})" '

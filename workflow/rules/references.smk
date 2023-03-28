@@ -24,7 +24,7 @@ rule download_reference_data:
     resources:
         mem_mb=config_resources["awscli"]["memory"],
         qname=rc.select_queue(config_resources["awscli"]["queue"], config_resources["queues"]),
-        tmpdir="temp/",
+        tmpdir=tempdir,
     shell:
         'if [[ "{params}" == "s3://"* ]] ; then aws s3 cp {params} {output}.staging ; '
         'elif [[ "{params}" == "http://"* ]] || [[ "{params}" == "https://"* ]] || [[ "{params}" == "ftp://"* ]] ; then wget -O {output}.staging {params} ; '

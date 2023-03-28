@@ -13,7 +13,7 @@ rule create_sequence_dictionary:
     benchmark:
         "results/performance_benchmarks/create_sequence_dictionary/{prefix}fasta.tsv"
     params:
-        tmpdir="temp",
+        tmpdir=tempDir,
         java_args=config_resources["gatk_create_sequence_dictionary"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
@@ -24,7 +24,7 @@ rule create_sequence_dictionary:
             config_resources["gatk_create_sequence_dictionary"]["queue"],
             config_resources["queues"],
         ),
-        tmpdir="temp",
+        tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CreateSequenceDictionary '
@@ -61,7 +61,7 @@ rule mark_duplicates:
     benchmark:
         "results/performance_benchmarks/mark_duplicates/{projectid}/{sampleid}.tsv"
     params:
-        tmpdir="temp",
+        tmpdir=tempDir,
         bamlist=lambda wildcards: " -INPUT ".join(
             tc.get_bams_by_lane(wildcards, config, manifest, "bam")
         ),
@@ -72,7 +72,7 @@ rule mark_duplicates:
     resources:
         mem_mb=config_resources["gatk_mark_duplicates"]["memory"],
         qname=config_resources["gatk_mark_duplicates"]["queue"],
-        tmpdir="temp",
+        tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" MarkDuplicates '
@@ -155,7 +155,7 @@ rule picard_collectmultiplemetrics:
     benchmark:
         "results/performance_benchmarks/picard_collectmultiplemetrics/{fileprefix}.tsv"
     params:
-        tmpdir="temp",
+        tmpdir=tempDir,
         java_args=config_resources["gatk_collectmultiplemetrics"]["java_args"],
         outprefix="results/collectmultiplemetrics/{fileprefix}.picard",
         extension=".txt",
@@ -169,7 +169,7 @@ rule picard_collectmultiplemetrics:
         qname=rc.select_queue(
             config_resources["gatk_collectmultiplemetrics"]["queue"], config_resources["queues"]
         ),
-        tmpdir="temp",
+        tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CollectMultipleMetrics '
@@ -212,7 +212,7 @@ rule picard_collectgcbiasmetrics:
     benchmark:
         "results/performance_benchmarks/picard_collectgcbiasmetrics/{fileprefix}.tsv"
     params:
-        tmpdir="temp",
+        tmpdir=tempDir,
         java_args=config_resources["gatk_collectgcbiasmetrics"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
@@ -222,7 +222,7 @@ rule picard_collectgcbiasmetrics:
         qname=rc.select_queue(
             config_resources["gatk_collectgcbiasmetrics"]["queue"], config_resources["queues"]
         ),
-        tmpdir="temp",
+        tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CollectGcBiasMetrics '
@@ -255,7 +255,7 @@ rule picard_collectwgsmetrics:
     benchmark:
         "results/performance_benchmarks/picard_collectwgsmetrics/{fileprefix}.tsv"
     params:
-        tmpdir="temp",
+        tmpdir=tempDir,
         java_args=config_resources["gatk_collectwgsmetrics"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
@@ -265,7 +265,7 @@ rule picard_collectwgsmetrics:
         qname=rc.select_queue(
             config_resources["gatk_collectwgsmetrics"]["queue"], config_resources["queues"]
         ),
-        tmpdir="temp",
+        tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CollectWgsMetrics '

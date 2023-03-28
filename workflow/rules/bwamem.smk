@@ -89,7 +89,7 @@ rule bwa_map_and_sort:
             wildcards.lane,
             wildcards.sampleid,
         ),
-        tmpdir="temp",
+        tmpdir=tempDir,
     conda:
         lambda wildcards: "../envs/{}.yaml".format(config["behaviors"]["aligner"])
     threads: config_resources["bwa_map_and_sort"]["threads"]
@@ -98,7 +98,7 @@ rule bwa_map_and_sort:
         qname=rc.select_queue(
             config_resources["bwa_map_and_sort"]["queue"], config_resources["queues"]
         ),
-        tmpdir="temp",
+        tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "
         '{params.exec_name} mem -t {threads} -Y -R "{params.readgroup}" -K {params.K} '

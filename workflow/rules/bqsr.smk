@@ -23,7 +23,7 @@ rule bqsr_base_recalibrator:
     output:
         table="results/bqsr/{projectid}/{sampleid}.recal_table",
     params:
-        tmpdir="temp",
+        tmpdir=tempDir,
         java_args=config_resources["gatk_bqsr_base_recalibrator"]["java_args"],
     benchmark:
         "results/performance_benchmarks/bqsr_base_recalibrator/{projectid}/{sampleid}.tsv"
@@ -67,7 +67,7 @@ rule bqsr_apply_bqsr:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
         bai="results/bqsr/{projectid}/{sampleid}.bai",
     params:
-        tmpdir="temp",
+        tmpdir=tempDir,
         java_args=config_resources["gatk_bqsr_apply_bqsr"]["java_args"],
     benchmark:
         "results/performance_benchmarks/bqsr_apply_bqsr/{projectid}/{sampleid}.tsv"

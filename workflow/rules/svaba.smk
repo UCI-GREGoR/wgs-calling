@@ -69,7 +69,7 @@ rule svaba_select_output_variants:
         vcf="results/svaba/{projectid}/{sampleid}.svaba.as_bnd.vcf.gz",
         linker=temp("results/svaba/{projectid}/{sampleid}.svaba.reheader_linker.tsv"),
     params:
-        tmpdir="temp",
+        tmpdir=tempDir,
         bam="results/bqsr/{projectid}/{sampleid}.bam",
         blacklist_definition='##FILTER=<ID=BLACKLIST,Description=\\"Variant is in calling exclusion region\\">',
     benchmark:
@@ -135,15 +135,17 @@ rule bedpe_to_vcf:
         "{prefix}.svaba.resolved.bedpe",
     output:
         "{prefix}.svaba.vcf.gz",
+    params:
+        tmpdir=tempDir,
     conda:
         "../envs/svtools.yaml"
     threads: config_resources["svtools"]["threads"]
     resources:
         mem_mb=config_resources["svtools"]["memory"],
         qname=rc.select_queue(config_resources["svtools"]["queue"], config_resources["queues"]),
-        tmpdir="temp",
+        tmpdir=tempDir,
     shell:
-        "mkdir -p temp && "
+        "mkdir -p {params.tmpdir} && "
         "svtools bedpetovcf -i {input} -o {output}.tmp && "
-        "bcftools sort -O z --temp-dir temp -o {output} {output}.tmp && "
+        "bcftools sort -O z --temp-dir {params.tmpdir} -o {output} {output}.tmp && "
         "rm {output}.tmp"
