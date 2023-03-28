@@ -39,7 +39,7 @@ with open("config/config_resources.yaml", "r") as f:
 validate(config, "../schema/global_config_schema.yaml")
 validate(config_resources, "../schema/resources_config_schema.yaml")
 
-tempDir = "temp"
+tempDir = config_resources["tmpdir"]
 manifest = config["manifest"]
 manifest = pd.read_csv(manifest, sep="\t")
 
