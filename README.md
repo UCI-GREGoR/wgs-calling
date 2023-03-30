@@ -54,6 +54,11 @@ The following settings are recognized in `config/config.yaml`. Note that each re
     - `bucket-name`: name of s3 bucket to which to sync data
     - `profile-name`: optional name of aws profile to use for data sync
 - `parameters`: tool-specific parameters. note that this section is a work in progress, somewhat more than the rest
+  - `bwa`: parameters specific to [bwa](https://bio-bwa.sourceforge.net/)
+    - `K`: chunk size parameter. `bwa` defaults this to `1e7*{threads}`, but to maintain consistency independent of thread count,
+      this is manually fixed. higher numbers improve runtime at the cost of (marginally) increased RAM usage
+  - `bwa-mem2`: parameters specific to [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2)
+    - `K`: chunk size parameter. see the corresponding `bwa` option for detauls
   - `deepvariant`: parameters specific to [deepvariant](https://github.com/google/deepvariant)
     - `number-shards`: how many shards to break calling into. needs to be at most the number of available threads in the submission queue
 	- `docker-version`: which docker tag to use when pulling the official DeepVariant docker image
