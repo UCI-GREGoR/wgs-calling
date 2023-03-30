@@ -79,7 +79,7 @@ rule bwa_map_and_sort:
         "results/performance_benchmarks/bwa_map_and_sort/{projectid}/{sampleid}_{lane}.tsv"
     params:
         exec_name=config["behaviors"]["aligner"],
-        K="1000000",
+        K=config["parameters"][config["behaviors"]["aligner"]]["K"],
         readgroup=lambda wildcards: "@RG\\tID:{}\\tSM:{}\\tLB:{}\\tPL:{}\\tPU:{}.{}.{}".format(
             "RG" + wildcards.lane,
             wildcards.sampleid,
