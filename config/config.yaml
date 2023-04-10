@@ -32,6 +32,10 @@ behaviors:
     profile-name: "ucigrant"
 
 parameters:
+  bwa:
+    K: 120000000
+  bwa-mem2:
+    K: 120000000
   deepvariant:
     number-shards: 16
     docker-version: "1.4.0"

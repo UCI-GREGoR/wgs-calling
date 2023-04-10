@@ -12,10 +12,10 @@ rule create_exon_bedfile:
         "results/performance_benchmarks/bcftools_stats/exons.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: 1
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="1000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         'gunzip -c {input} | awk -F"\\t" \'$3 == "exon" {{print $1"\\t"$4"\\t"$5}}\' | sort -k 1,1 -k 2,2g -k 3,3g | bgzip -c > {output.bed_gz} && '
         "tabix -s1 -b2 -e3 {output.bed_gz}"
@@ -40,9 +40,9 @@ rule bcftools_stats:
         "results/performance_benchmarks/bcftools_stats/{prefix}.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: 1
+    threads: config_resources["bcftools"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
     shell:
         "bcftools stats -E {input.bed_gz} -F {input.fasta} -I {input.vcf} > {output.stats}"

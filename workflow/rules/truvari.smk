@@ -17,10 +17,10 @@ rule truvari_merge_within_caller:
         "results/performance_benchmarks/truvari_merge_within_caller/{projectid}/{sampleid}.{toolname}.tsv"
     conda:
         "../envs/truvari.yaml"
-    threads: 1
+    threads: config_resources["truvari"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["truvari"]["memory"],
+        qname=rc.select_queue(config_resources["truvari"]["queue"], config_resources["queues"]),
     shell:
         "truvari collapse -i {input.vcf} -o {output.vcf} -c {output.collapsed} -f {input.fasta} "
         "-p 0.5 -O 0.25 -P 0.5"
@@ -46,10 +46,10 @@ rule bcftools_concat_sv_callers:
         "results/performance_benchmarks/bcftools_concat_sv_callers/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: 1
+    threads: config_resources["bcftools"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
     shell:
         "bcftools concat -a -d exact -O v {input.vcf} | bcftools sort -O z -o {output.vcf}"
 
@@ -87,10 +87,10 @@ rule truvari_ensemble_sv_vcf:
         "results/performance_benchmarks/truvari_ensemble_sv_vcf/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: 1
+    threads: config_resources["bcftools"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
     shell:
         'bcftools filter -i "{params.bcftools_filter_count} {params.bcftools_filter_sources}" -O z -o {output} {input}'
 
@@ -108,9 +108,9 @@ rule truvari_add_variant_sources:
         tsv="results/reports/sv_data/{projectid}/{sampleid}.sv.truvari-raw.tsv",
     benchmark:
         "results/performance_benchmarks/truvari_add_variant_sources/{projectid}/{sampleid}.tsv"
-    threads: 1
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="1000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     script:
         "../scripts/truvari_add_variant_sources.py"
