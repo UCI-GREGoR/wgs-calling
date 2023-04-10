@@ -12,10 +12,10 @@ rule copy_fastqs:
         symlink_target=config["behaviors"]["symlink-fastqs"],
     benchmark:
         "results/performance_benchmarks/copy_fastqs/{projectid}/{sampleid}_{lane}_{suffix}.fastq.tsv"
-    threads: 1
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="500",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         'if [[ "{params.symlink_target}" == "True" ]] ; then '
         "ln -s $(readlink -m {input.r1}) {output.r1} && ln -s $(readlink -m {input.r2}) {output.r2} ; "

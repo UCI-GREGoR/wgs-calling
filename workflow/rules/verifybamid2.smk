@@ -23,10 +23,10 @@ rule estimate_contamination:
         db_prefix="reference_data/verifybamid2/{}/ref.db".format(reference_build),
     conda:
         "../envs/verifybamid2.yaml"
-    threads: 2
+    threads: config_resources["verifybamid2"]["threads"]
     resources:
-        mem_mb="22000",
-        qname="small",
+        mem_mb=config_resources["verifybamid2"]["memory"],
+        qname=rc.select_queue(config_resources["verifybamid2"]["queue"], config_resources["queues"]),
     shell:
         "verifybamid2 "
         "--BamFile {input.bam} "

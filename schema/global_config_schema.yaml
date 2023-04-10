@@ -86,6 +86,22 @@ properties:
   parameters:
     type: object
     properties:
+      bwa:
+        type: object
+        properties:
+          K:
+            type: integer
+        required:
+          - K
+        additionalProperties: false
+      bwa-mem2:
+        type: object
+        properties:
+          K:
+            type: integer
+        required:
+          - K
+        additionalProperties: false
       deepvariant:
         type: object
         properties:

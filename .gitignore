@@ -20,6 +20,9 @@ run_*.e*
 # Emacs backup files
 *~
 
+# Vim swap files
+*.swp
+
 # Commitizen Infrastructure
 node_modules
 package*json
