@@ -5,6 +5,14 @@ properties:
     type: string
   sample-logbook:
     type: string
+  sample-linking:
+    type: object
+    properties:
+      sex:
+        type: string
+      external-ids:
+        type: string
+    additionalProperties: false
   multiqc-read-config:
     type: string
   multiqc-alignment-config:

@@ -28,6 +28,9 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `manifest`: relative path to run manifest
 - `sample-logbook`: local Excel spreadsheet clone of sample manifest information from Google docs
   - this is upstream input. a local cloned file is preferred due to the possibility of uncontrolled upstream changes
+- `sample-linking`: two column tsv linker files with sample annotation data
+  - `sex`: path to linker containing internal subject ID and self-reported sex data
+  - `external-ids`: path to linker containing internal subject ID and external IDs
 - `multiqc-read-config`: relative path to configuration settings for pre-alignment multiQC report
 - `multiqc-alignment-config`: relative path to configuration settings for post-alignment multiQC report
 - `multiqc-calling-config`: relative path to configuration settings for post-calling multiQC report
