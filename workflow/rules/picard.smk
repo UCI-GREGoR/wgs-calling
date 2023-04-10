@@ -13,19 +13,22 @@ rule create_sequence_dictionary:
     benchmark:
         "results/performance_benchmarks/create_sequence_dictionary/{prefix}fasta.tsv"
     params:
-        tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
+        tmpdir=tempDir,
+        java_args=config_resources["gatk_create_sequence_dictionary"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
     container:
         "docker://broadinstitute/gatk:4.3.0.0"
-    threads: 1
+    threads: config_resources["gatk_create_sequence_dictionary"]["threads"]
     resources:
-        mem_mb="10000",
-        qname="small",
-        tmpdir="temp",
+        mem_mb=config_resources["gatk_create_sequence_dictionary"]["memory"],
+        qname=rc.select_queue(
+            config_resources["gatk_create_sequence_dictionary"]["queue"],
+            config_resources["queues"],
+        ),
+        tmpdir=tempDir,
     shell:
-        "mkdir -p temp/ && "
+        "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CreateSequenceDictionary '
         "-REFERENCE {input} "
         "-OUTPUT {output.standard} "
@@ -40,7 +43,6 @@ rule mark_duplicates:
     Note that the following tools are confirmed OK with marked but
     non-deduped reads:
     - deepvariant
-    - octopus
     - manta
     - tiddit (? https://github.com/SciLifeLab/TIDDIT/blob/2bd94921ef2df4b08967e8f76fb10bc94730715d/tiddit/tiddit_signal.pyx#L160)
     - svaba
@@ -61,22 +63,22 @@ rule mark_duplicates:
     benchmark:
         "results/performance_benchmarks/mark_duplicates/{projectid}/{sampleid}.tsv"
     params:
-        tmpdir="temp",
+        tmpdir=tempDir,
         bamlist=lambda wildcards: " -INPUT ".join(
             tc.get_bams_by_lane(wildcards, config, manifest, "bam")
         ),
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx3000m",
+        java_args=config_resources["gatk_mark_duplicates"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
     container:
         "docker://broadinstitute/gatk:4.3.0.0"
-    threads: 2
+    threads: config_resources["gatk_mark_duplicates"]["threads"]
     resources:
-        mem_mb="12000",
-        qname="small",
-        tmpdir="temp",
+        mem_mb=config_resources["gatk_mark_duplicates"]["memory"],
+        qname=config_resources["gatk_mark_duplicates"]["queue"],
+        tmpdir=tempDir,
     shell:
-        "mkdir -p temp/ && "
+        "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" MarkDuplicates '
         "-INPUT {params.bamlist} "
         "-OUTPUT {output.bam} "
@@ -92,15 +94,15 @@ rule sort_bam:
     output:
         bam="{prefix}.sort.bam",
     benchmark:
-        "results/performance_benchmarks/sort_bam/{prefix}.sort.bam"
+        "results/performance_benchmarks/sort_bam/{prefix}.sort.bam.tsv"
     conda:
         "../envs/samtools.yaml"
     container:
         "{}/bwa.sif".format(apptainer_images)
-    threads: 4
+    threads: config_resources["samtools"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["samtools"]["memory"],
+        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
     shell:
         "samtools sort -@ {threads} -o {output.bam} -O bam {input.bam}"
 
@@ -119,10 +121,10 @@ rule samtools_create_bai:
         "../envs/samtools.yaml"
     container:
         "{}/bwa.sif".format(apptainer_images)
-    threads: 4
+    threads: config_resources["samtools"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["samtools"]["memory"],
+        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
     shell:
         "samtools index -@ {threads} -b -o {output.bai} {input.bam}"
 
@@ -161,8 +163,8 @@ rule picard_collectmultiplemetrics:
     benchmark:
         "results/performance_benchmarks/picard_collectmultiplemetrics/{fileprefix}.tsv"
     params:
-        tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
+        tmpdir=tempDir,
+        java_args=config_resources["gatk_collectmultiplemetrics"]["java_args"],
         outprefix="results/collectmultiplemetrics/{fileprefix}.picard",
         extension=".txt",
         validation_stringency="LENIENT",
@@ -171,13 +173,15 @@ rule picard_collectmultiplemetrics:
         "../envs/gatk4.yaml"
     container:
         "docker://broadinstitute/gatk:4.3.0.0"
-    threads: 1
+    threads: config_resources["gatk_collectmultiplemetrics"]["threads"]
     resources:
-        mem_mb="10000",
-        qname="small",
-        tmpdir="temp",
+        mem_mb=config_resources["gatk_collectmultiplemetrics"]["memory"],
+        qname=rc.select_queue(
+            config_resources["gatk_collectmultiplemetrics"]["queue"], config_resources["queues"]
+        ),
+        tmpdir=tempDir,
     shell:
-        "mkdir -p temp/ && "
+        "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CollectMultipleMetrics '
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "
@@ -218,19 +222,21 @@ rule picard_collectgcbiasmetrics:
     benchmark:
         "results/performance_benchmarks/picard_collectgcbiasmetrics/{fileprefix}.tsv"
     params:
-        tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx2000m",
+        tmpdir=tempDir,
+        java_args=config_resources["gatk_collectgcbiasmetrics"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
     container:
         "docker://broadinstitute/gatk:4.3.0.0"
-    threads: 1
+    threads: config_resources["gatk_collectgcbiasmetrics"]["threads"]
     resources:
-        mem_mb="10000",
-        qname="small",
-        tmpdir="temp",
+        mem_mb=config_resources["gatk_collectgcbiasmetrics"]["memory"],
+        qname=rc.select_queue(
+            config_resources["gatk_collectgcbiasmetrics"]["queue"], config_resources["queues"]
+        ),
+        tmpdir=tempDir,
     shell:
-        "mkdir -p temp/ && "
+        "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CollectGcBiasMetrics '
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "
@@ -261,19 +267,21 @@ rule picard_collectwgsmetrics:
     benchmark:
         "results/performance_benchmarks/picard_collectwgsmetrics/{fileprefix}.tsv"
     params:
-        tmpdir="temp",
-        java_args="-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=2 -Xmx10000m",
+        tmpdir=tempDir,
+        java_args=config_resources["gatk_collectwgsmetrics"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
     container:
         "docker://broadinstitute/gatk:4.3.0.0"
-    threads: 1
+    threads: config_resources["gatk_collectwgsmetrics"]["threads"]
     resources:
-        mem_mb="16000",
-        qname="small",
-        tmpdir="temp",
+        mem_mb=config_resources["gatk_collectwgsmetrics"]["memory"],
+        qname=rc.select_queue(
+            config_resources["gatk_collectwgsmetrics"]["queue"], config_resources["queues"]
+        ),
+        tmpdir=tempDir,
     shell:
-        "mkdir -p temp/ && "
+        "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" CollectWgsMetrics '
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "

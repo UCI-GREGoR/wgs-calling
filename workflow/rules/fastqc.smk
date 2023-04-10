@@ -11,7 +11,7 @@ rule run_fastqc_pretrimming:
         r1_html="results/fastqc/{projectid}/{prefix}_R1_{suffix}_fastqc.html",
         r2_html="results/fastqc/{projectid}/{prefix}_R2_{suffix}_fastqc.html",
     benchmark:
-        "results/performance_benchmarks/fastqc/{projectid}/{prefix}_{suffix}_fastqc.tsv"
+        "results/performance_benchmarks/run_fastqc_pretrimming/{projectid}/{prefix}_{suffix}_fastqc.tsv"
     params:
         outdir="results/fastqc/{projectid}",
         tmpdir="temp",
@@ -19,10 +19,10 @@ rule run_fastqc_pretrimming:
         "../envs/fastqc.yaml"
     container:
         "{}/fastqc.sif".format(apptainer_images)
-    threads: 4
+    threads: config_resources["fastqc"]["threads"]
     resources:
-        mem_mb="16000",
-        qname="small",
+        mem_mb=config_resources["fastqc"]["memory"],
+        qname=rc.select_queue(config_resources["fastqc"]["queue"], config_resources["queues"]),
     shell:
         "mkdir -p {params.outdir} && "
         "mkdir -p {params.tmpdir} && "
@@ -42,7 +42,7 @@ rule run_fastqc_posttrimming:
         r1_html="results/fastqc_posttrimming/{projectid}/{sampleid}_{lane}_R1_fastp_fastqc.html",
         r2_html="results/fastqc_posttrimming/{projectid}/{sampleid}_{lane}_R2_fastp_fastqc.html",
     benchmark:
-        "results/performance_benchmarks/fastqc_posttrimming/{projectid}/{sampleid}_{lane}_fastp_fastqc.tsv"
+        "results/performance_benchmarks/run_fastqc_posttrimming/{projectid}/{sampleid}_{lane}_fastp_fastqc.tsv"
     params:
         outdir="results/fastqc_posttrimming/{projectid}",
         tmpdir="temp",
@@ -50,10 +50,10 @@ rule run_fastqc_posttrimming:
         "../envs/fastqc.yaml"
     container:
         "{}/fastqc.sif".format(apptainer_images)
-    threads: 4
+    threads: config_resources["fastqc"]["threads"]
     resources:
-        mem_mb="16000",
-        qname="small",
+        mem_mb=config_resources["fastqc"]["memory"],
+        qname=rc.select_queue(config_resources["fastqc"]["queue"], config_resources["queues"]),
     shell:
         "mkdir -p {params.outdir} && "
         "mkdir -p {params.tmpdir} && "
@@ -70,7 +70,7 @@ use rule run_fastqc_pretrimming as run_fastqc_pretrimming_combined with:
         r1_html="results/fastqc_combined/{projectid}/{sampleid}_R1_fastqc.html",
         r2_html="results/fastqc_combined/{projectid}/{sampleid}_R2_fastqc.html",
     benchmark:
-        "results/performance_benchmarks/fastqc_combined/{projectid}/{sampleid}_fastqc.tsv"
+        "results/performance_benchmarks/run_fastqc_pretrimming_combined/{projectid}/{sampleid}_fastqc.tsv"
     params:
         outdir="results/fastqc_combined/{projectid}",
         tmpdir="tmp",
@@ -86,7 +86,7 @@ use rule run_fastqc_posttrimming as run_fastqc_posttrimming_combined with:
         r1_html="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R1_fastqc.html",
         r2_html="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R2_fastqc.html",
     benchmark:
-        "results/performance_benchmarks/fastqc_posttrimming_combined/{projectid}/{sampleid}_fastqc.tsv"
+        "results/performance_benchmarks/run_fastqc_posttrimming_combined/{projectid}/{sampleid}_fastqc.tsv"
     params:
         outdir="results/fastqc_posttrimming_combined/{projectid}",
         tmpdir="tmp",

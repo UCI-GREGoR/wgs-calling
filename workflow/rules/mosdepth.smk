@@ -34,10 +34,10 @@ rule run_mosdepth:
         "../envs/mosdepth.yaml"
     container:
         "docker://brentp/mosdepth:v0.3.3"
-    threads: 1
+    threads: config_resources["mosdepth"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["mosdepth"]["memory"],
+        qname=rc.select_queue(config_resources["mosdepth"]["queue"], config_resources["queues"]),
     shell:
         "mosdepth --threads {threads} "
         "--by {params.win_size} "

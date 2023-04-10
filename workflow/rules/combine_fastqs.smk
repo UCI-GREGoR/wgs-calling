@@ -24,10 +24,10 @@ rule combine_input_fastqs_by_lane:
         "../envs/bcftools.yaml"
     container:
         "{}/bcftools.sif".format(apptainer_images)
-    threads: 1
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         "gunzip -c {input} | bgzip -c > {output}"
 

@@ -59,10 +59,10 @@ rule run_multiqc_fastq:
         "../envs/multiqc.yaml"
     container:
         "docker://ewels/multiqc:v1.14"
-    threads: 1
+    threads: config_resources["multiqc"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["multiqc"]["memory"],
+        qname=rc.select_queue(config_resources["multiqc"]["queue"], config_resources["queues"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
@@ -140,10 +140,10 @@ rule run_multiqc_alignment:
         "../envs/multiqc.yaml"
     container:
         "docker://ewels/multiqc:v1.14"
-    threads: 1
+    threads: config_resources["multiqc"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["multiqc"]["memory"],
+        qname=rc.select_queue(config_resources["multiqc"]["queue"], config_resources["queues"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
@@ -221,10 +221,10 @@ rule run_multiqc_calling:
         "../envs/multiqc.yaml"
     container:
         "docker://ewels/multiqc:v1.14"
-    threads: 1
+    threads: config_resources["multiqc"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["multiqc"]["memory"],
+        qname=rc.select_queue(config_resources["multiqc"]["queue"], config_resources["queues"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "

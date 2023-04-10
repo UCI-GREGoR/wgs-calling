@@ -25,10 +25,10 @@ rule estimate_contamination:
         "../envs/verifybamid2.yaml"
     container:
         "docker://griffan/verifybamid2:v2.0.1"
-    threads: 4
+    threads: config_resources["verifybamid2"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["verifybamid2"]["memory"],
+        qname=rc.select_queue(config_resources["verifybamid2"]["queue"], config_resources["queues"]),
     shell:
         "verifybamid2 "
         "--BamFile {input.bam} "

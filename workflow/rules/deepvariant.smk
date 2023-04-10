@@ -1,3 +1,22 @@
+localrules:
+    caller_scatter_tasks,
+
+
+rule caller_scatter_tasks:
+    """
+    For scatter-gather: take input set of range annotations
+    and prepare for individual caller runs
+    """
+    input:
+        lambda wildcards: config[wildcards.caller][reference_build]["calling-ranges"],
+    output:
+        "results/{caller}/split_ranges/{splitnum}.ssv",
+    benchmark:
+        "results/performance_benchmarks/{caller}/split_ranges/{splitnum}.tsv"
+    shell:
+        "cat $(awk 'NR == {wildcards.splitnum}' {input}) | tr '\\n' ' ' > {output}"
+
+
 rule deepvariant_make_examples:
     """
     Run deepvariant make_examples in a hybrid
@@ -18,10 +37,9 @@ rule deepvariant_make_examples:
             expand(
                 "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",
                 shardnum=[
-                    str(i).rjust(5, "0")
-                    for i in range(config["parameters"]["deepvariant"]["number-shards"])
+                    str(i).rjust(5, "0") for i in range(config_resources["deepvariant"]["threads"])
                 ],
-                shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
+                shardmax=str(config_resources["deepvariant"]["threads"]).rjust(5, "0"),
                 suffix=["gz", "gz.example_info.json"],
             )
         ),
@@ -29,10 +47,9 @@ rule deepvariant_make_examples:
             expand(
                 "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord-{shardnum}-of-{shardmax}.gz",
                 shardnum=[
-                    str(i).rjust(5, "0")
-                    for i in range(config["parameters"]["deepvariant"]["number-shards"])
+                    str(i).rjust(5, "0") for i in range(config_resources["deepvariant"]["threads"])
                 ],
-                shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
+                shardmax=str(config_resources["deepvariant"]["threads"]).rjust(5, "0"),
             )
         ),
     benchmark:
@@ -40,23 +57,24 @@ rule deepvariant_make_examples:
     params:
         shard_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
-            shardmax=config["parameters"]["deepvariant"]["number-shards"],
+            shardmax=config_resources["deepvariant"]["threads"],
         ),
         gvcf_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord@{shardmax}.gz",
-            shardmax=config["parameters"]["deepvariant"]["number-shards"],
+            shardmax=config_resources["deepvariant"]["threads"],
         ),
+        tmpdir=tempDir,
     container:
         "docker://google/deepvariant:{}".format(
             config["parameters"]["deepvariant"]["docker-version"]
         )
-    threads: config["parameters"]["deepvariant"]["number-shards"]
+    threads: config_resources["deepvariant"]["threads"]
     resources:
-        mem_mb="{}".format(12000 * config["parameters"]["deepvariant"]["number-shards"]),
-        qname="large",
-        tmpdir="temp",
+        mem_mb=config_resources["deepvariant"]["make_examples_memory"],
+        qname=rc.select_queue(config_resources["deepvariant"]["queue"], config_resources["queues"]),
+        tmpdir=tempDir,
     shell:
-        "mkdir -p temp && "
+        "mkdir -p {params.tmpdir} && "
         "seq 0 $(({threads}-1)) | parallel -j{threads} --tmpdir ${{TMPDIR}} "
         "make_examples --mode calling "
         '--ref {input.fasta} --reads {input.bam} --regions "$(cat {input.intervals})" '
@@ -74,10 +92,9 @@ rule deepvariant_call_variants:
         expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",
             shardnum=[
-                str(i).rjust(5, "0")
-                for i in range(config["parameters"]["deepvariant"]["number-shards"])
+                str(i).rjust(5, "0") for i in range(config_resources["deepvariant"]["threads"])
             ],
-            shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
+            shardmax=str(config_resources["deepvariant"]["threads"]).rjust(5, "0"),
             suffix=["gz", "gz.example_info.json"],
         ),
     output:
@@ -87,17 +104,17 @@ rule deepvariant_call_variants:
     params:
         shard_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord@{shardmax}.gz",
-            shardmax=config["parameters"]["deepvariant"]["number-shards"],
+            shardmax=config_resources["deepvariant"]["threads"],
         ),
         docker_model="/opt/models/wgs/model.ckpt",
     container:
         "docker://google/deepvariant:{}".format(
             config["parameters"]["deepvariant"]["docker-version"]
         )
-    threads: config["parameters"]["deepvariant"]["number-shards"]
+    threads: config_resources["deepvariant"]["threads"]
     resources:
-        mem_mb="{}".format(config["parameters"]["deepvariant"]["number-shards"] * 30000),
-        qname="large",
+        mem_mb=config_resources["deepvariant"]["call_variants_memory"],
+        qname=rc.select_queue(config_resources["deepvariant"]["queue"], config_resources["queues"]),
     shell:
         "call_variants "
         "--outfile {output.gz} "
@@ -118,10 +135,9 @@ rule deepvariant_postprocess_variants:
         gvcf=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord-{shardnum}-of-{shardmax}.gz",
             shardnum=[
-                str(i).rjust(5, "0")
-                for i in range(config["parameters"]["deepvariant"]["number-shards"])
+                str(i).rjust(5, "0") for i in range(config_resources["deepvariant"]["threads"])
             ],
-            shardmax=str(config["parameters"]["deepvariant"]["number-shards"]).rjust(5, "0"),
+            shardmax=str(config_resources["deepvariant"]["threads"]).rjust(5, "0"),
         ),
         fai="reference_data/{}/{}/ref.fasta.fai".format(
             config["behaviors"]["aligner"], reference_build
@@ -140,7 +156,7 @@ rule deepvariant_postprocess_variants:
     params:
         gvcf_string=expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.gvcf.tfrecord@{shardmax}.gz",
-            shardmax=config["parameters"]["deepvariant"]["number-shards"],
+            shardmax=config_resources["deepvariant"]["threads"],
         ),
     benchmark:
         "results/performance_benchmarks/deepvariant_postprocess_variants/{projectid}/{sampleid}.{splitnum}.tsv"
@@ -150,8 +166,8 @@ rule deepvariant_postprocess_variants:
         )
     threads: 1
     resources:
-        mem_mb="32000",
-        qname="large",
+        mem_mb=config_resources["deepvariant"]["postprocess_variants_memory"],
+        qname=rc.select_queue(config_resources["deepvariant"]["queue"], config_resources["queues"]),
     shell:
         "postprocess_variants "
         "--ref {input.fasta} "
@@ -179,9 +195,21 @@ rule deepvariant_combine_regions:
         "../envs/bcftools.yaml"
     container:
         "{}/bcftools.sif".format(apptainer_images)
-    threads: 4
+    threads: config_resources["bcftools"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
     shell:
         "bcftools concat --threads {threads} -O z -o {output} {input}"
+
+
+use rule deepvariant_combine_regions as deepvariant_combine_gvcfs with:
+    input:
+        expand(
+            "results/deepvariant/{{projectid}}/postprocess_variants/{{sampleid}}.{splitnum}.g.vcf.gz",
+            splitnum=[i + 1 for i in range(caller_num_intervals)],
+        ),
+    output:
+        "results/deepvariant/{projectid}/{sampleid}.sorted.g.vcf.gz",
+    benchmark:
+        "results/performance_benchmarks/deepvariant_combine_gvcfs/{projectid}/{sampleid}.tsv"

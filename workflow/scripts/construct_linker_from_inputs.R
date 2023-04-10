@@ -53,7 +53,7 @@ apply.id.mappings <- function(df, vec) {
   vec
 }
 
-run.construct.linker <- function(input.fn, output.fn) {
+parse.logbook <- function(input.fn, output.fn) {
   sheet.names <- openxlsx::getSheetNames(input.fn)
   pmgrc.id <- c()
   jira.tickets <- c()
@@ -110,12 +110,60 @@ run.construct.linker <- function(input.fn, output.fn) {
   ## construct output stems for deliverables, if sufficient information is present to fit the accepted format
   output.stems <- construct.output.stems(res)
   res$output <- output.stems
+  res
+}
+
+add.linker.data <- function(df, linker.fn, target.colname) {
+  linker.df <- read.table(linker.fn, header = TRUE, sep = "\t", quote = "", comment.char = "", stringsAsFactors = FALSE)
+  rownames(linker.df) <- linker.df[, 1]
+  ## handle the situation where people not yet present are being added here
+  new.subjects <- linker.df[!(linker.df[, 1] %in% df$pmgrc), 1]
+  if (length(new.subjects) > 0) {
+    new.df <- data.frame(
+      pmgrc = new.subjects,
+      jira = NA,
+      ru = NA,
+      sq = NA,
+      ls = NA,
+      sex = NA,
+      output = NA
+    )
+    df <- rbind(df, new.df)
+  }
+  df[, target.colname] <- linker.df[df[, "pmgrc"], 2]
+  df
+}
+
+run.construct.linker <- function(logbook.fn,
+                                 sex.linker.fn,
+                                 external.id.linker.fn,
+                                 out.fn) {
+  df <- data.frame(
+    pmgrc = c("A"),
+    jira = c("A"),
+    ru <- c("A"),
+    sq <- c("A"),
+    ls <- c("A"),
+    sex <- c("A")
+  )
+  df <- df[-1, ]
+  if (!is.null(logbook.fn)) {
+    df <- parse.logbook(logbook.fn, out.fn)
+  }
+  if (!is.null(sex.linker.fn)) {
+    df <- add.linker.data(df, sex.linker.fn, "sex")
+  }
+  if (!is.null(external.id.linker.fn)) {
+    df <- add.linker.data(df, external.id.linker.fn, "output")
+  }
   write.table(res, output.fn, row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 }
 
 if (exists("snakemake")) {
   run.construct.linker(
-    snakemake@input[["logbook"]],
+    snakemake@params[["logbook"]],
+    snakemake@params[["sex_linker"]],
+    snakemake@params[["external_id_linker"]],
     snakemake@output[["linker"]]
   )
 }
