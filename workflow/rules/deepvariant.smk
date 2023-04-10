@@ -64,6 +64,8 @@ rule deepvariant_make_examples:
             shardmax=config_resources["deepvariant"]["threads"],
         ),
         tmpdir=tempDir,
+    conda:
+        "../envs/deepvariant.yaml"
     container:
         "docker://google/deepvariant:{}".format(
             config["parameters"]["deepvariant"]["docker-version"]
