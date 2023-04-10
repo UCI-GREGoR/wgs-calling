@@ -109,6 +109,20 @@ parse.logbook <- function(input.fn, output.fn) {
 add.linker.data <- function(df, linker.fn, target.colname) {
   linker.df <- read.table(linker.fn, header = TRUE, sep = "\t", quote = "", comment.char = "", stringsAsFactors = FALSE)
   rownames(linker.df) <- linker.df[, 1]
+  ## handle the situation where people not yet present are being added here
+  new.subjects <- linker.df[!(linker.df[, 1] %in% df$pmgrc), 1]
+  if (length(new.subjects) > 0) {
+    new.df <- data.frame(
+      pmgrc = new.subjects,
+      jira = NA,
+      ru = NA,
+      sq = NA,
+      ls = NA,
+      sex = NA,
+      output = NA
+    )
+    df <- rbind(df, new.df)
+  }
   df[, target.colname] <- linker.df[df[, "pmgrc"], 2]
   df
 }
