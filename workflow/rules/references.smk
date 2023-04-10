@@ -20,11 +20,11 @@ rule download_reference_data:
         "results/performance_benchmarks/download_reference_data/{reference_file}.tsv"
     conda:
         "../envs/awscli.yaml"
-    threads: config_resources["awscli"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["awscli"]["memory"],
-        qname=rc.select_queue(config_resources["awscli"]["queue"], config_resources["queues"]),
-        tmpdir=tempdir,
+        mem_mb="2000",
+        qname="small",
+        tmpdir="temp/",
     shell:
         'if [[ "{params}" == "s3://"* ]] ; then aws s3 cp {params} {output}.staging ; '
         'elif [[ "{params}" == "http://"* ]] || [[ "{params}" == "https://"* ]] || [[ "{params}" == "ftp://"* ]] ; then wget -O {output}.staging {params} ; '
@@ -45,10 +45,10 @@ rule index_vcf:
         "results/performance_benchmarks/index_vcf/{prefix}.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: config_resources["default"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
+        mem_mb="2000",
+        qname="small",
     shell:
         "tabix -p vcf {input}"
 
@@ -63,9 +63,9 @@ rule adjust_fasta_formatting:
         "reference_data/references/{}/ref.fasta".format(reference_build),
     output:
         "reference_data/{{aligner}}/{}/ref.fasta".format(reference_build),
-    threads: config_resources["default"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
+        mem_mb="1000",
+        qname="small",
     shell:
         "sed 's/>/_/g' {input} | sed 's/^_/>/' > {output}"

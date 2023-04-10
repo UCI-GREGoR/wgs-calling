@@ -20,10 +20,10 @@ rule somalier_extract:
         extract_dir="results/somalier/{projectid}/extract",
     conda:
         "../envs/somalier.yaml"
-    threads: config_resources["somalier"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["somalier"]["memory"],
-        qname=rc.select_queue(config_resources["somalier"]["queue"], config_resources["queues"]),
+        mem_mb="1000",
+        qname="small",
     shell:
         "somalier extract -d {params.extract_dir} "
         "--sites {input.sites_vcf} "
@@ -48,10 +48,10 @@ rule somalier_relate:
         outprefix="results/somalier/{projectid}/relate/somalier",
     conda:
         "../envs/somalier.yaml"
-    threads: config_resources["somalier"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["somalier"]["memory"],
-        qname=rc.select_queue(config_resources["somalier"]["queue"], config_resources["queues"]),
+        mem_mb="1000",
+        qname="small",
     shell:
         "somalier relate --ped {input.ped} -o {params.outprefix} {input.somalier}"
 
@@ -81,9 +81,9 @@ rule somalier_build_pedfile:
         last_sample_sex=config["behaviors"]["assume-last-sample-sex"]
         if "assume-last-sample-sex" in config["behaviors"]
         else "unknown",
-    threads: config_resources["default"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
+        mem_mb="1000",
+        qname="small",
     script:
         "../scripts/construct_somalier_pedfile.py"

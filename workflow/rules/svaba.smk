@@ -31,10 +31,10 @@ rule svaba_run:
         outprefix="results/svaba/{projectid}/{sampleid}",
     conda:
         "../envs/svaba.yaml"
-    threads: config_resources["svaba"]["threads"]
+    threads: 8
     resources:
-        mem_mb=config_resources["svaba"]["memory"],
-        qname=rc.select_queue(config_resources["svaba"]["queue"], config_resources["queues"]),
+        mem_mb="32000",
+        qname="large",
     shell:
         "svaba run -p {threads} -G {input.bwa_fasta} -I -L 6 -t {input.bam} -B {input.bed} -a {params.outprefix}"
 
@@ -69,17 +69,17 @@ rule svaba_select_output_variants:
         vcf="results/svaba/{projectid}/{sampleid}.svaba.as_bnd.vcf.gz",
         linker=temp("results/svaba/{projectid}/{sampleid}.svaba.reheader_linker.tsv"),
     params:
-        tmpdir=tempDir,
+        tmpdir="temp",
         bam="results/bqsr/{projectid}/{sampleid}.bam",
         blacklist_definition='##FILTER=<ID=BLACKLIST,Description=\\"Variant is in calling exclusion region\\">',
     benchmark:
         "results/performance_benchmarks/svaba_select_output_variants/{projectid}/{sampleid}.svaba.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: config_resources["bcftools"]["threads"]
+    threads: 4
     resources:
-        mem_mb=config_resources["bcftools"]["memory"],
-        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
+        mem_mb="16000",
+        qname="small",
     shell:
         "mkdir -p {params.tmpdir} && "
         "echo -e '{params.bam}\\t{wildcards.sampleid}' > {output.linker} && "
@@ -101,10 +101,10 @@ rule vcf_to_bedpe:
         "{prefix}.svaba.as_bnd.bedpe",
     conda:
         "../envs/svtools.yaml"
-    threads: config_resources["svtools"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["svtools"]["memory"],
-        qname=rc.select_queue(config_resources["svtools"]["queue"], config_resources["queues"]),
+        mem_mb="2000",
+        qname="small",
     shell:
         "gunzip -c {input} > {output}.tmp && "
         "svtools vcftobedpe -i {output}.tmp -o {output} && "
@@ -119,10 +119,10 @@ rule svaba_resolve_breakends:
         "{prefix}.svaba.as_bnd.bedpe",
     output:
         "{prefix}.svaba.resolved.bedpe",
-    threads: config_resources["default"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
+        mem_mb="2000",
+        qname="small",
     script:
         "../scripts/reclassify_svs.py"
 
@@ -135,17 +135,15 @@ rule bedpe_to_vcf:
         "{prefix}.svaba.resolved.bedpe",
     output:
         "{prefix}.svaba.vcf.gz",
-    params:
-        tmpdir=tempDir,
     conda:
         "../envs/svtools.yaml"
-    threads: config_resources["svtools"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["svtools"]["memory"],
-        qname=rc.select_queue(config_resources["svtools"]["queue"], config_resources["queues"]),
-        tmpdir=tempDir,
+        mem_mb="2000",
+        qname="small",
+        tmpdir="temp",
     shell:
-        "mkdir -p {params.tmpdir} && "
+        "mkdir -p temp && "
         "svtools bedpetovcf -i {input} -o {output}.tmp && "
-        "bcftools sort -O z --temp-dir {params.tmpdir} -o {output} {output}.tmp && "
+        "bcftools sort -O z --temp-dir temp -o {output} {output}.tmp && "
         "rm {output}.tmp"
