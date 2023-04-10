@@ -25,7 +25,7 @@ rule bqsr_base_recalibrator_spark:
     output:
         recal_table="results/bqsr/{projectid}/{sampleid}.recal_table",
     params:
-        tmpdir=tempDir,
+        tmpdir="temp",
         java_opts="-XX:+UseParallelGC -XX:ParallelGCThreads=2",
         extra="--known-sites reference_data/bqsr/{}/ref.known.indels.vcf.gz".format(reference_build),
     benchmark:
@@ -63,7 +63,7 @@ rule bqsr_apply_bqsr_spark:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
         bai="results/bqsr/{projectid}/{sampleid}.bai",
     params:
-        tmpdir=tempDir,
+        tmpdir="temp",
     benchmark:
         "results/performance_benchmarks/bqsr_apply_bqsr_spark/{projectid}/{sampleid}.tsv"
     threads: 8

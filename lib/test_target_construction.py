@@ -158,7 +158,7 @@ def test_construct_snv_targets(standard_config, standard_manifest):
     the output sorted vcf files of the SNV caller sub-dag.
     """
     expected = [
-        "results/deepvariant/PROJ1/{}.sorted.vcf.gz".format(x) for x in ["SAM1", "SAM2", "SAM3"]
+        "results/octopus/PROJ1/{}.sorted.vcf.gz".format(x) for x in ["SAM1", "SAM2", "SAM3"]
     ]
     observed = tc.construct_snv_targets(standard_config, standard_manifest)
     ## this function is used for snakemake target population, so order is irrelevant

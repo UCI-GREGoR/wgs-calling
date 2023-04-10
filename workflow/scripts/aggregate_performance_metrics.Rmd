@@ -4,14 +4,14 @@ output:
   html_document:
     code_folding: hide
     md_extensions: "-fancy_lists -emoji"
-    highlight: tango
-    number_sections: no
-    theme: default
-    toc: yes
-    toc_depth: 3
-    toc_float:
-      collapsed: no
-      smooth_scroll: yes
+  highlight: tango
+  number_sections: no
+  theme: default
+  toc: yes
+  toc_depth: 3
+  toc_float:
+    collapsed: no
+    smooth_scroll: yes
 ---
 
 ```{r link.variables, eval=TRUE, echo=FALSE}

@@ -1,13 +1,7 @@
-import random
-
-
-def select_queue(queuename: str, all_queues: dict) -> str:
+def compute_octopus_mem_mb(wildcards, input, threads, attempt) -> int:
     """
-    use a yaml string representation of a queue group and a configured
-    yaml array of queue names to select queue targets for a rule resource
+    Compute scaling RAM requirements for octopus_run_task with each resubmission
+    to the compute controller
     """
-    if queuename in all_queues.keys():
-        return random.choice(all_queues[queuename])
-    raise ValueError(
-        "Configured queue set does not match anything in user resource config: {}".format(queuename)
-    )
+    octopus_scaling_ram = 16000
+    return int(threads * octopus_scaling_ram * (1 + (attempt - 1) * 0.1))

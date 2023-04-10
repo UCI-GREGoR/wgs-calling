@@ -32,7 +32,7 @@ def wildcards_s3_reference():
     """
     snakemake wildcards for testing a request for a reference file on s3
     """
-    return Namedlist(fromdict={"reference_file": "deepvariant/grch100/ref.skip-regions"})
+    return Namedlist(fromdict={"reference_file": "octopus/grch100/ref.skip-regions"})
 
 
 @pytest.fixture
@@ -40,7 +40,7 @@ def wildcards_url_reference():
     """
     snakemake wildcards for testing a request for a reference file specified by a URL
     """
-    return Namedlist(fromdict={"reference_file": "deepvariant/grch100/ref.calling-ranges"})
+    return Namedlist(fromdict={"reference_file": "octopus/grch100/ref.calling-ranges"})
 
 
 @pytest.fixture
@@ -54,7 +54,7 @@ def standard_config():
         "genome-build": "grch100",
         "behaviors": {
             "aligner": "bwa-mem2",
-            "snv-caller": "deepvariant",
+            "snv-caller": "octopus",
             "sv-caller": ["manta", "tiddit"],
             "outcome": "fastqc",
             "symlink-fastqs": True,
@@ -67,7 +67,9 @@ def standard_config():
         "verifybamid2": {
             "grch100": {"db-V": "my.V", "db-UD": "my.UD", "db-mu": "my.mu", "db-bed": "my.bed"}
         },
-        "deepvariant": {
+        "octopus": {
+            "error-model": "my.error-model",
+            "forest-model": "my.forest-model",
             "grch100": {
                 "skip-regions": "s3://my.skip-regions",
                 "calling-ranges": "https://my.calling-ranges",

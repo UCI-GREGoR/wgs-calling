@@ -16,10 +16,10 @@ rule run_fastqc_pretrimming:
         outdir="results/fastqc/{projectid}",
     conda:
         "../envs/fastqc.yaml"
-    threads: config_resources["fastqc"]["threads"]
+    threads: 2
     resources:
-        mem_mb=config_resources["fastqc"]["memory"],
-        qname=rc.select_queue(config_resources["fastqc"]["queue"], config_resources["queues"]),
+        mem_mb="12000",
+        qname="small",
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
 
@@ -42,10 +42,10 @@ rule run_fastqc_posttrimming:
         outdir="results/fastqc_posttrimming/{projectid}",
     conda:
         "../envs/fastqc.yaml"
-    threads: config_resources["fastqc"]["threads"]
+    threads: 2
     resources:
-        mem_mb=config_resources["fastqc"]["memory"],
-        qname=rc.select_queue(config_resources["fastqc"]["queue"], config_resources["queues"]),
+        mem_mb="12000",
+        qname="small",
     shell:
         "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
 

@@ -13,10 +13,10 @@ rule vep_download_databases:
         "results/performance_benchmarks/vep_download_databases/out.tsv"
     container:
         "docker://ensemblorg/ensembl-vep"
-    threads: config_resources["default"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
+        mem_mb="1000",
+        qname="small",
     shell:
         "mkdir -p resources/vep && "
         "perl {params.vep_prefix}/ensembl-vep/INSTALL.pl -a cfp -s homo_sapiens -y {params.reference_build} -c resources/vep/{params.reference_build} -g all && "
@@ -38,10 +38,10 @@ rule vep_convert_cache:
         "results/performance_benchmarks/vep_convert_cache/out.tsv"
     container:
         "docker://ensemblorg/ensembl-vep"
-    threads: config_resources["vep"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["vep"]["memory"],
-        qname=rc.select_queue(config_resources["vep"]["queue"], config_resources["queues"]),
+        mem_mb="4000",
+        qname="small",
     shell:
         "perl {params.vep_prefix}/ensembl-vep/convert_cache.pl -species homo_sapiens --dir resources/vep/{params.reference_build} -version all && touch {output}"
 
@@ -62,10 +62,10 @@ rule vep_annotate:
         vep_prefix="/opt/vep/src",
     container:
         "docker://ensemblorg/ensembl-vep"
-    threads: config_resources["vep"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["vep"]["memory"],
-        qname=rc.select_queue(config_resources["vep"]["queue"], config_resources["queues"]),
+        mem_mb="4000",
+        qname="small",
     shell:
         "{params.vep_prefix}/ensembl-vep/vep --input_file {input.vcf} --output_file {output.gz} --force_overwrite "
         "--compress_output=gzip --cache --dir_cache resources/vep/{params.reference_build} --offline "
@@ -83,10 +83,10 @@ rule vep_format_annotation_file:
         tbi=temp("results/{prefix}.bcftools-annotation-source.tsv.gz.tbi"),
     conda:
         "../envs/bcftools.yaml"
-    threads: config_resources["default"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
+        mem_mb="2000",
+        qname="small",
     shell:
         "gunzip -c {input} | awk '! /#/' | cut -f 1,13 | sed 's/_/\\t/g ; s/\\//\\t/g ; s/,/\\t/g' | "
         "awk '{{OFS = \"\\t\" ; for (i = 5 ; i <= NF ; i++) print $1,$2,$3,$4,$i}}' | "
@@ -106,9 +106,9 @@ rule annotate_rsids:
         "results/{prefix}.annotated.vcf.gz",
     conda:
         "../envs/bcftools.yaml"
-    threads: config_resources["default"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
+        mem_mb="2000",
+        qname="small",
     shell:
         "bcftools annotate -a {input.annotations} -c CHROM,POS,REF,ALT,ID -O z -o {output} {input.vcf}"

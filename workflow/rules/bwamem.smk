@@ -10,10 +10,10 @@ rule samtools_index_fasta:
         "results/performance_benchmarks/samtools_index_fasta/{prefix}fasta.fai.tsv"
     conda:
         "../envs/samtools.yaml"
-    threads: config_resources["default"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
+        mem_mb="4000",
+        qname="small",
     shell:
         "samtools faidx {input}"
 
@@ -44,10 +44,10 @@ rule bwa_index:
         )
     conda:
         "../envs/{}.yaml".format(config["behaviors"]["aligner"])
-    threads: config_resources["bwa_index"]["threads"]
+    threads: 1
     resources:
-        mem_mb=config_resources["bwa_index"]["memory"],
-        qname=rc.select_queue(config_resources["bwa_index"]["queue"], config_resources["queues"]),
+        mem_mb="8000",
+        qname="small",
     shell:
         "{params.exec_name} index {input.fasta}"
 
@@ -79,7 +79,7 @@ rule bwa_map_and_sort:
         "results/performance_benchmarks/bwa_map_and_sort/{projectid}/{sampleid}_{lane}.tsv"
     params:
         exec_name=config["behaviors"]["aligner"],
-        K=config["parameters"][config["behaviors"]["aligner"]]["K"],
+        K="1000000",
         readgroup=lambda wildcards: "@RG\\tID:{}\\tSM:{}\\tLB:{}\\tPL:{}\\tPU:{}.{}.{}".format(
             "RG" + wildcards.lane,
             wildcards.sampleid,
@@ -89,16 +89,14 @@ rule bwa_map_and_sort:
             wildcards.lane,
             wildcards.sampleid,
         ),
-        tmpdir=tempDir,
+        tmpdir="temp",
     conda:
         lambda wildcards: "../envs/{}.yaml".format(config["behaviors"]["aligner"])
-    threads: config_resources["bwa_map_and_sort"]["threads"]
+    threads: 12
     resources:
-        mem_mb=config_resources["bwa_map_and_sort"]["memory"],
-        qname=rc.select_queue(
-            config_resources["bwa_map_and_sort"]["queue"], config_resources["queues"]
-        ),
-        tmpdir=tempDir,
+        mem_mb="500000",
+        qname="large",
+        tmpdir="temp",
     shell:
         "mkdir -p {params.tmpdir} && "
         '{params.exec_name} mem -t {threads} -Y -R "{params.readgroup}" -K {params.K} '
