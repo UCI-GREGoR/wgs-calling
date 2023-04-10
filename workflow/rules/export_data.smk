@@ -3,10 +3,16 @@ checkpoint generate_linker:
     From a sample logbook, generate a simple linker
     between various sample ID types
     """
-    input:
-        logbook=config["sample-logbook"],
     output:
         linker="results/export/linker.tsv",
+    params:
+        logbook=config["sample-logbook"] if "sample-logbook" in config else None,
+        sex_linker=config["sample-linking"]["sex"]
+        if "sample-linking" in config and "sex" in config["sample-linking"]
+        else None,
+        external_id_linker=config["sample-linking"]["external-ids"]
+        if "sample-linking" in config and "external-ids" in config["sample-linking"]
+        else None,
     benchmark:
         "results/performance_benchmarks/generate_linker/linker.tsv"
     conda:
@@ -16,7 +22,7 @@ checkpoint generate_linker:
         mem_mb="2000",
         qname="small",
     script:
-        "../scripts/construct_linker_from_labbook.R"
+        "../scripts/construct_linker_from_inputs.R"
 
 
 rule create_cram_export:
