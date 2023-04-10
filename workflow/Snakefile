@@ -190,5 +190,4 @@ include: "rules/somalier.smk"
 include: "rules/svaba.smk"
 include: "rules/{}.smk".format(config["behaviors"]["sv-ensemble"]["merge-tool"])
 
-include: "rules/vep.smk"
 include: "rules/verifybamid2.smk"
