@@ -32,10 +32,10 @@ rule run_mosdepth:
         T="0,10,15,20,30",
     conda:
         "../envs/mosdepth.yaml"
-    threads: 1
+    threads: config_resources["mosdepth"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["mosdepth"]["memory"],
+        qname=rc.select_queue(config_resources["mosdepth"]["queue"], config_resources["queues"]),
     shell:
         "mosdepth --threads {threads} "
         "--by {params.win_size} "

@@ -3,20 +3,26 @@ checkpoint generate_linker:
     From a sample logbook, generate a simple linker
     between various sample ID types
     """
-    input:
-        logbook=config["sample-logbook"],
     output:
         linker="results/export/linker.tsv",
+    params:
+        logbook=config["sample-logbook"] if "sample-logbook" in config else None,
+        sex_linker=config["sample-linking"]["sex"]
+        if "sample-linking" in config and "sex" in config["sample-linking"]
+        else None,
+        external_id_linker=config["sample-linking"]["external-ids"]
+        if "sample-linking" in config and "external-ids" in config["sample-linking"]
+        else None,
     benchmark:
         "results/performance_benchmarks/generate_linker/linker.tsv"
     conda:
         "../envs/r.yaml"
-    threads: 1
+    threads: config_resources["r"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["r"]["memory"],
+        qname=rc.select_queue(config_resources["r"]["queue"], config_resources["queues"]),
     script:
-        "../scripts/construct_linker_from_labbook.R"
+        "../scripts/construct_linker_from_inputs.R"
 
 
 rule create_cram_export:
@@ -37,10 +43,10 @@ rule create_cram_export:
         "results/performance_benchmarks/create_cram_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/samtools.yaml"
-    threads: 1
+    threads: config_resources["samtools"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["samtools"]["memory"],
+        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
     shell:
         "samtools reheader -c 'sed \"s/SM:{wildcards.sqid}/SM:{params.exportid}/ ; "
         "s/LB:{wildcards.sqid}/LB:{params.exportid}/ ; "
@@ -64,10 +70,10 @@ rule create_crai_export:
         "results/performance_benchmarks/create_crai_export/{prefix}.tsv"
     conda:
         "../envs/samtools.yaml"
-    threads: 4
+    threads: config_resources["samtools"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["samtools"]["memory"],
+        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
     shell:
         "samtools index -@ {threads} -o {output.crai} {input.cram}"
 
@@ -94,10 +100,10 @@ rule create_snv_gvcf_export:
         "results/performance_benchmarks/create_snv_gvcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: 1
+    threads: config_resources["bcftools"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
     shell:
         'bcftools annotate -h <(echo -e "##wgs-pipelineVersion={params.pipeline_version}\\n##reference={params.reference_build}") -O v {input} | '
         'bcftools reheader -s <(echo -e "{wildcards.sqid}\\t{params.exportid}") | '
@@ -147,10 +153,10 @@ rule create_snv_vcf_export:
         "results/performance_benchmarks/create_snv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: 1
+    threads: config_resources["bcftools"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
     shell:
         'bcftools annotate -h <(echo -e "##wgs-pipelineVersion={params.pipeline_version}\\n##reference={params.reference_build}") -O u {input} | '
         'bcftools view -i \'(FILTER = "PASS" | FILTER = ".")\' -O u | '
@@ -187,10 +193,10 @@ rule remove_snv_region_exclusions:
         "results/remove_snv_region_exclusions/{prefix}.tsv"
     conda:
         "../envs/bedtools.yaml"
-    threads: 1
+    threads: config_resources["bedtools"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["bedtools"]["memory"],
+        qname=rc.select_queue(config_resources["bedtools"]["queue"], config_resources["queues"]),
     shell:
         "bedtools intersect -a {input.vcf} -b {input.bed} -wa -v -header | bgzip -c > {output}"
 
@@ -224,10 +230,10 @@ rule create_sv_vcf_export:
         "results/performance_benchmarks/create_sv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/bcftools.yaml"
-    threads: 1
+    threads: config_resources["bcftools"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
     shell:
         'bcftools annotate -h <(echo -e "##wgs-pipelineVersion={params.pipeline_version}\\n##reference={params.reference_build}") -O v {input} | '
         'bcftools reheader -s <(echo -e "{wildcards.sqid}\\t{params.exportid}") | '
@@ -257,10 +263,10 @@ rule remove_breakends:
         remove_breakends=config["behaviors"]["sv-remove-breakends"],
     conda:
         "../envs/bcftools.yaml"
-    threads: 1
+    threads: config_resources["bcftools"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
     shell:
         'if [[ "{params.remove_breakends}" == "True" ]] ; then '
         "bcftools filter -i 'SVTYPE != \"BND\"' -O z -o {output} {input} ; else "
@@ -276,10 +282,10 @@ rule checksum:
         "results/{export_status}/{projectid}/{prefix}",
     output:
         temp("results/{export_status}/{projectid}/{prefix}.md5"),
-    threads: 1
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="1000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         "md5sum {input} | sed -r 's|  .*/([^/ ]+)$|  \\1|' > {output}"
 
@@ -454,10 +460,10 @@ rule export_data_local:
         "results/export/{projectid}/md5_checks.txt",
     params:
         export_directory=config["behaviors"]["export-directory"],
-    threads: 1
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         "{input.bash} {params.export_directory} {output}"
 
@@ -522,10 +528,10 @@ rule export_data_remote:
         else "",
     conda:
         "../envs/awscli.yaml"
-    threads: 1
+    threads: config_resources["awscli"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["awscli"]["memory"],
+        qname=rc.select_queue(config_resources["awscli"]["queue"], config_resources["queues"]),
     shell:
         'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" --include="*.crai*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/crams && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/snv_vcfs && '
@@ -566,10 +572,10 @@ rule export_fastqs_remote:
         else "",
     conda:
         "../envs/awscli.yaml"
-    threads: 1
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         'aws s3 sync {params.profile} --exclude="*" --include="*.fastq.gz" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/fastqs && '
         "touch {output}"
