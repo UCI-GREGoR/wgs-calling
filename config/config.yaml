@@ -5,7 +5,7 @@ manifest: "config/manifest.tsv"
 sample-logbook: "resources/example_logbook.xlsx.xlsx"
 sample-linking:
   sex: "config/sample_linking_sex.tsv"
-  external_ids: "config/sample_linking_external_ids.tsv"
+  external-ids: "config/sample_linking_external_ids.tsv"
 multiqc-read-config: "config/multiqc_read_config.yaml"
 multiqc-alignment-config: "config/multiqc_alignment_config.yaml"
 multiqc-calling-config: "config/multiqc_calling_config.yaml"

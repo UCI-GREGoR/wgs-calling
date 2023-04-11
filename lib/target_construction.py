@@ -187,20 +187,18 @@ def construct_fastqc_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> li
     a run of fastQC
     """
     results_prefix = "results/fastqc"
-    results_r1 = [
-        "{}/{}/{}_fastqc.zip".format(
-            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix(".fastq.gz")
-        )
-        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r1"].to_list()
-    ]
-    results_r2 = [
-        "{}/{}/{}_fastqc.zip".format(
-            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix(".fastq.gz")
-        )
-        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r2"].to_list()
-    ]
-    results_r1.extend(results_r2)
-    return list(set(results_r1))
+    results = []
+    for projectid, sampleid, lane in zip(
+        manifest["projectid"], manifest["sampleid"], manifest["lane"]
+    ):
+        if projectid == wildcards.projectid:
+            results.append(
+                "{}/{}/{}_{}_R1_001_fastqc.zip".format(results_prefix, projectid, sampleid, lane)
+            )
+            results.append(
+                "{}/{}/{}_{}_R2_001_fastqc.zip".format(results_prefix, projectid, sampleid, lane)
+            )
+    return list(set(results))
 
 
 def construct_fastqc_posttrimming_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
@@ -209,20 +207,18 @@ def construct_fastqc_posttrimming_targets(wildcards: Namedlist, manifest: pd.Dat
     a run of fastQC, for fastqs after trimming
     """
     results_prefix = "results/fastqc_posttrimming"
-    results_r1 = [
-        "{}/{}/{}_fastp_fastqc.zip".format(
-            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix("_001.fastq.gz")
-        )
-        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r1"].to_list()
-    ]
-    results_r2 = [
-        "{}/{}/{}_fastp_fastqc.zip".format(
-            results_prefix, wildcards.projectid, os.path.basename(x).removesuffix("_001.fastq.gz")
-        )
-        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r2"].to_list()
-    ]
-    results_r1.extend(results_r2)
-    return list(set(results_r1))
+    results = []
+    for projectid, sampleid, lane in zip(
+        manifest["projectid"], manifest["sampleid"], manifest["lane"]
+    ):
+        if projectid == wildcards.projectid:
+            results.append(
+                "{}/{}/{}_{}_R1_fastp_fastqc.zip".format(results_prefix, projectid, sampleid, lane)
+            )
+            results.append(
+                "{}/{}/{}_{}_R2_fastp_fastqc.zip".format(results_prefix, projectid, sampleid, lane)
+            )
+    return list(set(results))
 
 
 def construct_fastqc_combined_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
@@ -231,16 +227,12 @@ def construct_fastqc_combined_targets(wildcards: Namedlist, manifest: pd.DataFra
     a run of fastQC, but on lane-combined fastqs
     """
     results_prefix = "results/fastqc_combined"
-    results_r1 = [
-        "{}/{}/{}_R1_fastqc.zip".format(results_prefix, wildcards.projectid, x)
-        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
-    ]
-    results_r2 = [
-        "{}/{}/{}_R2_fastqc.zip".format(results_prefix, wildcards.projectid, x)
-        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
-    ]
-    results_r1.extend(results_r2)
-    return list(set(results_r1))
+    results = []
+    for projectid, sampleid in zip(manifest["projectid"], manifest["sampleid"]):
+        if projectid == wildcards.projectid:
+            results.append("{}/{}/{}_R1_fastqc.zip".format(results_prefix, projectid, sampleid))
+            results.append("{}/{}/{}_R2_fastqc.zip".format(results_prefix, projectid, sampleid))
+    return list(set(results))
 
 
 def construct_fastqc_posttrimming_combined_targets(
@@ -251,16 +243,12 @@ def construct_fastqc_posttrimming_combined_targets(
     a run of fastQC, for fastqs after trimming, but on lane-combined fastqs
     """
     results_prefix = "results/fastqc_posttrimming_combined"
-    results_r1 = [
-        "{}/{}/{}_R1_fastqc.zip".format(results_prefix, wildcards.projectid, x)
-        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
-    ]
-    results_r2 = [
-        "{}/{}/{}_R2_fastqc.zip".format(results_prefix, wildcards.projectid, x)
-        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
-    ]
-    results_r1.extend(results_r2)
-    return list(set(results_r1))
+    results = []
+    for projectid, sampleid in zip(manifest["projectid"], manifest["sampleid"]):
+        if projectid == wildcards.projectid:
+            results.append("{}/{}/{}_R1_fastqc.zip".format(results_prefix, projectid, sampleid))
+            results.append("{}/{}/{}_R2_fastqc.zip".format(results_prefix, projectid, sampleid))
+    return list(set(results))
 
 
 def construct_fastp_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
@@ -269,24 +257,15 @@ def construct_fastp_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> lis
     a run of fastp
     """
     results_prefix = "results/fastp"
-    results_r1 = [
-        "{}/{}/{}_fastp.html".format(
-            results_prefix,
-            wildcards.projectid,
-            os.path.basename(x).removesuffix(".fastq.gz").split("_R1_")[0],
-        )
-        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r1"].to_list()
-    ]
-    results_r2 = [
-        "{}/{}/{}_fastp.html".format(
-            results_prefix,
-            wildcards.projectid,
-            os.path.basename(x).removesuffix(".fastq.gz").split("_R2_")[0],
-        )
-        for x in manifest.loc[manifest["projectid"] == wildcards.projectid, "r2"].to_list()
-    ]
-    results_r1.extend(results_r2)
-    return results_r1
+    results = []
+    for projectid, sampleid, lane in zip(
+        manifest["projectid"], manifest["sampleid"], manifest["lane"]
+    ):
+        if projectid == wildcards.projectid:
+            results.append(
+                "{}/{}/{}_{}_fastp.html".format(results_prefix, projectid, sampleid, lane)
+            )
+    return list(set(results))
 
 
 def map_reference_file(wildcards: Namedlist, config: dict):
