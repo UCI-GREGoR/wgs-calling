@@ -22,6 +22,8 @@ rule combine_input_fastqs_by_lane:
         temp("results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{readgroup}.fastq.gz"),
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "{}/bcftools.sif".format(apptainer_images)
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],

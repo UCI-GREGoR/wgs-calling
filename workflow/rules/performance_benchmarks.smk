@@ -34,6 +34,8 @@ rule performance_benchmarks:
         rule_threads=lambda wildcards: get_rule_threads(workflow),
     conda:
         "../envs/r.yaml"
+    container:
+        "docker://rocker/tidyverse:latest"
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],

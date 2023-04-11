@@ -13,6 +13,8 @@ rule summarize_methods:
         config=config,
     conda:
         "../envs/python_jinja.yaml"
+    container:
+        "{}/python_jinja.sif".format(apptainer_images)
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],

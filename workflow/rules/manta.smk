@@ -24,6 +24,8 @@ rule manta_configure:
         tmpdir=expand("{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}", tempdir=tempDir),
     conda:
         "../envs/manta.yaml"
+    container:
+        "{}/manta.sif".format(apptainer_images)
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
@@ -95,6 +97,8 @@ rule manta_run:
         tmpdir=expand("{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}", tempdir=tempDir),
     conda:
         "../envs/manta.yaml"
+    container:
+        "{}/manta.sif".format(apptainer_images)
     threads: config_resources["manta"]["threads"]
     resources:
         mem_mb=config_resources["manta"]["memory"],
@@ -127,6 +131,8 @@ rule manta_sort_output:
         tmpdir=expand("{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}", tempdir=tempDir),
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "{}/bcftools.sif".format(apptainer_images)
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],

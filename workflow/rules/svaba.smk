@@ -31,6 +31,8 @@ rule svaba_run:
         outprefix="results/svaba/{projectid}/{sampleid}",
     conda:
         "../envs/svaba.yaml"
+    container:
+        "{}/svaba.sif".format(apptainer_images)
     threads: config_resources["svaba"]["threads"]
     resources:
         mem_mb=config_resources["svaba"]["memory"],
@@ -76,6 +78,8 @@ rule svaba_select_output_variants:
         "results/performance_benchmarks/svaba_select_output_variants/{projectid}/{sampleid}.svaba.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "{}/bcftools.sif".format(apptainer_images)
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
@@ -101,6 +105,8 @@ rule vcf_to_bedpe:
         "{prefix}.svaba.as_bnd.bedpe",
     conda:
         "../envs/svtools.yaml"
+    container:
+        "docker://halllab/svtools:v0.5.1"
     threads: config_resources["svtools"]["threads"]
     resources:
         mem_mb=config_resources["svtools"]["memory"],
@@ -139,6 +145,8 @@ rule bedpe_to_vcf:
         tmpdir=tempDir,
     conda:
         "../envs/svtools.yaml"
+    container:
+        "docker://halllab/svtools:v0.5.1"
     threads: config_resources["svtools"]["threads"]
     resources:
         mem_mb=config_resources["svtools"]["memory"],

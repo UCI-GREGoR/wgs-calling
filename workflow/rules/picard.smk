@@ -17,6 +17,8 @@ rule create_sequence_dictionary:
         java_args=config_resources["gatk_create_sequence_dictionary"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: config_resources["gatk_create_sequence_dictionary"]["threads"]
     resources:
         mem_mb=config_resources["gatk_create_sequence_dictionary"]["memory"],
@@ -68,6 +70,8 @@ rule mark_duplicates:
         java_args=config_resources["gatk_mark_duplicates"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: config_resources["gatk_mark_duplicates"]["threads"]
     resources:
         mem_mb=config_resources["gatk_mark_duplicates"]["memory"],
@@ -93,6 +97,8 @@ rule sort_bam:
         "results/performance_benchmarks/sort_bam/{prefix}.sort.bam.tsv"
     conda:
         "../envs/samtools.yaml"
+    container:
+        "{}/bwa.sif".format(apptainer_images)
     threads: config_resources["samtools"]["threads"]
     resources:
         mem_mb=config_resources["samtools"]["memory"],
@@ -113,6 +119,8 @@ rule samtools_create_bai:
         "results/performance_benchmarks/samtools_create_bai/{prefix}.sort.tsv"
     conda:
         "../envs/samtools.yaml"
+    container:
+        "{}/bwa.sif".format(apptainer_images)
     threads: config_resources["samtools"]["threads"]
     resources:
         mem_mb=config_resources["samtools"]["memory"],
@@ -163,6 +171,8 @@ rule picard_collectmultiplemetrics:
         metric_accumulation_level="SAMPLE",
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: config_resources["gatk_collectmultiplemetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectmultiplemetrics"]["memory"],
@@ -216,6 +226,8 @@ rule picard_collectgcbiasmetrics:
         java_args=config_resources["gatk_collectgcbiasmetrics"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: config_resources["gatk_collectgcbiasmetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectgcbiasmetrics"]["memory"],
@@ -259,6 +271,8 @@ rule picard_collectwgsmetrics:
         java_args=config_resources["gatk_collectwgsmetrics"]["java_args"],
     conda:
         "../envs/gatk4.yaml"
+    container:
+        "docker://broadinstitute/gatk:4.3.0.0"
     threads: config_resources["gatk_collectwgsmetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectwgsmetrics"]["memory"],

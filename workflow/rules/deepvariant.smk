@@ -64,6 +64,8 @@ rule deepvariant_make_examples:
             shardmax=config_resources["deepvariant"]["threads"],
         ),
         tmpdir=tempDir,
+    conda:
+        "../envs/deepvariant.yaml"
     container:
         "docker://google/deepvariant:{}".format(
             config["parameters"]["deepvariant"]["docker-version"]
@@ -193,6 +195,8 @@ rule deepvariant_combine_regions:
         "results/performance_benchmarks/deepvariant_combine_regions/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "{}/bcftools.sif".format(apptainer_images)
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],

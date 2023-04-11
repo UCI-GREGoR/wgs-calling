@@ -10,6 +10,8 @@ rule samtools_index_fasta:
         "results/performance_benchmarks/samtools_index_fasta/{prefix}fasta.fai.tsv"
     conda:
         "../envs/samtools.yaml"
+    container:
+        "{}/bwa.sif".format(apptainer_images)
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
@@ -44,6 +46,8 @@ rule bwa_index:
         )
     conda:
         "../envs/{}.yaml".format(config["behaviors"]["aligner"])
+    container:
+        "{}/{}.sif".format(apptainer_images, config["behaviors"]["aligner"])
     threads: config_resources["bwa_index"]["threads"]
     resources:
         mem_mb=config_resources["bwa_index"]["memory"],
@@ -92,6 +96,8 @@ rule bwa_map_and_sort:
         tmpdir=tempDir,
     conda:
         lambda wildcards: "../envs/{}.yaml".format(config["behaviors"]["aligner"])
+    container:
+        "{}/{}.sif".format(apptainer_images, config["behaviors"]["aligner"])
     threads: config_resources["bwa_map_and_sort"]["threads"]
     resources:
         mem_mb=config_resources["bwa_map_and_sort"]["memory"],

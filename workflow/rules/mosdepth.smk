@@ -32,6 +32,8 @@ rule run_mosdepth:
         T="0,10,15,20,30",
     conda:
         "../envs/mosdepth.yaml"
+    container:
+        "docker://brentp/mosdepth:v0.3.3"
     threads: config_resources["mosdepth"]["threads"]
     resources:
         mem_mb=config_resources["mosdepth"]["memory"],

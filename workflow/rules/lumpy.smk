@@ -20,6 +20,8 @@ rule lumpy_run:
         "results/performance_benchmarks/lumpy_run/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/smoove.yaml"
+    container:
+        "{}/smoove.sif".format(apptainer_images)
     threads: config_resources["smoove"]["threads"]
     resources:
         mem_mb=config_resources["smoove"]["memory"],

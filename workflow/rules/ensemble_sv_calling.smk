@@ -24,6 +24,8 @@ rule compare_sv_callers:
         sv_callers=config["behaviors"]["sv-callers"],
     conda:
         "../envs/r.yaml"
+    container:
+        "docker://rocker/tidyverse:latest"
     threads: config_resources["r"]["threads"]
     resources:
         mem_mb=config_resources["r"]["memory"],

@@ -20,6 +20,8 @@ rule download_reference_data:
         "results/performance_benchmarks/download_reference_data/{reference_file}.tsv"
     conda:
         "../envs/awscli.yaml"
+    container:
+        "{}/awscli.sif".format(apptainer_images)
     threads: config_resources["awscli"]["threads"]
     resources:
         mem_mb=config_resources["awscli"]["memory"],
@@ -45,6 +47,8 @@ rule index_vcf:
         "results/performance_benchmarks/index_vcf/{prefix}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "{}/bcftools.sif".format(apptainer_images)
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],

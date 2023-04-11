@@ -17,6 +17,8 @@ checkpoint generate_linker:
         "results/performance_benchmarks/generate_linker/linker.tsv"
     conda:
         "../envs/r.yaml"
+    container:
+        "docker://rocker/tidyverse:latest"
     threads: config_resources["r"]["threads"]
     resources:
         mem_mb=config_resources["r"]["memory"],
@@ -43,6 +45,8 @@ rule create_cram_export:
         "results/performance_benchmarks/create_cram_export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/samtools.yaml"
+    container:
+        "{}/bwa.sif".format(apptainer_images)
     threads: config_resources["samtools"]["threads"]
     resources:
         mem_mb=config_resources["samtools"]["memory"],
@@ -70,6 +74,8 @@ rule create_crai_export:
         "results/performance_benchmarks/create_crai_export/{prefix}.tsv"
     conda:
         "../envs/samtools.yaml"
+    container:
+        "{}/bwa.sif".format(apptainer_images)
     threads: config_resources["samtools"]["threads"]
     resources:
         mem_mb=config_resources["samtools"]["memory"],
@@ -153,6 +159,8 @@ rule create_snv_vcf_export:
         "results/performance_benchmarks/create_snv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "{}/bcftools.sif".format(apptainer_images)
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
@@ -193,6 +201,8 @@ rule remove_snv_region_exclusions:
         "results/remove_snv_region_exclusions/{prefix}.tsv"
     conda:
         "../envs/bedtools.yaml"
+    container:
+        "{}/bedtools.sif".format(apptainer_images)
     threads: config_resources["bedtools"]["threads"]
     resources:
         mem_mb=config_resources["bedtools"]["memory"],
@@ -230,6 +240,8 @@ rule create_sv_vcf_export:
         "results/performance_benchmarks/create_sv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "{}/bcftools.sif".format(apptainer_images)
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],

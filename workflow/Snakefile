@@ -60,6 +60,7 @@ if "sample-linking" in config:
 
 
 reference_build = config["genome-build"]
+apptainer_images = config["apptainer-image-dir"] if "apptainer-image-dir" in config else "."
 aligner_index_suffixes = {}
 aligner_index_suffixes["bwa"] = ["ann", "amb", "bwt", "pac", "sa"]
 aligner_index_suffixes["bwa-mem2"] = ["ann", "amb", "bwt.2bit.64", "pac", "sa"]
@@ -189,5 +190,4 @@ include: "rules/somalier.smk"
 include: "rules/svaba.smk"
 include: "rules/{}.smk".format(config["behaviors"]["sv-ensemble"]["merge-tool"])
 
-include: "rules/vep.smk"
 include: "rules/verifybamid2.smk"

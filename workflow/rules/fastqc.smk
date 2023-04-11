@@ -14,14 +14,19 @@ rule run_fastqc_pretrimming:
         "results/performance_benchmarks/run_fastqc_pretrimming/{projectid}/{prefix}_{suffix}_fastqc.tsv"
     params:
         outdir="results/fastqc/{projectid}",
+        tmpdir="temp",
     conda:
         "../envs/fastqc.yaml"
+    container:
+        "{}/fastqc.sif".format(apptainer_images)
     threads: config_resources["fastqc"]["threads"]
     resources:
         mem_mb=config_resources["fastqc"]["memory"],
         qname=rc.select_queue(config_resources["fastqc"]["queue"], config_resources["queues"]),
     shell:
-        "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
+        "mkdir -p {params.outdir} && "
+        "mkdir -p {params.tmpdir} && "
+        "fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir} -d {params.tmpdir}"
 
 
 rule run_fastqc_posttrimming:
@@ -40,14 +45,19 @@ rule run_fastqc_posttrimming:
         "results/performance_benchmarks/run_fastqc_posttrimming/{projectid}/{sampleid}_{lane}_fastp_fastqc.tsv"
     params:
         outdir="results/fastqc_posttrimming/{projectid}",
+        tmpdir="temp",
     conda:
         "../envs/fastqc.yaml"
+    container:
+        "{}/fastqc.sif".format(apptainer_images)
     threads: config_resources["fastqc"]["threads"]
     resources:
         mem_mb=config_resources["fastqc"]["memory"],
         qname=rc.select_queue(config_resources["fastqc"]["queue"], config_resources["queues"]),
     shell:
-        "mkdir -p {params.outdir} && fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir}"
+        "mkdir -p {params.outdir} && "
+        "mkdir -p {params.tmpdir} && "
+        "fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir} -d {params.tmpdir}"
 
 
 use rule run_fastqc_pretrimming as run_fastqc_pretrimming_combined with:
@@ -63,6 +73,7 @@ use rule run_fastqc_pretrimming as run_fastqc_pretrimming_combined with:
         "results/performance_benchmarks/run_fastqc_pretrimming_combined/{projectid}/{sampleid}_fastqc.tsv"
     params:
         outdir="results/fastqc_combined/{projectid}",
+        tmpdir="tmp",
 
 
 use rule run_fastqc_posttrimming as run_fastqc_posttrimming_combined with:
@@ -78,3 +89,4 @@ use rule run_fastqc_posttrimming as run_fastqc_posttrimming_combined with:
         "results/performance_benchmarks/run_fastqc_posttrimming_combined/{projectid}/{sampleid}_fastqc.tsv"
     params:
         outdir="results/fastqc_posttrimming_combined/{projectid}",
+        tmpdir="tmp",

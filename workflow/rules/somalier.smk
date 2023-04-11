@@ -20,6 +20,8 @@ rule somalier_extract:
         extract_dir="results/somalier/{projectid}/extract",
     conda:
         "../envs/somalier.yaml"
+    container:
+        "docker://brentp/somalier:v0.2.16"
     threads: config_resources["somalier"]["threads"]
     resources:
         mem_mb=config_resources["somalier"]["memory"],
@@ -48,6 +50,8 @@ rule somalier_relate:
         outprefix="results/somalier/{projectid}/relate/somalier",
     conda:
         "../envs/somalier.yaml"
+    container:
+        "docker://brentp/somalier:v0.2.16"
     threads: config_resources["somalier"]["threads"]
     resources:
         mem_mb=config_resources["somalier"]["memory"],

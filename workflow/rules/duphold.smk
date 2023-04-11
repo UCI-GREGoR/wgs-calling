@@ -27,6 +27,8 @@ rule duphold_run:
         "results/performance_benchmarks/duphold_run/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/duphold.yaml"
+    container:
+        "docker://brentp/duphold:v0.2.3"
     threads: config_resources["duphold"]["threads"]
     resources:
         mem_mb=config_resources["duphold"]["memory"],
@@ -47,6 +49,8 @@ rule duphold_apply:
         "results/performance_benchmarks/duphold_apply/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/bcftools.yaml"
+    container:
+        "{}/bcftools.sif".format(apptainer_images)
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
