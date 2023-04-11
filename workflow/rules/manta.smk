@@ -17,7 +17,7 @@ rule manta_configure:
             reference_build
         ),
     output:
-        temp("{}/manta_workdir/{projectid}/{sampleid}/runWorkflow.py".format(tempDir)),
+        temp("{}/manta_workdir/{{projectid}}/{{sampleid}}/runWorkflow.py".format(tempDir)),
     benchmark:
         "results/performance_benchmarks/manta_configure/{projectid}/{sampleid}.tsv"
     params:
