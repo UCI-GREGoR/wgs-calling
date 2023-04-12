@@ -1,5 +1,7 @@
 channels:
+  - https://raw.githubusercontent.com/lightning.auriga/conda-builds/default/conda-builds
   - bioconda
   - conda-forge
+  - main
 dependencies:
-  - deepvariant
+  - deepvariant >=1.15.10

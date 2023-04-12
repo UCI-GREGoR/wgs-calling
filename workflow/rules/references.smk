@@ -18,10 +18,6 @@ rule download_reference_data:
         lambda wildcards: tc.map_reference_file(wildcards, config),
     benchmark:
         "results/performance_benchmarks/download_reference_data/{reference_file}.tsv"
-    conda:
-        "../envs/awscli.yaml"
-    container:
-        "{}/awscli.sif".format(apptainer_images)
     threads: config_resources["awscli"]["threads"]
     resources:
         mem_mb=config_resources["awscli"]["memory"],
