@@ -538,8 +538,6 @@ rule export_data_remote:
         profile="--profile {}".format(config["behaviors"]["export-s3"]["profile-name"])
         if "profile-name" in config["behaviors"]["export-s3"]
         else "",
-    conda:
-        "../envs/awscli.yaml"
     threads: config_resources["awscli"]["threads"]
     resources:
         mem_mb=config_resources["awscli"]["memory"],
@@ -582,8 +580,6 @@ rule export_fastqs_remote:
         profile="--profile {}".format(config["behaviors"]["export-s3"]["profile-name"])
         if "profile-name" in config["behaviors"]["export-s3"]
         else "",
-    conda:
-        "../envs/awscli.yaml"
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
