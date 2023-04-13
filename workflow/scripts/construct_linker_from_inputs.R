@@ -146,6 +146,24 @@ parse.logbook <- function(input.fn) {
   res
 }
 
+#' Contextually overwrite or append linker information to an existing
+#' data frame from a simple two column id->value linker file
+#'
+#' @details
+#' If entirely new subjects are encountered in the linker file,
+#' those subjects will be appended to the existing data frame
+#' with relevant linker information in the appropriate column
+#' and NA everywhere else
+#'
+#' @param df data.frame existing linker information, to which new
+#' information will be overwritten or appended
+#' @param linker.fn character; name of simple linker file with new
+#' information to be added to the existing data frame
+#' @param target.colname character; name of column in existing data
+#' frame to which linker information will be saved. column does not
+#' necessarily need to already exist, although it is intended to
+#' @return data.frame; modified version of input data frame with
+#' new information overwritten or appended
 add.linker.data <- function(df, linker.fn, target.colname) {
   stopifnot(is.data.frame(df))
   stopifnot(
@@ -173,6 +191,16 @@ add.linker.data <- function(df, linker.fn, target.colname) {
   df
 }
 
+#' Run primary logic of this script, wrapped such that sourcing
+#' this file will not cause actual code execution.
+#'
+#' @param logbook.fn character or NULL; name of input legacy
+#' logbook file. Can be NULL, in which case it is effectively ignored
+#' @param sex.linker.fn character or NULL; name of input sex linker
+#' file. Can be NULL, in which case it is effectively ignored
+#' @param external.id.linker.fn character or NULL; name of input external
+#' ID linker file. Can be NULL, in which case it is effectively ignored
+#' @param out.fn character; name of file to which to write output linker data
 run.construct.linker <- function(logbook.fn,
                                  sex.linker.fn,
                                  external.id.linker.fn,
