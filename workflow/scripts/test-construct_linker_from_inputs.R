@@ -89,3 +89,7 @@ test_that("apply.id.mappings recognizes ad hoc 'PMGRC' replacement patterns", {
   observed <- apply.id.mappings(df, vec)
   expect_identical(expected, observed)
 })
+
+test_that("add.linker.data correctly replaces and appends data as appropriate", {
+
+})
