@@ -1,14 +1,24 @@
-if (!require(openxlsx, quietly = TRUE)) {
-  install.packages("openxlsx", repos = c(
-    "https://cran.case.edu/",
-    "http://lib.stat.cmu.edu/R/CRAN/",
-    "https://cran.yu.ac.kr/"
-  ))
-  require(openxlsx, quietly = TRUE)
-}
-library(stringr)
+library(openxlsx, quietly = TRUE)
+library(stringr, quietly = TRUE)
 
+#' Combine pmgrc (subject) ID, ls (analyte) ID, and sq (sequencing index) ID
+#' into a '_'-delimited identifier for exported data preparation.
+#'
+#' @details
+#' If any of the required columns have an NA entry for a particular subject,
+#' the entire resultant ID is set to NA.
+#'
+#' @param df data.frame; input data minimally containing columns 'pmgrc',
+#' 'ls', and 'sq'
+#' @return character vector; constructed output IDs for each row in input
+#' data.frame, or NA if any of the required inputs for the row were NA
 construct.output.stems <- function(df) {
+  stopifnot(is.data.frame(df))
+  stopifnot(
+    "input data frame contains column 'pmgrc'" = "pmgrc" %in% colnames(df),
+    "input data frame contains column 'ls'" = "ls" %in% colnames(df),
+    "input data frame contains column 'sq'" = "sq" %in% colnames(df)
+  )
   ## try to construct IDs of the format PMGRCID_LSID_SQID
   output.stems <- paste(df$pmgrc, df$ls, df$sq, sep = "_")
   output.stems[is.na(df$pmgrc) | is.na(df$ls) | is.na(df$sq)] <- NA
