@@ -46,6 +46,9 @@ construct.output.stems <- function(df) {
 #' @return character vector, mapped version of input character vector
 #' with ID relabelings applied
 apply.id.mappings <- function(df, vec) {
+  stopifnot(is.data.frame(df))
+  stopifnot(is.character(vec))
+  stopifnot("input vector should represent subject ID column of data frame" = nrow(df) == length(vec))
   known.patterns <- c("^SAMPLE SWAP.*this is actually (PMGRC-\\d+-\\d+-\\d).*$" = "\\1")
   for (i in seq_len(ncol(df))) {
     new.ids <- rep(NA, length(vec))
@@ -64,6 +67,14 @@ apply.id.mappings <- function(df, vec) {
 }
 
 parse.logbook <- function(input.fn, output.fn) {
+  stopifnot(
+    is.character(input.fn),
+    length(input.fn) == 1
+  )
+  stopifnot(
+    is.character(output.fn),
+    length(output.fn) == 1
+  )
   sheet.names <- openxlsx::getSheetNames(input.fn)
   subject.id <- c()
   jira.tickets <- c()
@@ -124,6 +135,12 @@ parse.logbook <- function(input.fn, output.fn) {
 }
 
 add.linker.data <- function(df, linker.fn, target.colname) {
+  stopifnot(is.data.frame(df))
+  stopifnot(
+    is.character(linker.fn),
+    length(linker.fn) == 1
+  )
+  stopifnot(is.character(target.colname))
   linker.df <- read.table(linker.fn, header = TRUE, sep = "\t", quote = "", comment.char = "", stringsAsFactors = FALSE)
   rownames(linker.df) <- linker.df[, 1]
   ## handle the situation where people not yet present are being added here
@@ -148,6 +165,22 @@ run.construct.linker <- function(logbook.fn,
                                  sex.linker.fn,
                                  external.id.linker.fn,
                                  out.fn) {
+  stopifnot(
+    is.character(logbook.fn) || is.null(logbook.fn),
+    length(logbook.fn) <= 1
+  )
+  stopifnot(
+    is.character(sex.linker.fn) || is.null(sex.linker.fn),
+    length(sex.linker.fn) <= 1
+  )
+  stopifnot(
+    is.character(external.id.linker.fn) || is.null(external.id.linker.fn),
+    length(external.id.linker.fn) <= 1
+  )
+  stopifnot(
+    is.character(out.fn),
+    length(out.fn) == 1
+  )
   df <- data.frame(
     subject = c("A"),
     jira = c("A"),
