@@ -8,7 +8,7 @@ if (!isClass("snakemake.s4")) {
 source("construct_linker_from_inputs.R")
 
 linker.df <- data.frame(
-  pmgrc = c(
+  subject = c(
     "internalid1", "internalid2",
     "internalid3", "internalid4",
     NA, "internalid6"
@@ -53,9 +53,9 @@ test_that("construct.output.stems can construct IDs from valid input data", {
   expect_identical(expected.out, observed.out)
 })
 
-test_that("construct.output.stems detects the absence of the required pmgrc column", {
+test_that("construct.output.stems detects the absence of the required subject column", {
   broken.linker <- linker.df
-  broken.linker$pmgrc <- NULL
+  broken.linker$subject <- NULL
   expect_error(construct.output.stems(broken.linker))
 })
 

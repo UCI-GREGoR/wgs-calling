@@ -1,27 +1,27 @@
 library(openxlsx, quietly = TRUE)
 library(stringr, quietly = TRUE)
 
-#' Combine pmgrc (subject) ID, ls (analyte) ID, and sq (sequencing index) ID
+#' Combine subject ID, ls (analyte) ID, and sq (sequencing index) ID
 #' into a '_'-delimited identifier for exported data preparation.
 #'
 #' @details
 #' If any of the required columns have an NA entry for a particular subject,
 #' the entire resultant ID is set to NA.
 #'
-#' @param df data.frame; input data minimally containing columns 'pmgrc',
+#' @param df data.frame; input data minimally containing columns 'subject',
 #' 'ls', and 'sq'
 #' @return character vector; constructed output IDs for each row in input
 #' data.frame, or NA if any of the required inputs for the row were NA
 construct.output.stems <- function(df) {
   stopifnot(is.data.frame(df))
   stopifnot(
-    "input data frame contains column 'pmgrc'" = "pmgrc" %in% colnames(df),
+    "input data frame contains column 'subject'" = "subject" %in% colnames(df),
     "input data frame contains column 'ls'" = "ls" %in% colnames(df),
     "input data frame contains column 'sq'" = "sq" %in% colnames(df)
   )
-  ## try to construct IDs of the format PMGRCID_LSID_SQID
-  output.stems <- paste(df$pmgrc, df$ls, df$sq, sep = "_")
-  output.stems[is.na(df$pmgrc) | is.na(df$ls) | is.na(df$sq)] <- NA
+  ## try to construct IDs of the format SUBJECTID_LSID_SQID
+  output.stems <- paste(df$subject, df$ls, df$sq, sep = "_")
+  output.stems[is.na(df$subject) | is.na(df$ls) | is.na(df$sq)] <- NA
   output.stems
 }
 
@@ -31,7 +31,7 @@ construct.output.stems <- function(df) {
 #' notes along the lines of
 #' "SAMPLE SWAP - this is actually PMGRC-\d+-\d+-\d" that
 #' only exist in freetext in rows that are labeled by
-#' _unmapped_ PMGRC ID. For downstream analysis, these ID
+#' _unmapped_ subject ID. For downstream analysis, these ID
 #' mappings must be detected and applied. To make things
 #' even more confusing, there doesn't appear to be any sense
 #' to which columns of the logbook this information is reported in.
@@ -41,7 +41,7 @@ construct.output.stems <- function(df) {
 #' are detected.
 #'
 #' @param df data.frame, input logbook sheet from read.xlsx
-#' @param vec character vector, vector of actual PMGRC IDs from
+#' @param vec character vector, vector of actual subject IDs from
 #' current sheet
 #' @return character vector, mapped version of input character vector
 #' with ID relabelings applied
@@ -65,7 +65,7 @@ apply.id.mappings <- function(df, vec) {
 
 parse.logbook <- function(input.fn, output.fn) {
   sheet.names <- openxlsx::getSheetNames(input.fn)
-  pmgrc.id <- c()
+  subject.id <- c()
   jira.tickets <- c()
   sq.id <- c()
   ls.id <- c()
@@ -74,9 +74,9 @@ parse.logbook <- function(input.fn, output.fn) {
   for (sheet.name in sheet.names) {
     df <- openxlsx::read.xlsx(input.fn, sheet = sheet.name, check.names = FALSE)
     colnames(df) <- tolower(colnames(df))
-    if (colnames(df)[1] == "pmgrc.id") {
+    if (colnames(df)[1] == "subject.id") {
       ## resolve chaos
-      pmgrc.col <- 1
+      subject.col <- 1
       jira.col <- which(stringr::str_detect(colnames(df), "jira\\.ticket\\.for\\.batches\\.in\\.flight"))
       sq.col <- which(stringr::str_detect(colnames(df), "sq\\.id"))
       ls.col <- which(stringr::str_detect(colnames(df), "ls\\.id"))
@@ -92,9 +92,9 @@ parse.logbook <- function(input.fn, output.fn) {
       ## subject needs to have an ID update applied to it. for some IDs, this information
       ## is not recorded but rather just applied without annotation. It's not clear what
       ## governs the difference between those two situations
-      df[, pmgrc.col] <- apply.id.mappings(df, df[, pmgrc.col])
+      df[, subject.col] <- apply.id.mappings(df, df[, subject.col])
       for (row.num in seq_len(nrow(df))) {
-        pmgrc.id <- c(pmgrc.id, df[row.num, pmgrc.col])
+        subject.id <- c(subject.id, df[row.num, subject.col])
         jira.tickets <- c(jira.tickets, df[row.num, jira.col])
         sq.id <- c(sq.id, df[row.num, sq.col])
         ls.id <- c(ls.id, df[row.num, ls.col])
@@ -108,7 +108,7 @@ parse.logbook <- function(input.fn, output.fn) {
     }
   }
   res <- data.frame(
-    pmgrc = pmgrc.id,
+    subject = subject.id,
     jira = jira.tickets,
     ru = ru.id,
     sq = sq.id,
@@ -127,10 +127,10 @@ add.linker.data <- function(df, linker.fn, target.colname) {
   linker.df <- read.table(linker.fn, header = TRUE, sep = "\t", quote = "", comment.char = "", stringsAsFactors = FALSE)
   rownames(linker.df) <- linker.df[, 1]
   ## handle the situation where people not yet present are being added here
-  new.subjects <- linker.df[!(linker.df[, 1] %in% df$pmgrc), 1]
+  new.subjects <- linker.df[!(linker.df[, 1] %in% df$subject), 1]
   if (length(new.subjects) > 0) {
     new.df <- data.frame(
-      pmgrc = new.subjects,
+      subject = new.subjects,
       jira = NA,
       ru = NA,
       sq = NA,
@@ -140,7 +140,7 @@ add.linker.data <- function(df, linker.fn, target.colname) {
     )
     df <- rbind(df, new.df)
   }
-  df[, target.colname] <- linker.df[df[, "pmgrc"], 2]
+  df[, target.colname] <- linker.df[df[, "subject"], 2]
   df
 }
 
@@ -149,7 +149,7 @@ run.construct.linker <- function(logbook.fn,
                                  external.id.linker.fn,
                                  out.fn) {
   df <- data.frame(
-    pmgrc = c("A"),
+    subject = c("A"),
     jira = c("A"),
     ru <- c("A"),
     sq <- c("A"),

@@ -5,7 +5,7 @@ localrules:
 
 rule multiqc_link_ids:
     """
-    Link SQ IDs to PMGRC IDs for user convenience in multiqc reports
+    Link SQ IDs to subject IDs for user convenience in multiqc reports
     """
     input:
         "results/export/linker.tsv",
@@ -17,7 +17,7 @@ rule multiqc_link_ids:
 
 rule multiqc_link_ids_index_sortorder:
     """
-    Link SQ IDs to PMGRC IDs for user convenience in multiqc reports,
+    Link SQ IDs to subject IDs for user convenience in multiqc reports,
     but due to user feedback, have it be sorted by SQ index code instead
     of study ID.
     """

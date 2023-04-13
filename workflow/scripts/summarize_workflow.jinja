@@ -203,7 +203,7 @@ criteria: {{ ensemble_filtering_criteria|join("; ") }}.
 
 ### Aligned Reads
 
-Aligned bam files are mapped to generic sample IDs {PMGRCID_LSID_SQID} and converted to lossless crams.
+Aligned bam files are mapped to generic sample IDs and converted to lossless crams.
 For recordkeeping, this pipeline's version is added to the bam header as a comment (@CO) tag.
 For additional recordkeeping, the source path for the input reference fasta used for this pipeline
 is also added to the cram header. For posterity, that same information is reported here:
@@ -211,7 +211,7 @@ is also added to the cram header. For posterity, that same information is report
 
 ### SNV Calls
 
-SNV VCFs are mapped to generic sample IDs {PMGRCID_LSID_SQID}, both in filename and in vcf sample header.
+SNV VCFs are mapped to generic sample IDs, both in filename and in vcf sample header.
 SNVs are filtered based on the following criteria (derived from [Pedersen _et al._](https://doi.org/10.1038/s41525-021-00227-3)):
 
   - filter status PASS
