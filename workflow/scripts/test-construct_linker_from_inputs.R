@@ -70,3 +70,22 @@ test_that("construct.output.stems detects the absence of the required sq column"
   broken.linker$sq <- NULL
   expect_error(construct.output.stems(broken.linker))
 })
+
+test_that("apply.id.mappings recognizes ad hoc 'PMGRC' replacement patterns", {
+  df <- data.frame(
+    c(NA, "some filler text", "SAMPLE SWAP: this is actually PMGRC-123-456-7", "more filler text", NA),
+    c("some filler text", "SAMPLE SWAP: this is actually PMGRC-987-654-3", NA, "more filler text", NA),
+    c("some filler text", "more filler text", "even more filler text", "final filler text", NA),
+    c(NA, NA, NA, NA, NA)
+  )
+  vec <- c("PMGRC-1-2-3", "PMGRC-4-5-6", "PMGRC-7-8-9", "PMGRC-11-22-3", "PMGRC-44-55-6")
+  expected <- c(
+    "PMGRC-1-2-3",
+    "PMGRC-987-654-3",
+    "PMGRC-123-456-7",
+    "PMGRC-11-22-3",
+    "PMGRC-44-55-6"
+  )
+  observed <- apply.id.mappings(df, vec)
+  expect_identical(expected, observed)
+})
