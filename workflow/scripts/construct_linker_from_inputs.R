@@ -66,14 +66,26 @@ apply.id.mappings <- function(df, vec) {
   vec
 }
 
-parse.logbook <- function(input.fn, output.fn) {
+#' Parse legacy manual logbook data, attempt to minimally standardize,
+#' and convert into some sort of useful format.
+#'
+#' @description
+#' For legacy support with work performed at Invitae, this function supports
+#' input in the form of a manually annotated Excel document created by lab
+#' staff. The format largely defies description, and varies from tab to tab.
+#' For any future applications, this functionality should _never_ be used;
+#' rather, input information should be provided via the data type-specific
+#' linker files.
+#'
+#' @param input.fn character; name of spreadsheet containing logbook data.
+#' In practical use, this was a local copy pulled from a google sheet,
+#' to make individual runs of the workflow comparatively resilient to the
+#' mercurial changes of the file upstream.
+#' @return data.frame; formatted linker data
+parse.logbook <- function(input.fn) {
   stopifnot(
     is.character(input.fn),
     length(input.fn) == 1
-  )
-  stopifnot(
-    is.character(output.fn),
-    length(output.fn) == 1
   )
   sheet.names <- openxlsx::getSheetNames(input.fn)
   subject.id <- c()
