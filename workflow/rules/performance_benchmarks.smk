@@ -35,7 +35,7 @@ rule performance_benchmarks:
     conda:
         "../envs/r.yaml"
     container:
-        "docker://rocker/tidyverse:latest"
+        "{}/r.sif".format(apptainer_images)
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],

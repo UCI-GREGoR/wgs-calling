@@ -25,7 +25,7 @@ rule compare_sv_callers:
     conda:
         "../envs/r.yaml"
     container:
-        "docker://rocker/tidyverse:latest"
+        "{}/r.sif".format(apptainer_images)
     threads: config_resources["r"]["threads"]
     resources:
         mem_mb=config_resources["r"]["memory"],
