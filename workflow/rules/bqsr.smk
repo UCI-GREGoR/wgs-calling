@@ -30,7 +30,7 @@ rule bqsr_base_recalibrator:
     conda:
         "../envs/gatk4.yaml"
     container:
-        "docker://broadinstitute/gatk:4.3.0.0"
+        "{}/gatk4.sif".format(apptainer_images)
     threads: config_resources["gatk_bqsr_base_recalibrator"]["threads"]
     resources:
         mem_mb=config_resources["gatk_bqsr_base_recalibrator"]["memory"],
@@ -76,7 +76,7 @@ rule bqsr_apply_bqsr:
     conda:
         "../envs/gatk4.yaml"
     container:
-        "docker://broadinstitute/gatk:4.3.0.0"
+        "{}/gatk4.sif".format(apptainer_images)
     threads: config_resources["gatk_bqsr_apply_bqsr"]["threads"]
     resources:
         mem_mb=config_resources["gatk_bqsr_apply_bqsr"]["memory"],
