@@ -229,6 +229,62 @@ def test_construct_fastqc_targets(wildcards_without_lane, standard_manifest):
     assert observed == expected
 
 
+def test_construct_fastqc_posttrimming_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_fastqc_posttrimming_targets can determine
+    the output files of fastqc on fastp-trimmed R1/R2 fastq.gz files.
+    """
+    expected = expand(
+        "results/fastqc_posttrimming/PROJ1/{sname}_{lname}_{readname}_fastp_fastqc.zip",
+        sname=["SAM1", "SAM2", "SAM3"],
+        lname=["L001", "L002"],
+        readname=["R1", "R2"],
+    )
+    observed = tc.construct_fastqc_posttrimming_targets(wildcards_without_lane, standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
+
+
+def test_construct_fastqc_combined_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_fastqc_combined_targets can determine
+    the output files of fastqc on input R1/R2 fastq.gz files,
+    but combined across lanes.
+    """
+    expected = expand(
+        "results/fastqc_combined/PROJ1/{sname}_{readname}_fastqc.zip",
+        sname=["SAM1", "SAM2", "SAM3"],
+        readname=["R1", "R2"],
+    )
+    observed = tc.construct_fastqc_combined_targets(wildcards_without_lane, standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
+
+
+def test_construct_fastqc_posttrimming_combined_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_fastqc_posttrimming_combined_targets can determine
+    the output files of fastqc on fastp-trimmed R1/R2 fastq.gz files, after
+    combining across lanes.
+    """
+    expected = expand(
+        "results/fastqc_posttrimming_combined/PROJ1/{sname}_{readname}_fastqc.zip",
+        sname=["SAM1", "SAM2", "SAM3"],
+        readname=["R1", "R2"],
+    )
+    observed = tc.construct_fastqc_posttrimming_combined_targets(
+        wildcards_without_lane, standard_manifest
+    )
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
+
+
 def test_construct_fastp_targets(wildcards_without_lane, standard_manifest):
     """
     Test that construct_fastp_targets can determine
