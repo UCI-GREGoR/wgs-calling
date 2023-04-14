@@ -182,4 +182,6 @@ def test_construct_nonexport_files(
     observed = ed.construct_nonexport_files(
         nonexport_wildcards, manifest_data, linker_checkpoints, suffix
     )
+    print(expected)
+    print(observed)
     assert expected == observed

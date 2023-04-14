@@ -41,19 +41,8 @@ def construct_nonexport_files(
     linker_fn = checkpoints.generate_linker.get().output[0]
     linker_df = pd.read_csv(linker_fn, sep="\t")
     subjectids = manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
-    targets = linker_df.loc[
-        (linker_df["ru"] == wildcards.projectid) & [x in subjectids for x in linker_df["sq"]],
-        "output",
-    ]
-    nonexport_targets = []
-    for subjectid in subjectids:
-        in_targets = False
-        for target in targets.to_list():
-            if subjectid in target:
-                in_targets = True
-                break
-        if not in_targets:
-            nonexport_targets.append(subjectid)
+    targets = linker_df.loc[linker_df["ru"] == wildcards.projectid, "sq"].to_list()
+    nonexport_targets = [subject for subject in subjectids if subject not in targets]
     res = expand(
         "results/nonexport/{projectid}/{file_prefix}.{file_suffix}",
         projectid=wildcards.projectid,
