@@ -160,6 +160,9 @@ def test_construct_snv_targets(standard_config, standard_manifest):
     expected = [
         "results/deepvariant/PROJ1/{}.sorted.vcf.gz".format(x) for x in ["SAM1", "SAM2", "SAM3"]
     ]
+    expected.extend(
+        ["results/deepvariant/PROJ1/{}.sorted.g.vcf.gz".format(x) for x in ["SAM1", "SAM2", "SAM3"]]
+    )
     observed = tc.construct_snv_targets(standard_config, standard_manifest)
     ## this function is used for snakemake target population, so order is irrelevant
     expected.sort()
@@ -214,8 +217,9 @@ def test_construct_fastqc_targets(wildcards_without_lane, standard_manifest):
     the output files of fastqc on input R1/R2 fastq.gz files.
     """
     expected = expand(
-        "results/fastqc/PROJ1/fn{fnum}_{readname}_fastqc.zip",
-        fnum=[i + 1 for i in range(6)],
+        "results/fastqc/PROJ1/{sname}_{lname}_{readname}_001_fastqc.zip",
+        sname=["SAM1", "SAM2", "SAM3"],
+        lname=["L001", "L002"],
         readname=["R1", "R2"],
     )
     observed = tc.construct_fastqc_targets(wildcards_without_lane, standard_manifest)
@@ -231,9 +235,9 @@ def test_construct_fastp_targets(wildcards_without_lane, standard_manifest):
     the output files of fastp on input R1/R2 fastq.gz files.
     """
     expected = expand(
-        "results/fastp/PROJ1/fn{fnum}_{readname}_fastp.html",
-        fnum=[i + 1 for i in range(6)],
-        readname=["R1", "R2"],
+        "results/fastp/PROJ1/{sname}_{lname}_fastp.html",
+        sname=["SAM1", "SAM2", "SAM3"],
+        lname=["L001", "L002"],
     )
     observed = tc.construct_fastp_targets(wildcards_without_lane, standard_manifest)
     ## this function is used for snakemake target population, so order is irrelevant
