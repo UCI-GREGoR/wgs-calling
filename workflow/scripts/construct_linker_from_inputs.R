@@ -239,7 +239,7 @@ run.construct.linker <- function(logbook.fn,
   if (!is.null(external.id.linker.fn)) {
     df <- add.linker.data(df, external.id.linker.fn, "output")
   }
-  write.table(res, output.fn, row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+  write.table(df, output.fn, row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 }
 
 if (exists("snakemake")) {
