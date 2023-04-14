@@ -12,14 +12,6 @@ from lib import export_data as ed
 
 
 @pytest.fixture
-def common_tmpdir(tmp_path):
-    """
-    Construct a temporary directory into which test files can be emitted
-    """
-    return tmp_path
-
-
-@pytest.fixture
 def manifest_data() -> pd.DataFrame:
     """
     Construct example manifest data in a pandas DataFrame

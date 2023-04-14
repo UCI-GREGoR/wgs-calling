@@ -330,3 +330,52 @@ def test_map_reference_file_url(wildcards_url_reference, standard_config):
     expected = "https://my.calling-ranges"
     observed = tc.map_reference_file(wildcards_url_reference, standard_config)
     assert observed == expected
+
+
+@pytest.fixture
+def caller_interval_file_size():
+    """
+    For stability reasons, define the number of fake calling ranges
+    exactly once
+    """
+    return 20
+
+
+@pytest.fixture
+def caller_interval_file(common_tmpdir, caller_interval_file_size):
+    """
+    Create a temporary file containing fake interval data,
+    and return its name and path
+    """
+    fn = common_tmpdir / "shallowvariant-calling-ranges.tsv"
+    with open(fn, "w") as f:
+        f.writelines([str(i) + "\n" for i in range(caller_interval_file_size)])
+    return fn
+
+
+@pytest.fixture
+def caller_interval_config(caller_interval_file):
+    """
+    Create a config structure with a local caller interval file
+    """
+    res = {
+        "genome-build": "hg002",
+        "behaviors": {"snv-caller": "shallowvariant"},
+        "shallowvariant": {
+            "hg001": {"calling-ranges": "fake_fn.tsv"},
+            "hg002": {"calling-ranges": caller_interval_file},
+        },
+    }
+    return res
+
+
+def test_caller_interval_file_count(caller_interval_config, caller_interval_file_size):
+    """
+    Test the rather silly function for counting the number of configured
+    caller interval files
+    """
+    ## the conftest config structure has a fake remote interval file,
+    ## so we need to use a different one specific to this test
+    expected = caller_interval_file_size
+    observed = tc.caller_interval_file_count(caller_interval_config)
+    assert expected == observed
