@@ -18,7 +18,7 @@ checkpoint generate_linker:
     conda:
         "../envs/r.yaml"
     container:
-        "docker://rocker/tidyverse:latest"
+        "{}/r.sif".format(apptainer_images)
     threads: config_resources["r"]["threads"]
     resources:
         mem_mb=config_resources["r"]["memory"],
@@ -471,7 +471,9 @@ rule export_data_local:
     output:
         "results/export/{projectid}/md5_checks.txt",
     params:
-        export_directory=config["behaviors"]["export-directory"],
+        export_directory=config["behaviors"]["export-directory"]
+        if "export-directory" in config["behaviors"]
+        else "",
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
