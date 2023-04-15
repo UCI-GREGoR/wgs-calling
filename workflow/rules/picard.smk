@@ -18,7 +18,7 @@ rule create_sequence_dictionary:
     conda:
         "../envs/gatk4.yaml"
     container:
-        "docker://broadinstitute/gatk:4.3.0.0"
+        "{}/gatk4.sif".format(apptainer_images)
     threads: config_resources["gatk_create_sequence_dictionary"]["threads"]
     resources:
         mem_mb=config_resources["gatk_create_sequence_dictionary"]["memory"],
@@ -71,11 +71,13 @@ rule mark_duplicates:
     conda:
         "../envs/gatk4.yaml"
     container:
-        "docker://broadinstitute/gatk:4.3.0.0"
+        "{}/gatk4.sif".format(apptainer_images)
     threads: config_resources["gatk_mark_duplicates"]["threads"]
     resources:
         mem_mb=config_resources["gatk_mark_duplicates"]["memory"],
-        qname=config_resources["gatk_mark_duplicates"]["queue"],
+        qname=rc.select_queue(
+            config_resources["gatk_mark_duplicates"]["queue"], config_resources["queues"]
+        ),
         tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "
@@ -172,7 +174,7 @@ rule picard_collectmultiplemetrics:
     conda:
         "../envs/gatk4.yaml"
     container:
-        "docker://broadinstitute/gatk:4.3.0.0"
+        "{}/gatk4.sif".format(apptainer_images)
     threads: config_resources["gatk_collectmultiplemetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectmultiplemetrics"]["memory"],
@@ -227,7 +229,7 @@ rule picard_collectgcbiasmetrics:
     conda:
         "../envs/gatk4.yaml"
     container:
-        "docker://broadinstitute/gatk:4.3.0.0"
+        "{}/gatk4.sif".format(apptainer_images)
     threads: config_resources["gatk_collectgcbiasmetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectgcbiasmetrics"]["memory"],
@@ -272,7 +274,7 @@ rule picard_collectwgsmetrics:
     conda:
         "../envs/gatk4.yaml"
     container:
-        "docker://broadinstitute/gatk:4.3.0.0"
+        "{}/gatk4.sif".format(apptainer_images)
     threads: config_resources["gatk_collectwgsmetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectwgsmetrics"]["memory"],

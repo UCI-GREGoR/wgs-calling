@@ -26,7 +26,7 @@ rule run_fastqc_pretrimming:
     shell:
         "mkdir -p {params.outdir} && "
         "mkdir -p {params.tmpdir} && "
-        "fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir} -d {params.tmpdir}"
+        "fastqc --threads {threads} --outdir {params.outdir} --dir {params.tmpdir} {input.r1} {input.r2}"
 
 
 rule run_fastqc_posttrimming:
@@ -57,7 +57,7 @@ rule run_fastqc_posttrimming:
     shell:
         "mkdir -p {params.outdir} && "
         "mkdir -p {params.tmpdir} && "
-        "fastqc --threads {threads} {input.r1} {input.r2} --outdir {params.outdir} -d {params.tmpdir}"
+        "fastqc --threads {threads} --outdir {params.outdir} --dir {params.tmpdir} {input.r1} {input.r2}"
 
 
 use rule run_fastqc_pretrimming as run_fastqc_pretrimming_combined with:

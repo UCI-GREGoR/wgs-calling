@@ -233,7 +233,7 @@ This rule is executed by running `snakemake -j1 export_data`. This rule has the 
 If the above assumptions are met, the rule will do the following:
 
 - construct a subdirectory under `export-directory` named `{JIRA ticket}/{flowcell ID}`
-- move all `PMGRC-.*` files from `results/export` to that directory
+- move all `*vcf.gz*` and `*cram*` files from `results/export` to that directory
 - move the methods summary from `results/export` to that directory
 - edit the checksum files that were in `results/export` to no longer contain the relative paths specific to the workflow results directory structure
 - run `md5sum -c` on all files with checksums (cram, crai, vcf.gz, tbi) and report the results to `results/export/md5_checks.txt`

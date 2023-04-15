@@ -4,6 +4,14 @@ from snakemake.io import Namedlist
 
 
 @pytest.fixture
+def common_tmpdir(tmp_path):
+    """
+    Construct a temporary directory into which test files can be emitted
+    """
+    return tmp_path
+
+
+@pytest.fixture
 def wildcards_with_lane():
     """
     snakemake wildcards for testing steps that require specific behaviors per-lane
