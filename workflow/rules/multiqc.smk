@@ -34,9 +34,11 @@ rule run_multiqc_fastq:
     Run multiqc on fastqc and fastp output for input fastqs
     """
     input:
-        fastqc=lambda wildcards: tc.construct_fastqc_targets(wildcards, manifest),
-        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_targets(
-            wildcards, manifest
+        fastqc=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc", "001_fastqc", True
+        ),
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         multiqc_config=config["multiqc-read-config"],
@@ -76,9 +78,11 @@ rule run_multiqc_fastq:
 
 use rule run_multiqc_fastq as run_multiqc_fastq_index_sortorder with:
     input:
-        fastqc=lambda wildcards: tc.construct_fastqc_targets(wildcards, manifest),
-        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_targets(
-            wildcards, manifest
+        fastqc=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc", "001_fastqc", True
+        ),
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         multiqc_config=config["multiqc-read-config"],
@@ -99,10 +103,12 @@ rule run_multiqc_alignment:
     Run multiqc on all steps up to but not including variant calling
     """
     input:
-        fastqc=lambda wildcards: tc.construct_fastqc_combined_targets(wildcards, manifest),
+        fastqc=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_combined", "fastqc", False
+        ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
-        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_combined_targets(
-            wildcards, manifest
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_posttrimming_combined", "fastqc", False
         ),
         verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
         alignstats=tc.construct_combined_alignstats_targets,
@@ -161,10 +167,12 @@ rule run_multiqc_alignment:
 
 use rule run_multiqc_alignment as run_multiqc_alignment_index_sortorder with:
     input:
-        fastqc=lambda wildcards: tc.construct_fastqc_combined_targets(wildcards, manifest),
+        fastqc=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_combined", "fastqc", False
+        ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
-        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_combined_targets(
-            wildcards, manifest
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_posttrimming_combined", "fastqc", False
         ),
         verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
         alignstats=tc.construct_combined_alignstats_targets,
