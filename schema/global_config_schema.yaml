@@ -27,6 +27,9 @@ properties:
   behaviors:
     type: object
     properties:
+      use-containers:
+        type: boolean
+        default: no
       aligner:
         type: string
         pattern: "^bwa-mem2$|^bwa$"

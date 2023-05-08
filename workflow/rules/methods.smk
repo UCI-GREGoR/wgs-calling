@@ -12,9 +12,9 @@ rule summarize_methods:
     params:
         config=config,
     conda:
-        "../envs/python_jinja.yaml"
+        "../envs/python_jinja.yaml" if not use_containers else None
     container:
-        "{}/python_jinja.sif".format(apptainer_images)
+        "{}/python_jinja.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],

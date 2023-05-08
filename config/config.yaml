@@ -13,6 +13,7 @@ genome-build: "grch38"
 apptainer-image-dir: "apptainer_images"
 
 behaviors:
+  use-containers: no
   aligner: "bwa"
   snv-caller: "deepvariant"
   sv-callers:

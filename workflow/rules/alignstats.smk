@@ -12,9 +12,9 @@ rule run_alignstats:
     params:
         min_qual=20,
     conda:
-        "../envs/alignstats.yaml"
+        "../envs/alignstats.yaml" if not use_containers else None
     container:
-        "{}/alignstats.sif".format(apptainer_images)
+        "{}/alignstats.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["alignstats"]["threads"]
     resources:
         mem_mb=config_resources["alignstats"]["memory"],

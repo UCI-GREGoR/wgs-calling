@@ -21,9 +21,9 @@ rule combine_input_fastqs_by_lane:
     output:
         temp("results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{readgroup}.fastq.gz"),
     conda:
-        "../envs/bcftools.yaml"
+        "../envs/bcftools.yaml" if not use_containers else None
     container:
-        "{}/bcftools.sif".format(apptainer_images)
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
