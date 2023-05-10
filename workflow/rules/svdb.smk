@@ -12,9 +12,9 @@ rule merge_sv_vcfs:
     benchmark:
         "results/performance_benchmarks/merge_sv_vcfs/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/svdb.yaml"
+        "../envs/svdb.yaml" if not use_containers else None
     container:
-        "{}/svdb.sif".format(apptainer_images)
+        "{}/svdb.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["svdb"]["threads"]
     resources:
         mem_mb=config_resources["svdb"]["memory"],
@@ -48,9 +48,9 @@ rule ensemble_sv_vcf:
     benchmark:
         "results/performance_benchmarks/ensemble_sv_vcf/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/bcftools.yaml"
+        "../envs/bcftools.yaml" if not use_containers else None
     container:
-        "{}/bcftools.sif".format(apptainer_images)
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
@@ -71,9 +71,9 @@ rule summarize_sv_variant_sources:
     benchmark:
         "results/performance_benchmarks/summarize_sv_variant_sources/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/bcftools.yaml"
+        "../envs/bcftools.yaml" if not use_containers else None
     container:
-        "{}/bcftools.sif".format(apptainer_images)
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],

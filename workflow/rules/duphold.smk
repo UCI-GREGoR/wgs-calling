@@ -26,9 +26,9 @@ rule duphold_run:
     benchmark:
         "results/performance_benchmarks/duphold_run/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/duphold.yaml"
+        "../envs/duphold.yaml" if not use_containers else None
     container:
-        "docker://brentp/duphold:v0.2.3"
+        "docker://brentp/duphold:v0.2.3" if use_containers else None
     threads: config_resources["duphold"]["threads"]
     resources:
         mem_mb=config_resources["duphold"]["memory"],
@@ -48,9 +48,9 @@ rule duphold_apply:
     benchmark:
         "results/performance_benchmarks/duphold_apply/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/bcftools.yaml"
+        "../envs/bcftools.yaml" if not use_containers else None
     container:
-        "{}/bcftools.sif".format(apptainer_images)
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],

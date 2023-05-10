@@ -36,6 +36,7 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `multiqc-calling-config`: relative path to configuration settings for post-calling multiQC report
 - `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
 - `behaviors`: user-configurable modifiers to how the pipeline will run
+  - `use-containers`: whether to, when possible, use either the docker or singularity image for each rule, or instead the rule-specific conda environment. See discussion below for how to choose this setting, and how it interacts with snakemake invocations.
   - `aligner`: which alignment tool to use. permitted values: `bwa-mem2`
   - `snv-caller`: which calling tool to use for SNVs. permitted values: `deepvariant`
   - `sv-callers`: which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`
@@ -145,7 +146,7 @@ Execute the workflow locally via
 
 using `$N` cores or run it in a cluster environment via
 
-    snakemake --use-conda --profile sge-profile --cluster-config config/cluster.yaml --jobs 100
+    snakemake --use-conda --use-singularity --profile sge-profile --cluster-config config/cluster.yaml --jobs 100
 
 See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/executable.html) for further details.
 
@@ -155,6 +156,19 @@ Snakemake interfaces with job schedulers via _cluster profiles_. For running job
 the cookiecutter template [here](https://github.com/Snakemake-Profiles/sge).
 
 
+
+#### How to choose the pipeline's rule-specific dependency behavior
+
+This pipeline is designed to be run using either conda or docker/singularity/apptainer to manage rule-specific dependencies.
+Snakemake's usual method for selecting between these options is to either specify `--use-conda` or `--use-singularity`
+during the `snakemake` command line invocation. However, due to a lack of a functional conda environment for DeepVariant,
+pure conda mode is not possible when using DeepVariant for variant calling.
+
+To get around this discrepancy, this workflow should always be invoked with `snakemake --use-conda --use-singularity`.
+The user can then further control whether they want pure-container or (almost) pure-conda mode by setting the
+userspace configuration `use-containers` in `config/config.yaml`. In order to use containers, a local copy of the
+apptainer images built for this workflow is required; the method of acquiring these containers is TBD but will
+probably involve an S3 pull.
 
 ### Step 5: Investigate results
 

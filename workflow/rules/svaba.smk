@@ -30,9 +30,9 @@ rule svaba_run:
     params:
         outprefix="results/svaba/{projectid}/{sampleid}",
     conda:
-        "../envs/svaba.yaml"
+        "../envs/svaba.yaml" if not use_containers else None
     container:
-        "{}/svaba.sif".format(apptainer_images)
+        "{}/svaba.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["svaba"]["threads"]
     resources:
         mem_mb=config_resources["svaba"]["memory"],
@@ -77,9 +77,9 @@ rule svaba_select_output_variants:
     benchmark:
         "results/performance_benchmarks/svaba_select_output_variants/{projectid}/{sampleid}.svaba.tsv"
     conda:
-        "../envs/bcftools.yaml"
+        "../envs/bcftools.yaml" if not use_containers else None
     container:
-        "{}/bcftools.sif".format(apptainer_images)
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
@@ -104,9 +104,9 @@ rule vcf_to_bedpe:
     output:
         "{prefix}.svaba.as_bnd.bedpe",
     conda:
-        "../envs/svtools.yaml"
+        "../envs/svtools.yaml" if not use_containers else None
     container:
-        "docker://halllab/svtools:v0.5.1"
+        "docker://halllab/svtools:v0.5.1" if use_containers else None
     threads: config_resources["svtools"]["threads"]
     resources:
         mem_mb=config_resources["svtools"]["memory"],
@@ -144,9 +144,9 @@ rule bedpe_to_vcf:
     params:
         tmpdir=tempDir,
     conda:
-        "../envs/svtools.yaml"
+        "../envs/svtools.yaml" if not use_containers else None
     container:
-        "docker://halllab/svtools:v0.5.1"
+        "docker://halllab/svtools:v0.5.1" if use_containers else None
     threads: config_resources["svtools"]["threads"]
     resources:
         mem_mb=config_resources["svtools"]["memory"],

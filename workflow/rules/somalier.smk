@@ -19,9 +19,9 @@ rule somalier_extract:
     params:
         extract_dir="results/somalier/{projectid}/extract",
     conda:
-        "../envs/somalier.yaml"
+        "../envs/somalier.yaml" if not use_containers else None
     container:
-        "docker://brentp/somalier:v0.2.16"
+        "docker://brentp/somalier:v0.2.16" if use_containers else None
     threads: config_resources["somalier"]["threads"]
     resources:
         mem_mb=config_resources["somalier"]["memory"],
@@ -49,9 +49,9 @@ rule somalier_relate:
     params:
         outprefix="results/somalier/{projectid}/relate/somalier",
     conda:
-        "../envs/somalier.yaml"
+        "../envs/somalier.yaml" if not use_containers else None
     container:
-        "docker://brentp/somalier:v0.2.16"
+        "docker://brentp/somalier:v0.2.16" if use_containers else None
     threads: config_resources["somalier"]["threads"]
     resources:
         mem_mb=config_resources["somalier"]["memory"],

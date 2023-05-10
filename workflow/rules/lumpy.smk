@@ -19,9 +19,9 @@ rule lumpy_run:
     benchmark:
         "results/performance_benchmarks/lumpy_run/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/smoove.yaml"
+        "../envs/smoove.yaml" if not use_containers else None
     container:
-        "{}/smoove.sif".format(apptainer_images)
+        "{}/smoove.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["smoove"]["threads"]
     resources:
         mem_mb=config_resources["smoove"]["memory"],

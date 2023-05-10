@@ -19,9 +19,9 @@ rule run_fastp:
         outprefix="results/fastp/{projectid}/{sampleid}_{lane}",
         quality=10,
     conda:
-        "../envs/fastp.yaml"
+        "../envs/fastp.yaml" if not use_containers else None
     container:
-        "{}/fastp.sif".format(apptainer_images)
+        "{}/fastp.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["fastp"]["threads"]
     resources:
         mem_mb=config_resources["fastp"]["memory"],

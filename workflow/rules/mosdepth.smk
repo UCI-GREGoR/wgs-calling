@@ -31,9 +31,9 @@ rule run_mosdepth:
         mapq=20,
         T="0,10,15,20,30",
     conda:
-        "../envs/mosdepth.yaml"
+        "../envs/mosdepth.yaml" if not use_containers else None
     container:
-        "docker://brentp/mosdepth:v0.3.3"
+        "docker://brentp/mosdepth:v0.3.3" if use_containers else None
     threads: config_resources["mosdepth"]["threads"]
     resources:
         mem_mb=config_resources["mosdepth"]["memory"],

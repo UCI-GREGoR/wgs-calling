@@ -23,9 +23,9 @@ rule manta_configure:
     params:
         tmpdir=expand("{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}", tempdir=tempDir),
     conda:
-        "../envs/manta.yaml"
+        "../envs/manta.yaml" if not use_containers else None
     container:
-        "{}/manta.sif".format(apptainer_images)
+        "{}/manta.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
@@ -96,9 +96,9 @@ rule manta_run:
     params:
         tmpdir=expand("{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}", tempdir=tempDir),
     conda:
-        "../envs/manta.yaml"
+        "../envs/manta.yaml" if not use_containers else None
     container:
-        "{}/manta.sif".format(apptainer_images)
+        "{}/manta.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["manta"]["threads"]
     resources:
         mem_mb=config_resources["manta"]["memory"],
@@ -130,9 +130,9 @@ rule manta_sort_output:
     params:
         tmpdir=expand("{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}", tempdir=tempDir),
     conda:
-        "../envs/bcftools.yaml"
+        "../envs/bcftools.yaml" if not use_containers else None
     container:
-        "{}/bcftools.sif".format(apptainer_images)
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],

@@ -9,9 +9,9 @@ rule samtools_index_fasta:
     benchmark:
         "results/performance_benchmarks/samtools_index_fasta/{prefix}fasta.fai.tsv"
     conda:
-        "../envs/samtools.yaml"
+        "../envs/samtools.yaml" if not use_containers else None
     container:
-        "{}/bwa.sif".format(apptainer_images)
+        "{}/bwa.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
@@ -45,9 +45,11 @@ rule bwa_index:
             config["behaviors"]["aligner"], reference_build
         )
     conda:
-        "../envs/{}.yaml".format(config["behaviors"]["aligner"])
+        "../envs/{}.yaml".format(config["behaviors"]["aligner"]) if not use_containers else None
     container:
-        "{}/{}.sif".format(apptainer_images, config["behaviors"]["aligner"])
+        "{}/{}.sif".format(
+            apptainer_images, config["behaviors"]["aligner"]
+        ) if use_containers else None
     threads: config_resources["bwa_index"]["threads"]
     resources:
         mem_mb=config_resources["bwa_index"]["memory"],
@@ -95,9 +97,13 @@ rule bwa_map_and_sort:
         ),
         tmpdir=tempDir,
     conda:
-        lambda wildcards: "../envs/{}.yaml".format(config["behaviors"]["aligner"])
+        lambda wildcards: "../envs/{}.yaml".format(
+            config["behaviors"]["aligner"]
+        ) if not use_containers else None
     container:
-        "{}/{}.sif".format(apptainer_images, config["behaviors"]["aligner"])
+        "{}/{}.sif".format(
+            apptainer_images, config["behaviors"]["aligner"]
+        ) if use_containers else None
     threads: config_resources["bwa_map_and_sort"]["threads"]
     resources:
         mem_mb=config_resources["bwa_map_and_sort"]["memory"],
