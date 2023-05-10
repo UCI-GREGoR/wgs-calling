@@ -22,9 +22,9 @@ rule estimate_contamination:
         outprefix="results/contamination/{fileprefix}.vb2",
         db_prefix="reference_data/verifybamid2/{}/ref.db".format(reference_build),
     conda:
-        "../envs/verifybamid2.yaml"
+        "../envs/verifybamid2.yaml" if not use_containers else None
     container:
-        "docker://griffan/verifybamid2:v2.0.1"
+        "docker://griffan/verifybamid2:v2.0.1" if use_containers else None
     threads: config_resources["verifybamid2"]["threads"]
     resources:
         mem_mb=config_resources["verifybamid2"]["memory"],

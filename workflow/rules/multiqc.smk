@@ -58,9 +58,9 @@ rule run_multiqc_fastq:
             )
         ),
     conda:
-        "../envs/multiqc.yaml"
+        "../envs/multiqc.yaml" if not use_containers else None
     container:
-        "docker://ewels/multiqc:v1.14"
+        "docker://ewels/multiqc:v1.14" if use_containers else None
     threads: config_resources["multiqc"]["threads"]
     resources:
         mem_mb=config_resources["multiqc"]["memory"],
@@ -143,9 +143,9 @@ rule run_multiqc_alignment:
             )
         ),
     conda:
-        "../envs/multiqc.yaml"
+        "../envs/multiqc.yaml" if not use_containers else None
     container:
-        "docker://ewels/multiqc:v1.14"
+        "docker://ewels/multiqc:v1.14" if use_containers else None
     threads: config_resources["multiqc"]["threads"]
     resources:
         mem_mb=config_resources["multiqc"]["memory"],
@@ -226,9 +226,9 @@ rule run_multiqc_calling:
             )
         ),
     conda:
-        "../envs/multiqc.yaml"
+        "../envs/multiqc.yaml" if not use_containers else None
     container:
-        "docker://ewels/multiqc:v1.14"
+        "docker://ewels/multiqc:v1.14" if use_containers else None
     threads: config_resources["multiqc"]["threads"]
     resources:
         mem_mb=config_resources["multiqc"]["memory"],

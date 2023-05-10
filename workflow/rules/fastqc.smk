@@ -16,9 +16,9 @@ rule run_fastqc_pretrimming:
         outdir="results/fastqc/{projectid}",
         tmpdir="temp",
     conda:
-        "../envs/fastqc.yaml"
+        "../envs/fastqc.yaml" if not use_containers else None
     container:
-        "{}/fastqc.sif".format(apptainer_images)
+        "{}/fastqc.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["fastqc"]["threads"]
     resources:
         mem_mb=config_resources["fastqc"]["memory"],
@@ -47,9 +47,9 @@ rule run_fastqc_posttrimming:
         outdir="results/fastqc_posttrimming/{projectid}",
         tmpdir="temp",
     conda:
-        "../envs/fastqc.yaml"
+        "../envs/fastqc.yaml" if not use_containers else None
     container:
-        "{}/fastqc.sif".format(apptainer_images)
+        "{}/fastqc.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["fastqc"]["threads"]
     resources:
         mem_mb=config_resources["fastqc"]["memory"],

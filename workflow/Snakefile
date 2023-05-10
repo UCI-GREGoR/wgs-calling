@@ -42,7 +42,9 @@ validate(config_resources, "../schema/resources_config_schema.yaml")
 tempDir = config_resources["tmpdir"]
 manifest = config["manifest"]
 manifest = pd.read_csv(manifest, sep="\t")
-
+## note that this variable controls container usage for everything *except DeepVariant*,
+## which currently does not have a conda alternative.
+use_containers = config["behaviors"]["use-containers"]
 
 validate(manifest, "../schema/manifest_schema.yaml")
 

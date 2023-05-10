@@ -13,6 +13,7 @@ genome-build: "grch38"
 apptainer-image-dir: "apptainer_images"
 
 behaviors:
+  use-containers: no
   aligner: "bwa"
   snv-caller: "deepvariant"
   sv-callers:
@@ -39,7 +40,7 @@ parameters:
     K: 120000000
   deepvariant:
     number-shards: 16
-    docker-version: "1.5.0"
+    docker-version: "1.4.0"
   manta:
     config-ini: "config/configManta.py.ini"
   tiddit:
