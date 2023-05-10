@@ -28,7 +28,7 @@ rule bqsr_base_recalibrator:
     benchmark:
         "results/performance_benchmarks/bqsr_base_recalibrator/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/gatk4.yaml"
+        "../envs/gatk4.yaml" if not use_containers else None
     container:
         "{}/gatk4.sif".format(apptainer_images)
     threads: config_resources["gatk_bqsr_base_recalibrator"]["threads"]
@@ -74,7 +74,7 @@ rule bqsr_apply_bqsr:
     benchmark:
         "results/performance_benchmarks/bqsr_apply_bqsr/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/gatk4.yaml"
+        "../envs/gatk4.yaml" if not use_containers else None
     container:
         "{}/gatk4.sif".format(apptainer_images)
     threads: config_resources["gatk_bqsr_apply_bqsr"]["threads"]

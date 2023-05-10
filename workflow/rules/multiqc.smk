@@ -5,7 +5,7 @@ localrules:
 
 rule multiqc_link_ids:
     """
-    Link SQ IDs to PMGRC IDs for user convenience in multiqc reports
+    Link SQ IDs to subject IDs for user convenience in multiqc reports
     """
     input:
         "results/export/linker.tsv",
@@ -17,7 +17,7 @@ rule multiqc_link_ids:
 
 rule multiqc_link_ids_index_sortorder:
     """
-    Link SQ IDs to PMGRC IDs for user convenience in multiqc reports,
+    Link SQ IDs to subject IDs for user convenience in multiqc reports,
     but due to user feedback, have it be sorted by SQ index code instead
     of study ID.
     """
@@ -56,9 +56,9 @@ rule run_multiqc_fastq:
             )
         ),
     conda:
-        "../envs/multiqc.yaml"
+        "../envs/multiqc.yaml" if not use_containers else None
     container:
-        "docker://ewels/multiqc:v1.14"
+        "docker://ewels/multiqc:v1.14" if use_containers else None
     threads: config_resources["multiqc"]["threads"]
     resources:
         mem_mb=config_resources["multiqc"]["memory"],
@@ -137,9 +137,9 @@ rule run_multiqc_alignment:
             )
         ),
     conda:
-        "../envs/multiqc.yaml"
+        "../envs/multiqc.yaml" if not use_containers else None
     container:
-        "docker://ewels/multiqc:v1.14"
+        "docker://ewels/multiqc:v1.14" if use_containers else None
     threads: config_resources["multiqc"]["threads"]
     resources:
         mem_mb=config_resources["multiqc"]["memory"],
@@ -218,9 +218,9 @@ rule run_multiqc_calling:
             )
         ),
     conda:
-        "../envs/multiqc.yaml"
+        "../envs/multiqc.yaml" if not use_containers else None
     container:
-        "docker://ewels/multiqc:v1.14"
+        "docker://ewels/multiqc:v1.14" if use_containers else None
     threads: config_resources["multiqc"]["threads"]
     resources:
         mem_mb=config_resources["multiqc"]["memory"],

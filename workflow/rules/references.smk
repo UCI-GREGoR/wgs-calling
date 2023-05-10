@@ -42,9 +42,9 @@ rule index_vcf:
     benchmark:
         "results/performance_benchmarks/index_vcf/{prefix}.tsv"
     conda:
-        "../envs/bcftools.yaml"
+        "../envs/bcftools.yaml" if not use_containers else None
     container:
-        "{}/bcftools.sif".format(apptainer_images)
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],

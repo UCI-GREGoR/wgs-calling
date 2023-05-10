@@ -16,9 +16,9 @@ rule truvari_merge_within_caller:
     benchmark:
         "results/performance_benchmarks/truvari_merge_within_caller/{projectid}/{sampleid}.{toolname}.tsv"
     conda:
-        "../envs/truvari.yaml"
+        "../envs/truvari.yaml" if not use_containers else None
     container:
-        "{}/truvari.sif".format(apptainer_images)
+        "{}/truvari.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["truvari"]["threads"]
     resources:
         mem_mb=config_resources["truvari"]["memory"],
@@ -47,9 +47,9 @@ rule bcftools_concat_sv_callers:
     benchmark:
         "results/performance_benchmarks/bcftools_concat_sv_callers/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/bcftools.yaml"
+        "../envs/bcftools.yaml" if not use_containers else None
     container:
-        "{}/bcftools.sif".format(apptainer_images)
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
@@ -90,9 +90,9 @@ rule truvari_ensemble_sv_vcf:
     benchmark:
         "results/performance_benchmarks/truvari_ensemble_sv_vcf/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/bcftools.yaml"
+        "../envs/bcftools.yaml" if not use_containers else None
     container:
-        "{}/bcftools.sif".format(apptainer_images)
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],

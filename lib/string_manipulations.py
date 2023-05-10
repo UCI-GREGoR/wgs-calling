@@ -34,6 +34,7 @@ def format_reference_build(ref: str) -> str:
         "as such, this will cause mismatch problems if you try to load "
         "a variant VCF into Moon without first modifying the header to "
         "contain 'GRCh38' or 'hg38' somewhere in the header. If your "
-        "intended build is GRCh37/hg19, Moon should default to this anyway."
+        "intended build is GRCh37/hg19, Moon should default to this anyway.",
+        UserWarning,
     )
     return ref

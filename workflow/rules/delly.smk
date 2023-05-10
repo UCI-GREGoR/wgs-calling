@@ -15,9 +15,9 @@ rule delly_run:
     output:
         vcf="results/delly/{projectid}/{sampleid}.delly.vcf.gz",
     conda:
-        "../envs/delly.yaml"
+        "../envs/delly.yaml" if not use_containers else None
     container:
-        "docker://dellytools/delly:latest"
+        "docker://dellytools/delly:latest" if use_containers else None
     benchmark:
         "results/performance_benchmarks/delly_run/{projectid}/{sampleid}.tsv"
     threads: config_resources["delly"]["threads"]

@@ -160,6 +160,9 @@ def test_construct_snv_targets(standard_config, standard_manifest):
     expected = [
         "results/deepvariant/PROJ1/{}.sorted.vcf.gz".format(x) for x in ["SAM1", "SAM2", "SAM3"]
     ]
+    expected.extend(
+        ["results/deepvariant/PROJ1/{}.sorted.g.vcf.gz".format(x) for x in ["SAM1", "SAM2", "SAM3"]]
+    )
     observed = tc.construct_snv_targets(standard_config, standard_manifest)
     ## this function is used for snakemake target population, so order is irrelevant
     expected.sort()
@@ -214,11 +217,68 @@ def test_construct_fastqc_targets(wildcards_without_lane, standard_manifest):
     the output files of fastqc on input R1/R2 fastq.gz files.
     """
     expected = expand(
-        "results/fastqc/PROJ1/fn{fnum}_{readname}_fastqc.zip",
-        fnum=[i + 1 for i in range(6)],
+        "results/fastqc/PROJ1/{sname}_{lname}_{readname}_001_fastqc.zip",
+        sname=["SAM1", "SAM2", "SAM3"],
+        lname=["L001", "L002"],
         readname=["R1", "R2"],
     )
     observed = tc.construct_fastqc_targets(wildcards_without_lane, standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
+
+
+def test_construct_fastqc_posttrimming_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_fastqc_posttrimming_targets can determine
+    the output files of fastqc on fastp-trimmed R1/R2 fastq.gz files.
+    """
+    expected = expand(
+        "results/fastqc_posttrimming/PROJ1/{sname}_{lname}_{readname}_fastp_fastqc.zip",
+        sname=["SAM1", "SAM2", "SAM3"],
+        lname=["L001", "L002"],
+        readname=["R1", "R2"],
+    )
+    observed = tc.construct_fastqc_posttrimming_targets(wildcards_without_lane, standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
+
+
+def test_construct_fastqc_combined_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_fastqc_combined_targets can determine
+    the output files of fastqc on input R1/R2 fastq.gz files,
+    but combined across lanes.
+    """
+    expected = expand(
+        "results/fastqc_combined/PROJ1/{sname}_{readname}_fastqc.zip",
+        sname=["SAM1", "SAM2", "SAM3"],
+        readname=["R1", "R2"],
+    )
+    observed = tc.construct_fastqc_combined_targets(wildcards_without_lane, standard_manifest)
+    ## this function is used for snakemake target population, so order is irrelevant
+    expected.sort()
+    observed.sort()
+    assert observed == expected
+
+
+def test_construct_fastqc_posttrimming_combined_targets(wildcards_without_lane, standard_manifest):
+    """
+    Test that construct_fastqc_posttrimming_combined_targets can determine
+    the output files of fastqc on fastp-trimmed R1/R2 fastq.gz files, after
+    combining across lanes.
+    """
+    expected = expand(
+        "results/fastqc_posttrimming_combined/PROJ1/{sname}_{readname}_fastqc.zip",
+        sname=["SAM1", "SAM2", "SAM3"],
+        readname=["R1", "R2"],
+    )
+    observed = tc.construct_fastqc_posttrimming_combined_targets(
+        wildcards_without_lane, standard_manifest
+    )
     ## this function is used for snakemake target population, so order is irrelevant
     expected.sort()
     observed.sort()
@@ -231,9 +291,9 @@ def test_construct_fastp_targets(wildcards_without_lane, standard_manifest):
     the output files of fastp on input R1/R2 fastq.gz files.
     """
     expected = expand(
-        "results/fastp/PROJ1/fn{fnum}_{readname}_fastp.html",
-        fnum=[i + 1 for i in range(6)],
-        readname=["R1", "R2"],
+        "results/fastp/PROJ1/{sname}_{lname}_fastp.html",
+        sname=["SAM1", "SAM2", "SAM3"],
+        lname=["L001", "L002"],
     )
     observed = tc.construct_fastp_targets(wildcards_without_lane, standard_manifest)
     ## this function is used for snakemake target population, so order is irrelevant
@@ -270,3 +330,52 @@ def test_map_reference_file_url(wildcards_url_reference, standard_config):
     expected = "https://my.calling-ranges"
     observed = tc.map_reference_file(wildcards_url_reference, standard_config)
     assert observed == expected
+
+
+@pytest.fixture
+def caller_interval_file_size():
+    """
+    For stability reasons, define the number of fake calling ranges
+    exactly once
+    """
+    return 20
+
+
+@pytest.fixture
+def caller_interval_file(common_tmpdir, caller_interval_file_size):
+    """
+    Create a temporary file containing fake interval data,
+    and return its name and path
+    """
+    fn = common_tmpdir / "shallowvariant-calling-ranges.tsv"
+    with open(fn, "w") as f:
+        f.writelines([str(i) + "\n" for i in range(caller_interval_file_size)])
+    return fn
+
+
+@pytest.fixture
+def caller_interval_config(caller_interval_file):
+    """
+    Create a config structure with a local caller interval file
+    """
+    res = {
+        "genome-build": "hg002",
+        "behaviors": {"snv-caller": "shallowvariant"},
+        "shallowvariant": {
+            "hg001": {"calling-ranges": "fake_fn.tsv"},
+            "hg002": {"calling-ranges": caller_interval_file},
+        },
+    }
+    return res
+
+
+def test_caller_interval_file_count(caller_interval_config, caller_interval_file_size):
+    """
+    Test the rather silly function for counting the number of configured
+    caller interval files
+    """
+    ## the conftest config structure has a fake remote interval file,
+    ## so we need to use a different one specific to this test
+    expected = caller_interval_file_size
+    observed = tc.caller_interval_file_count(caller_interval_config)
+    assert expected == observed
