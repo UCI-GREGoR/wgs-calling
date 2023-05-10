@@ -222,7 +222,9 @@ def test_construct_fastqc_targets(wildcards_without_lane, standard_manifest):
         lname=["L001", "L002"],
         readname=["R1", "R2"],
     )
-    observed = tc.construct_fastqc_targets(wildcards_without_lane, standard_manifest)
+    observed = tc.construct_fastqc_targets(
+        wildcards_without_lane, standard_manifest, "results/fastqc", "001_fastqc", True
+    )
     ## this function is used for snakemake target population, so order is irrelevant
     expected.sort()
     observed.sort()
@@ -240,7 +242,13 @@ def test_construct_fastqc_posttrimming_targets(wildcards_without_lane, standard_
         lname=["L001", "L002"],
         readname=["R1", "R2"],
     )
-    observed = tc.construct_fastqc_posttrimming_targets(wildcards_without_lane, standard_manifest)
+    observed = tc.construct_fastqc_targets(
+        wildcards_without_lane,
+        standard_manifest,
+        "results/fastqc_posttrimming",
+        "fastp_fastqc",
+        True,
+    )
     ## this function is used for snakemake target population, so order is irrelevant
     expected.sort()
     observed.sort()
@@ -258,7 +266,9 @@ def test_construct_fastqc_combined_targets(wildcards_without_lane, standard_mani
         sname=["SAM1", "SAM2", "SAM3"],
         readname=["R1", "R2"],
     )
-    observed = tc.construct_fastqc_combined_targets(wildcards_without_lane, standard_manifest)
+    observed = tc.construct_fastqc_targets(
+        wildcards_without_lane, standard_manifest, "results/fastqc_combined", "fastqc", False
+    )
     ## this function is used for snakemake target population, so order is irrelevant
     expected.sort()
     observed.sort()
@@ -276,8 +286,12 @@ def test_construct_fastqc_posttrimming_combined_targets(wildcards_without_lane, 
         sname=["SAM1", "SAM2", "SAM3"],
         readname=["R1", "R2"],
     )
-    observed = tc.construct_fastqc_posttrimming_combined_targets(
-        wildcards_without_lane, standard_manifest
+    observed = tc.construct_fastqc_targets(
+        wildcards_without_lane,
+        standard_manifest,
+        "results/fastqc_posttrimming_combined",
+        "fastqc",
+        False,
     )
     ## this function is used for snakemake target population, so order is irrelevant
     expected.sort()

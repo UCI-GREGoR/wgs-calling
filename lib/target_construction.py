@@ -1,7 +1,7 @@
 import os
 
 import pandas as pd
-from snakemake.io import AnnotatedString, Namedlist
+from snakemake.io import AnnotatedString, Namedlist, expand
 
 
 def map_fastq_from_project_and_sample(
@@ -181,73 +181,47 @@ def construct_somalier_relate_targets(wildcards: Namedlist) -> list:
     return list(set(result))
 
 
-def construct_fastqc_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
-    """
-    From basic input manifest entries, construct output targets for
-    a run of fastQC
-    """
-    results_prefix = "results/fastqc"
-    results = []
-    for projectid, sampleid, lane in zip(
-        manifest["projectid"], manifest["sampleid"], manifest["lane"]
-    ):
-        if projectid == wildcards.projectid:
-            results.append(
-                "{}/{}/{}_{}_R1_001_fastqc.zip".format(results_prefix, projectid, sampleid, lane)
-            )
-            results.append(
-                "{}/{}/{}_{}_R2_001_fastqc.zip".format(results_prefix, projectid, sampleid, lane)
-            )
-    return list(set(results))
-
-
-def construct_fastqc_posttrimming_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
-    """
-    From basic input manifest entries, construct output targets for
-    a run of fastQC, for fastqs after trimming
-    """
-    results_prefix = "results/fastqc_posttrimming"
-    results = []
-    for projectid, sampleid, lane in zip(
-        manifest["projectid"], manifest["sampleid"], manifest["lane"]
-    ):
-        if projectid == wildcards.projectid:
-            results.append(
-                "{}/{}/{}_{}_R1_fastp_fastqc.zip".format(results_prefix, projectid, sampleid, lane)
-            )
-            results.append(
-                "{}/{}/{}_{}_R2_fastp_fastqc.zip".format(results_prefix, projectid, sampleid, lane)
-            )
-    return list(set(results))
-
-
-def construct_fastqc_combined_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
-    """
-    From basic input manifest entries, construct output targets for
-    a run of fastQC, but on lane-combined fastqs
-    """
-    results_prefix = "results/fastqc_combined"
-    results = []
-    for projectid, sampleid in zip(manifest["projectid"], manifest["sampleid"]):
-        if projectid == wildcards.projectid:
-            results.append("{}/{}/{}_R1_fastqc.zip".format(results_prefix, projectid, sampleid))
-            results.append("{}/{}/{}_R2_fastqc.zip".format(results_prefix, projectid, sampleid))
-    return list(set(results))
-
-
-def construct_fastqc_posttrimming_combined_targets(
-    wildcards: Namedlist, manifest: pd.DataFrame
+def construct_fastqc_targets(
+    wildcards: Namedlist,
+    manifest: pd.DataFrame,
+    results_prefix: str,
+    results_suffix: str,
+    include_lane: bool,
 ) -> list:
     """
     From basic input manifest entries, construct output targets for
-    a run of fastQC, for fastqs after trimming, but on lane-combined fastqs
+    a run of fastQC. Depending on user configuration, mess around with output
+    paths to make unique results combined by lane, using output from fastp,
+    or both.
     """
-    results_prefix = "results/fastqc_posttrimming_combined"
     results = []
-    for projectid, sampleid in zip(manifest["projectid"], manifest["sampleid"]):
+    for projectid, sampleid, lane in zip(
+        manifest["projectid"], manifest["sampleid"], manifest["lane"]
+    ):
         if projectid == wildcards.projectid:
-            results.append("{}/{}/{}_R1_fastqc.zip".format(results_prefix, projectid, sampleid))
-            results.append("{}/{}/{}_R2_fastqc.zip".format(results_prefix, projectid, sampleid))
+            if include_lane:
+                results.extend(
+                    expand(
+                        "{resultdir}/{projectdir}/{sampleid}_{lane}_{readgroup}_{suffix}.zip",
+                        resultdir=results_prefix,
+                        projectdir=projectid,
+                        sampleid=sampleid,
+                        lane=lane,
+                        readgroup=["R1", "R2"],
+                        suffix=results_suffix,
+                    )
+                )
+            else:
+                results.extend(
+                    expand(
+                        "{resultdir}/{projectdir}/{sampleid}_{readgroup}_{suffix}.zip",
+                        resultdir=results_prefix,
+                        projectdir=projectid,
+                        sampleid=sampleid,
+                        readgroup=["R1", "R2"],
+                        suffix=results_suffix,
+                    )
+                )
     return list(set(results))
 
 
