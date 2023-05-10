@@ -18,7 +18,7 @@ checkpoint generate_linker:
     conda:
         "../envs/r.yaml" if not use_containers else None
     container:
-        "docker://rocker/tidyverse:latest" if use_containers else None
+        "{}/r.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["r"]["threads"]
     resources:
         mem_mb=config_resources["r"]["memory"],
