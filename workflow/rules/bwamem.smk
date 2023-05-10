@@ -9,11 +9,13 @@ rule samtools_index_fasta:
     benchmark:
         "results/performance_benchmarks/samtools_index_fasta/{prefix}fasta.fai.tsv"
     conda:
-        "../envs/samtools.yaml"
-    threads: 1
+        "../envs/samtools.yaml" if not use_containers else None
+    container:
+        "{}/bwa.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         "samtools faidx {input}"
 
@@ -43,11 +45,15 @@ rule bwa_index:
             config["behaviors"]["aligner"], reference_build
         )
     conda:
-        "../envs/{}.yaml".format(config["behaviors"]["aligner"])
-    threads: 1
+        "../envs/{}.yaml".format(config["behaviors"]["aligner"]) if not use_containers else None
+    container:
+        "{}/{}.sif".format(
+            apptainer_images, config["behaviors"]["aligner"]
+        ) if use_containers else None
+    threads: config_resources["bwa_index"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["bwa_index"]["memory"],
+        qname=rc.select_queue(config_resources["bwa_index"]["queue"], config_resources["queues"]),
     shell:
         "{params.exec_name} index {input.fasta}"
 
@@ -79,7 +85,7 @@ rule bwa_map_and_sort:
         "results/performance_benchmarks/bwa_map_and_sort/{projectid}/{sampleid}_{lane}.tsv"
     params:
         exec_name=config["behaviors"]["aligner"],
-        K="1000000",
+        K=config["parameters"][config["behaviors"]["aligner"]]["K"],
         readgroup=lambda wildcards: "@RG\\tID:{}\\tSM:{}\\tLB:{}\\tPL:{}\\tPU:{}.{}.{}".format(
             "RG" + wildcards.lane,
             wildcards.sampleid,
@@ -89,14 +95,22 @@ rule bwa_map_and_sort:
             wildcards.lane,
             wildcards.sampleid,
         ),
-        tmpdir="temp",
+        tmpdir=tempDir,
     conda:
-        lambda wildcards: "../envs/{}.yaml".format(config["behaviors"]["aligner"])
-    threads: 12
+        lambda wildcards: "../envs/{}.yaml".format(
+            config["behaviors"]["aligner"]
+        ) if not use_containers else None
+    container:
+        "{}/{}.sif".format(
+            apptainer_images, config["behaviors"]["aligner"]
+        ) if use_containers else None
+    threads: config_resources["bwa_map_and_sort"]["threads"]
     resources:
-        mem_mb="500000",
-        qname="large",
-        tmpdir="temp",
+        mem_mb=config_resources["bwa_map_and_sort"]["memory"],
+        qname=rc.select_queue(
+            config_resources["bwa_map_and_sort"]["queue"], config_resources["queues"]
+        ),
+        tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "
         '{params.exec_name} mem -t {threads} -Y -R "{params.readgroup}" -K {params.K} '

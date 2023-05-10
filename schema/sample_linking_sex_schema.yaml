@@ -1,0 +1,14 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: an entry in the optional user-configured sample sex linker
+properties:
+  sqid:
+    type: string
+    description: "adapter index ID (e.g. SQ\\d{4})"
+  sex:
+    type: string
+    description: "sample self-reported sex"
+    pattern: "^Female$|^Male$"
+required:
+  - sqid
+  - sex
+additionalProperties: no

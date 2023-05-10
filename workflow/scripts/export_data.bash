@@ -18,7 +18,7 @@ fi
 TARGET_DIR="${TARGET_DIR}/${JIRA_TICKET}/${FLOWCELL}"
 mkdir -p "${TARGET_DIR}"
 # copy targets
-cp results/export/${FLOWCELL}/PMGRC* results/export/${FLOWCELL}/methods* "${TARGET_DIR}"
+cp results/export/${FLOWCELL}/*vcf.gz* results/export/${FLOWCELL}/*cram* results/export/${FLOWCELL}/methods* "${TARGET_DIR}"
 # return here later. this probably doesn't matter much
 RETURN_LOCATION="$(pwd)"
 cd "${TARGET_DIR}"

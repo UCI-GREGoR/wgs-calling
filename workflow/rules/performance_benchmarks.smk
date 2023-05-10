@@ -33,6 +33,12 @@ rule performance_benchmarks:
         rules=lambda wildcards: get_rule_names(workflow),
         rule_threads=lambda wildcards: get_rule_threads(workflow),
     conda:
-        "../envs/r.yaml"
+        "../envs/r.yaml" if not use_containers else None
+    container:
+        "{}/r.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["default"]["threads"]
+    resources:
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     script:
         "../scripts/aggregate_performance_metrics.Rmd"

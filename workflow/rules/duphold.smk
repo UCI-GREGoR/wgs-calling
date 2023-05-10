@@ -26,11 +26,13 @@ rule duphold_run:
     benchmark:
         "results/performance_benchmarks/duphold_run/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/duphold.yaml"
-    threads: 4
+        "../envs/duphold.yaml" if not use_containers else None
+    container:
+        "docker://brentp/duphold:v0.2.3" if use_containers else None
+    threads: config_resources["duphold"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["duphold"]["memory"],
+        qname=rc.select_queue(config_resources["duphold"]["queue"], config_resources["queues"]),
     shell:
         "duphold -s {input.snv_vcf} -t {threads} -v {input.sv_vcf} -b {input.bam} -f {input.fasta} -o {output.bcf}"
 
@@ -46,11 +48,13 @@ rule duphold_apply:
     benchmark:
         "results/performance_benchmarks/duphold_apply/{toolname}/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/bcftools.yaml"
-    threads: 4
+        "../envs/bcftools.yaml" if not use_containers else None
+    container:
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["bcftools"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
     shell:
         'bcftools view -i \'(FILTER = "PASS" | FILTER = ".") & '
         '((FMT/DHFFC[0] = ".") | '

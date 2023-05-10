@@ -23,16 +23,20 @@ rule bqsr_base_recalibrator:
     output:
         table="results/bqsr/{projectid}/{sampleid}.recal_table",
     params:
-        tmpdir="temp",
-        java_args="-Xmx8000m -XX:+UseParallelGC -XX:ParallelGCThreads=2",
+        tmpdir=tempDir,
+        java_args=config_resources["gatk_bqsr_base_recalibrator"]["java_args"],
     benchmark:
         "results/performance_benchmarks/bqsr_base_recalibrator/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/gatk4.yaml"
-    threads: 2
+        "../envs/gatk4.yaml" if not use_containers else None
+    container:
+        "{}/gatk4.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["gatk_bqsr_base_recalibrator"]["threads"]
     resources:
-        mem_mb="16000",
-        qname="large",
+        mem_mb=config_resources["gatk_bqsr_base_recalibrator"]["memory"],
+        qname=rc.select_queue(
+            config_resources["gatk_bqsr_base_recalibrator"]["queue"], config_resources["queues"]
+        ),
     shell:
         "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" BaseRecalibrator '
@@ -65,16 +69,20 @@ rule bqsr_apply_bqsr:
         bam="results/bqsr/{projectid}/{sampleid}.bam",
         bai="results/bqsr/{projectid}/{sampleid}.bai",
     params:
-        tmpdir="temp",
-        java_args="-Xmx10000m",
+        tmpdir=tempDir,
+        java_args=config_resources["gatk_bqsr_apply_bqsr"]["java_args"],
     benchmark:
         "results/performance_benchmarks/bqsr_apply_bqsr/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/gatk4.yaml"
-    threads: 1
+        "../envs/gatk4.yaml" if not use_containers else None
+    container:
+        "{}/gatk4.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["gatk_bqsr_apply_bqsr"]["threads"]
     resources:
-        mem_mb="20000",
-        qname="large",
+        mem_mb=config_resources["gatk_bqsr_apply_bqsr"]["memory"],
+        qname=rc.select_queue(
+            config_resources["gatk_bqsr_apply_bqsr"]["queue"], config_resources["queues"]
+        ),
     shell:
         "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" ApplyBQSR '

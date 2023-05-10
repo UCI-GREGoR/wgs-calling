@@ -5,6 +5,14 @@ properties:
     type: string
   sample-logbook:
     type: string
+  sample-linking:
+    type: object
+    properties:
+      sex:
+        type: string
+      external-ids:
+        type: string
+    additionalProperties: false
   multiqc-read-config:
     type: string
   multiqc-alignment-config:
@@ -14,9 +22,14 @@ properties:
   genome-build:
     type: string
     pattern: "^grch[0-9]+$"
+  apptainer-image-dir:
+    type: string
   behaviors:
     type: object
     properties:
+      use-containers:
+        type: boolean
+        default: no
       aligner:
         type: string
         pattern: "^bwa-mem2$|^bwa$"
@@ -86,6 +99,22 @@ properties:
   parameters:
     type: object
     properties:
+      bwa:
+        type: object
+        properties:
+          K:
+            type: integer
+        required:
+          - K
+        additionalProperties: false
+      bwa-mem2:
+        type: object
+        properties:
+          K:
+            type: integer
+        required:
+          - K
+        additionalProperties: false
       deepvariant:
         type: object
         properties:

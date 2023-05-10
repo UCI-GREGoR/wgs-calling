@@ -28,11 +28,15 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 - `manifest`: relative path to run manifest
 - `sample-logbook`: local Excel spreadsheet clone of sample manifest information from Google docs
   - this is upstream input. a local cloned file is preferred due to the possibility of uncontrolled upstream changes
+- `sample-linking`: two column tsv linker files with sample annotation data
+  - `sex`: path to linker containing internal subject ID and self-reported sex data
+  - `external-ids`: path to linker containing internal subject ID and external IDs
 - `multiqc-read-config`: relative path to configuration settings for pre-alignment multiQC report
 - `multiqc-alignment-config`: relative path to configuration settings for post-alignment multiQC report
 - `multiqc-calling-config`: relative path to configuration settings for post-calling multiQC report
 - `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
 - `behaviors`: user-configurable modifiers to how the pipeline will run
+  - `use-containers`: whether to, when possible, use either the docker or singularity image for each rule, or instead the rule-specific conda environment. See discussion below for how to choose this setting, and how it interacts with snakemake invocations.
   - `aligner`: which alignment tool to use. permitted values: `bwa-mem2`
   - `snv-caller`: which calling tool to use for SNVs. permitted values: `deepvariant`
   - `sv-callers`: which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`
@@ -54,6 +58,11 @@ The following settings are recognized in `config/config.yaml`. Note that each re
     - `bucket-name`: name of s3 bucket to which to sync data
     - `profile-name`: optional name of aws profile to use for data sync
 - `parameters`: tool-specific parameters. note that this section is a work in progress, somewhat more than the rest
+  - `bwa`: parameters specific to [bwa](https://bio-bwa.sourceforge.net/)
+    - `K`: chunk size parameter. `bwa` defaults this to `1e7*{threads}`, but to maintain consistency independent of thread count,
+      this is manually fixed. higher numbers improve runtime at the cost of (marginally) increased RAM usage
+  - `bwa-mem2`: parameters specific to [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2)
+    - `K`: chunk size parameter. see the corresponding `bwa` option for detauls
   - `deepvariant`: parameters specific to [deepvariant](https://github.com/google/deepvariant)
     - `number-shards`: how many shards to break calling into. needs to be at most the number of available threads in the submission queue
 	- `docker-version`: which docker tag to use when pulling the official DeepVariant docker image
@@ -137,7 +146,7 @@ Execute the workflow locally via
 
 using `$N` cores or run it in a cluster environment via
 
-    snakemake --use-conda --profile sge-profile --cluster-config config/cluster.yaml --jobs 100
+    snakemake --use-conda --use-singularity --profile sge-profile --cluster-config config/cluster.yaml --jobs 100
 
 See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/executable.html) for further details.
 
@@ -147,6 +156,19 @@ Snakemake interfaces with job schedulers via _cluster profiles_. For running job
 the cookiecutter template [here](https://github.com/Snakemake-Profiles/sge).
 
 
+
+#### How to choose the pipeline's rule-specific dependency behavior
+
+This pipeline is designed to be run using either conda or docker/singularity/apptainer to manage rule-specific dependencies.
+Snakemake's usual method for selecting between these options is to either specify `--use-conda` or `--use-singularity`
+during the `snakemake` command line invocation. However, due to a lack of a functional conda environment for DeepVariant,
+pure conda mode is not possible when using DeepVariant for variant calling.
+
+To get around this discrepancy, this workflow should always be invoked with `snakemake --use-conda --use-singularity`.
+The user can then further control whether they want pure-container or (almost) pure-conda mode by setting the
+userspace configuration `use-containers` in `config/config.yaml`. In order to use containers, a local copy of the
+apptainer images built for this workflow is required; the method of acquiring these containers is TBD but will
+probably involve an S3 pull.
 
 ### Step 5: Investigate results
 
@@ -225,7 +247,7 @@ This rule is executed by running `snakemake -j1 export_data`. This rule has the 
 If the above assumptions are met, the rule will do the following:
 
 - construct a subdirectory under `export-directory` named `{JIRA ticket}/{flowcell ID}`
-- move all `PMGRC-.*` files from `results/export` to that directory
+- move all `*vcf.gz*` and `*cram*` files from `results/export` to that directory
 - move the methods summary from `results/export` to that directory
 - edit the checksum files that were in `results/export` to no longer contain the relative paths specific to the workflow results directory structure
 - run `md5sum -c` on all files with checksums (cram, crai, vcf.gz, tbi) and report the results to `results/export/md5_checks.txt`

@@ -4,6 +4,14 @@ from snakemake.io import Namedlist
 
 
 @pytest.fixture
+def common_tmpdir(tmp_path):
+    """
+    Construct a temporary directory into which test files can be emitted
+    """
+    return tmp_path
+
+
+@pytest.fixture
 def wildcards_with_lane():
     """
     snakemake wildcards for testing steps that require specific behaviors per-lane
@@ -32,7 +40,7 @@ def wildcards_s3_reference():
     """
     snakemake wildcards for testing a request for a reference file on s3
     """
-    return Namedlist(fromdict={"reference_file": "octopus/grch100/ref.skip-regions"})
+    return Namedlist(fromdict={"reference_file": "deepvariant/grch100/ref.skip-regions"})
 
 
 @pytest.fixture
@@ -40,7 +48,7 @@ def wildcards_url_reference():
     """
     snakemake wildcards for testing a request for a reference file specified by a URL
     """
-    return Namedlist(fromdict={"reference_file": "octopus/grch100/ref.calling-ranges"})
+    return Namedlist(fromdict={"reference_file": "deepvariant/grch100/ref.calling-ranges"})
 
 
 @pytest.fixture
@@ -54,7 +62,7 @@ def standard_config():
         "genome-build": "grch100",
         "behaviors": {
             "aligner": "bwa-mem2",
-            "snv-caller": "octopus",
+            "snv-caller": "deepvariant",
             "sv-caller": ["manta", "tiddit"],
             "outcome": "fastqc",
             "symlink-fastqs": True,
@@ -67,9 +75,7 @@ def standard_config():
         "verifybamid2": {
             "grch100": {"db-V": "my.V", "db-UD": "my.UD", "db-mu": "my.mu", "db-bed": "my.bed"}
         },
-        "octopus": {
-            "error-model": "my.error-model",
-            "forest-model": "my.forest-model",
+        "deepvariant": {
             "grch100": {
                 "skip-regions": "s3://my.skip-regions",
                 "calling-ranges": "https://my.calling-ranges",

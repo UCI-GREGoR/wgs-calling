@@ -5,7 +5,7 @@ localrules:
 
 rule multiqc_link_ids:
     """
-    Link SQ IDs to PMGRC IDs for user convenience in multiqc reports
+    Link SQ IDs to subject IDs for user convenience in multiqc reports
     """
     input:
         "results/export/linker.tsv",
@@ -17,7 +17,7 @@ rule multiqc_link_ids:
 
 rule multiqc_link_ids_index_sortorder:
     """
-    Link SQ IDs to PMGRC IDs for user convenience in multiqc reports,
+    Link SQ IDs to subject IDs for user convenience in multiqc reports,
     but due to user feedback, have it be sorted by SQ index code instead
     of study ID.
     """
@@ -34,9 +34,11 @@ rule run_multiqc_fastq:
     Run multiqc on fastqc and fastp output for input fastqs
     """
     input:
-        fastqc=lambda wildcards: tc.construct_fastqc_targets(wildcards, manifest),
-        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_targets(
-            wildcards, manifest
+        fastqc=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc", "001_fastqc", True
+        ),
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         multiqc_config=config["multiqc-read-config"],
@@ -56,11 +58,13 @@ rule run_multiqc_fastq:
             )
         ),
     conda:
-        "../envs/multiqc.yaml"
-    threads: 1
+        "../envs/multiqc.yaml" if not use_containers else None
+    container:
+        "docker://ewels/multiqc:v1.14" if use_containers else None
+    threads: config_resources["multiqc"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["multiqc"]["memory"],
+        qname=rc.select_queue(config_resources["multiqc"]["queue"], config_resources["queues"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
@@ -74,9 +78,11 @@ rule run_multiqc_fastq:
 
 use rule run_multiqc_fastq as run_multiqc_fastq_index_sortorder with:
     input:
-        fastqc=lambda wildcards: tc.construct_fastqc_targets(wildcards, manifest),
-        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_targets(
-            wildcards, manifest
+        fastqc=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc", "001_fastqc", True
+        ),
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         multiqc_config=config["multiqc-read-config"],
@@ -97,10 +103,12 @@ rule run_multiqc_alignment:
     Run multiqc on all steps up to but not including variant calling
     """
     input:
-        fastqc=lambda wildcards: tc.construct_fastqc_combined_targets(wildcards, manifest),
+        fastqc=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_combined", "fastqc", False
+        ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
-        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_combined_targets(
-            wildcards, manifest
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_posttrimming_combined", "fastqc", False
         ),
         verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
         alignstats=tc.construct_combined_alignstats_targets,
@@ -135,11 +143,13 @@ rule run_multiqc_alignment:
             )
         ),
     conda:
-        "../envs/multiqc.yaml"
-    threads: 1
+        "../envs/multiqc.yaml" if not use_containers else None
+    container:
+        "docker://ewels/multiqc:v1.14" if use_containers else None
+    threads: config_resources["multiqc"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["multiqc"]["memory"],
+        qname=rc.select_queue(config_resources["multiqc"]["queue"], config_resources["queues"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
@@ -157,10 +167,12 @@ rule run_multiqc_alignment:
 
 use rule run_multiqc_alignment as run_multiqc_alignment_index_sortorder with:
     input:
-        fastqc=lambda wildcards: tc.construct_fastqc_combined_targets(wildcards, manifest),
+        fastqc=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_combined", "fastqc", False
+        ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
-        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_posttrimming_combined_targets(
-            wildcards, manifest
+        fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
+            wildcards, manifest, "results/fastqc_posttrimming_combined", "fastqc", False
         ),
         verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
         alignstats=tc.construct_combined_alignstats_targets,
@@ -214,11 +226,13 @@ rule run_multiqc_calling:
             )
         ),
     conda:
-        "../envs/multiqc.yaml"
-    threads: 1
+        "../envs/multiqc.yaml" if not use_containers else None
+    container:
+        "docker://ewels/multiqc:v1.14" if use_containers else None
+    threads: config_resources["multiqc"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["multiqc"]["memory"],
+        qname=rc.select_queue(config_resources["multiqc"]["queue"], config_resources["queues"]),
     shell:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "

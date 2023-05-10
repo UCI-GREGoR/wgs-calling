@@ -19,11 +19,13 @@ rule lumpy_run:
     benchmark:
         "results/performance_benchmarks/lumpy_run/{projectid}/{sampleid}.tsv"
     conda:
-        "../envs/smoove.yaml"
-    threads: 1
+        "../envs/smoove.yaml" if not use_containers else None
+    container:
+        "{}/smoove.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["smoove"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="large",
+        mem_mb=config_resources["smoove"]["memory"],
+        qname=rc.select_queue(config_resources["smoove"]["queue"], config_resources["queues"]),
     shell:
         "smoove call --outdir {params.outdir} --exclude {input.bed} --name {wildcards.sampleid} --fasta {input.fasta} -p 1 --genotype {input.bam} && "
         "mv {params.outdir}/{wildcards.sampleid}-smoove.genotyped.vcf.gz {output.vcf}"

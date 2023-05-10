@@ -21,11 +21,13 @@ rule combine_input_fastqs_by_lane:
     output:
         temp("results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{readgroup}.fastq.gz"),
     conda:
-        "../envs/bcftools.yaml"
-    threads: 1
+        "../envs/bcftools.yaml" if not use_containers else None
+    container:
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["default"]["threads"]
     resources:
-        mem_mb="2000",
-        qname="small",
+        mem_mb=config_resources["default"]["memory"],
+        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
     shell:
         "gunzip -c {input} | bgzip -c > {output}"
 

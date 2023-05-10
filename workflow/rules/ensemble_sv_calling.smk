@@ -23,10 +23,12 @@ rule compare_sv_callers:
     params:
         sv_callers=config["behaviors"]["sv-callers"],
     conda:
-        "../envs/r.yaml"
-    threads: 1
+        "../envs/r.yaml" if not use_containers else None
+    container:
+        "{}/r.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["r"]["threads"]
     resources:
-        mem_mb="4000",
-        qname="small",
+        mem_mb=config_resources["r"]["memory"],
+        qname=rc.select_queue(config_resources["r"]["queue"], config_resources["queues"]),
     script:
         "../scripts/compare_sv_callers.Rmd"

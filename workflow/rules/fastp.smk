@@ -19,11 +19,13 @@ rule run_fastp:
         outprefix="results/fastp/{projectid}/{sampleid}_{lane}",
         quality=10,
     conda:
-        "../envs/fastp.yaml"
-    threads: 2
+        "../envs/fastp.yaml" if not use_containers else None
+    container:
+        "{}/fastp.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["fastp"]["threads"]
     resources:
-        mem_mb="8000",
-        qname="small",
+        mem_mb=config_resources["fastp"]["memory"],
+        qname=rc.select_queue(config_resources["fastp"]["queue"], config_resources["queues"]),
     shell:
         "fastp -i {input.r1} -I {input.r2} "
         "-o {output.r1_fastq} -O {output.r2_fastq} "

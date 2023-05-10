@@ -22,11 +22,13 @@ rule estimate_contamination:
         outprefix="results/contamination/{fileprefix}.vb2",
         db_prefix="reference_data/verifybamid2/{}/ref.db".format(reference_build),
     conda:
-        "../envs/verifybamid2.yaml"
-    threads: 2
+        "../envs/verifybamid2.yaml" if not use_containers else None
+    container:
+        "docker://griffan/verifybamid2:v2.0.1" if use_containers else None
+    threads: config_resources["verifybamid2"]["threads"]
     resources:
-        mem_mb="22000",
-        qname="small",
+        mem_mb=config_resources["verifybamid2"]["memory"],
+        qname=rc.select_queue(config_resources["verifybamid2"]["queue"], config_resources["queues"]),
     shell:
         "verifybamid2 "
         "--BamFile {input.bam} "

@@ -2,6 +2,11 @@
 .parallel
 .keras
 
+# infrastructure related to containers
+.cache
+.java
+.wget-hsts
+
 # Testing refuse
 .coverage
 
@@ -19,6 +24,9 @@ run_*.e*
 
 # Emacs backup files
 *~
+
+# Vim swap files
+*.swp
 
 # Commitizen Infrastructure
 node_modules

@@ -3,12 +3,17 @@
 # one row per sample. It can be parsed easily via pandas.
 manifest: "config/manifest.tsv"
 sample-logbook: "resources/example_logbook.xlsx.xlsx"
+sample-linking:
+  sex: "config/sample_linking_sex.tsv"
+  external-ids: "config/sample_linking_external_ids.tsv"
 multiqc-read-config: "config/multiqc_read_config.yaml"
 multiqc-alignment-config: "config/multiqc_alignment_config.yaml"
 multiqc-calling-config: "config/multiqc_calling_config.yaml"
 genome-build: "grch38"
+apptainer-image-dir: "apptainer_images"
 
 behaviors:
+  use-containers: no
   aligner: "bwa"
   snv-caller: "deepvariant"
   sv-callers:
@@ -29,6 +34,10 @@ behaviors:
     profile-name: "ucigrant"
 
 parameters:
+  bwa:
+    K: 120000000
+  bwa-mem2:
+    K: 120000000
   deepvariant:
     number-shards: 16
     docker-version: "1.4.0"
