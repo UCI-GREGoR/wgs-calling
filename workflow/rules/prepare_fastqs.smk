@@ -31,11 +31,11 @@ checkpoint input_bam_sample_lanes:
     by lane, sniff the bam for read names and determine which lanes are reportedly present.
     """
     input:
-        "results/input_bams/{projectid}/{subjectid}.sorted.bam",
+        "results/input_bams/{projectid}/{sampleid}.sorted.bam",
     output:
-        temp("results/fastqs_from_bam/{projectid}/{subjectid}_expected-lanes.tsv"),
+        temp("results/fastqs_from_bam/{projectid}/{sampleid}_expected-lanes.tsv"),
     benchmark:
-        "results/performance_benchmarks/input_bam_sample_lanes/{projectid}/{subjectid}.tsv"
+        "results/performance_benchmarks/input_bam_sample_lanes/{projectid}/{sampleid}.tsv"
     conda:
         "../envs/samtools.yaml" if not use_containers else None
     container:
@@ -56,11 +56,11 @@ rule input_bam_to_split_fastq:
     split by lane, bgzip compressed.
     """
     input:
-        "results/input_bams/{projectid}/{subjectid}.sorted.bam",
+        "results/input_bams/{projectid}/{sampleid}.sorted.bam",
     output:
-        "results/fastqs_from_bam/{projectid}/{subjectid}_L00{lane}_{readgroup}_001.fastq.gz",
+        "results/fastqs_from_bam/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
     benchmark:
-        "results/performance_benchmarks/input_bam_to_split_fastq/{projectid}/{subjectid}_L00{lane}_{readgroup}.tsv"
+        "results/performance_benchmarks/input_bam_to_split_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}.tsv"
     params:
         off_target_read_flag=lambda wildcards: 3 - int(wildcards.readgroup.strip("R")),
     conda:
@@ -91,9 +91,9 @@ checkpoint input_fastq_sample_lanes:
             )
         )[wildcards.readgroup].to_list()[0],
     output:
-        temp("results/fastqs_from_fastq/{projectid}/{subjectid}_expected-lanes.tsv"),
+        temp("results/fastqs_from_fastq/{projectid}/{sampleid}_expected-lanes.tsv"),
     benchmark:
-        "results/performance_benchmarks/input_fastq_sample_lanes/{projectid}/{subjectid}.tsv"
+        "results/performance_benchmarks/input_fastq_sample_lanes/{projectid}/{sampleid}.tsv"
     threads: 1
     resources:
         mem_mb=1000,
@@ -116,9 +116,9 @@ rule input_fastq_to_split_fastq:
             )
         )[wildcards.readgroup].to_list()[0],
     output:
-        "results/fastqs_from_fastq/{projectid}/{subjectid}_L00{lane}_{readgroup}_001.fastq.gz",
+        "results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
     benchmark:
-        "results/performance_benchmarks/input_fastq_to_split_fastq/{projectid}/{subjectid}_L00{lane}_{readgroup}.tsv"
+        "results/performance_benchmarks/input_fastq_to_split_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}.tsv"
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:
