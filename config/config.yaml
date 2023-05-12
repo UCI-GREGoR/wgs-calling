@@ -8,7 +8,6 @@ sample-linking:
   external-ids: "config/sample_linking_external_ids.tsv"
 multiqc-read-config: "config/multiqc_read_config.yaml"
 multiqc-alignment-config: "config/multiqc_alignment_config.yaml"
-multiqc-calling-config: "config/multiqc_calling_config.yaml"
 genome-build: "grch38"
 apptainer-image-dir: "apptainer_images"
 
