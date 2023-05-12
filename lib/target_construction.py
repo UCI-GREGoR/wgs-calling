@@ -1,6 +1,7 @@
 import os
 
 import pandas as pd
+from snakemake.checkpoints import Checkpoint, Checkpoints
 from snakemake.io import AnnotatedString, Namedlist, expand
 
 
@@ -29,24 +30,78 @@ def map_fastqs_to_manifest(wildcards: Namedlist, manifest: pd.DataFrame, readtag
     """
     Query input manifest to find path of an input fastq
     """
-    query = 'projectid == "{}" and sampleid == "{}" and lane == "{}"'.format(
-        wildcards.projectid, wildcards.sampleid, wildcards.lane
-    )
+    query = 'projectid == "{}" and sampleid == "{}"'.format(wildcards.projectid, wildcards.sampleid)
     result = manifest.query(query)
-    result = result[readtag.lower()].to_list()
-    assert len(result) == 1
-    return result[0]
+    ## try to determine if one of a series of special data types are present
+    ## "bam": data were input as pre-aligned bam that needs to be realigned
+    if "bam" in manifest.columns:
+        return "results/fastqs_from_bams/{}_{}_{}_001.fastq.gz".format(
+            wildcards.sampleid, wildcards.lane, readtag
+        )
+
+    result_bylane = result.loc[
+        result["lane"] == wildcards.lane,
+    ]
+    if len(result_bylane) == 1:
+        return result_bylane[readtag.lower()].to_list()[0]
+    if (
+        len(
+            result.loc[
+                result["lane"] == "combined",
+            ]
+        )
+        == 1
+    ):
+        return "results/fastqs_from_fastq/{}_{}_{}_001.fastq.gz".format(
+            wildcards.sampleid, wildcards.lane, readtag
+        )
+    raise ValueError(
+        "no valid manifest entry found for sample {}, lane {}, read {}".format(
+            wildcards.sampleid, wildcards.lane, readtag
+        )
+    )
+
+
+def locate_input_bam(wildcards: Namedlist, manifest: pd.DataFrame):
+    """
+    Attempt to find user-specified bamfile for input. This is expected
+    to be specified as an alternative to fastqs; fastqs are preferred.
+    """
+    query = 'projectid == "{}" and sampleid == "{}"'.format(wildcards.projectid, wildcards.sampleid)
+    result = manifest.query(query)
+    assert not result["bam"].isna().to_list()[0]
+    return result["bam"].to_list()[0]
 
 
 def get_bams_by_lane(
-    wildcards: Namedlist, config: dict, manifest: pd.DataFrame, suffix: str
+    wildcards: Namedlist,
+    checkpoints: Checkpoints,
+    config: dict,
+    manifest: pd.DataFrame,
+    suffix: str,
 ) -> list:
     """
     For a project and sample, get all the expected bams for the subject based on manifest lanes
     """
     query = 'projectid == "{}" and sampleid == "{}"'.format(wildcards.projectid, wildcards.sampleid)
     result = manifest.query(query)
-    available_lanes = result["lane"]
+    if "bam" in manifest.columns:
+        with checkpoints.input_bam_sample_lanes.get(
+            projectid=wildcards.projectid, sampleid=wildcards.sampleid
+        ).output[0].open() as f:
+            available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
+    else:
+        available_lanes = result["lane"]
+        if len(available_lanes) == 1:
+            ## determine if one of a series of special lane types is present.
+            ## if any of them are present, will probably need a checkpoint's output
+            ## to determine the expected set of lanes.
+            available_lane = available_lanes.to_list()[0]
+            if available_lane == "combined":
+                with checkpoints.input_bam_sample_lanes.get(
+                    projectid=wildcards.projectid, sampleid=wildcards.sampleid
+                ).output[0].open() as f:
+                    available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
     result = [
         "results/aligned/{}/{}_{}.{}".format(wildcards.projectid, wildcards.sampleid, x, suffix)
         for x in available_lanes

@@ -1,25 +1,41 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 description: an entry in the sample manifest
-properties:
-  projectid:
-    type: string
-    description: "run ID or other desired grouping of sequencing samples"
-  sampleid:
-    type: string
-    description: "sequencing ID for sample"
-  r1:
-    type: string
-    description: "R1 fastq.gz file for sample"
-  r2:
-    type: string
-    description: "R2 fastq.gz file for sample"
-  lane:
-    type: string
-    default: "L001"
-    description: "sequencing lane code, with L00 prefix"
-required:
-  - projectid
-  - sampleid
-  - r1
-  - r2
-additionalProperties: no
+oneOf:
+  - properties:
+      projectid:
+        type: string
+        description: "run ID or other desired grouping of sequencing samples"
+      sampleid:
+        type: string
+        description: "sequencing ID for sample"
+      r1:
+        type: string
+        description: "R1 fastq.gz file for sample"
+      r2:
+        type: string
+        description: "R2 fastq.gz file for sample"
+      lane:
+        type: string
+        default: "L001"
+        description: "sequencing lane code, with L00 prefix"
+    required:
+      - projectid
+      - sampleid
+      - r1
+      - r2
+    additionalProperties: no
+  - properties:
+      projectid:
+        type: string
+        description: "run ID or other desired grouping of sequencing samples"
+      sampleid:
+        type: string
+        description: "sequencing ID for sample"
+      bam:
+        type: string
+        description: "aligned read bam file for sample"
+    required:
+      - projectid
+      - sampleid
+      - bam
+    additionalProperties: no
