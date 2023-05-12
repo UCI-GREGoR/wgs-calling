@@ -89,7 +89,7 @@ checkpoint input_fastq_sample_lanes:
             'projectid == "{}" and sampleid == "{}"'.format(
                 wildcards.projectid, wildcards.sampleid
             )
-        )[wildcards.readgroup].to_list()[0],
+        )[wildcards.readgroup.lower()].to_list()[0],
     output:
         temp("results/fastqs_from_fastq/{projectid}/{sampleid}_{readgroup}_expected-lanes.tsv"),
     benchmark:
@@ -114,7 +114,7 @@ rule input_fastq_to_split_fastq:
             'projectid == "{}" and sampleid == "{}"'.format(
                 wildcards.projectid, wildcards.sampleid
             )
-        )[wildcards.readgroup].to_list()[0],
+        )[wildcards.readgroup.lower()].to_list()[0],
     output:
         "results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
     benchmark:
