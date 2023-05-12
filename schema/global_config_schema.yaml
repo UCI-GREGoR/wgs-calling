@@ -299,7 +299,6 @@ required:
   - manifest
   - multiqc-read-config
   - multiqc-alignment-config
-  - multiqc-calling-config
   - genome-build
   - behaviors
   - references
