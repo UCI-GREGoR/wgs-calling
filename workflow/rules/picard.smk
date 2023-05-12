@@ -55,8 +55,10 @@ rule mark_duplicates:
     in case we ever want to change this around.
     """
     input:
-        bam=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bam"),
-        bai=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bam.bai"),
+        bam=lambda wildcards: tc.get_bams_by_lane(wildcards, checkpoints, config, manifest, "bam"),
+        bai=lambda wildcards: tc.get_bams_by_lane(
+            wildcards, checkpoints, config, manifest, "bam.bai"
+        ),
     output:
         bam=temp("results/markdups/{projectid}/{sampleid}.mrkdup.bam"),
         score="results/markdups/{projectid}/{sampleid}.mrkdup.score.txt",
@@ -65,7 +67,7 @@ rule mark_duplicates:
     params:
         tmpdir=tempDir,
         bamlist=lambda wildcards: " -INPUT ".join(
-            tc.get_bams_by_lane(wildcards, config, manifest, "bam")
+            tc.get_bams_by_lane(wildcards, checkpoints, config, manifest, "bam")
         ),
         java_args=config_resources["gatk_mark_duplicates"]["java_args"],
     conda:
