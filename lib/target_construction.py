@@ -99,7 +99,7 @@ def get_bams_by_lane(
             available_lane = available_lanes.to_list()[0]
             if available_lane == "combined":
                 with checkpoints.input_fastq_sample_lanes.get(
-                    projectid=wildcards.projectid, sampleid=wildcards.sampleid
+                    projectid=wildcards.projectid, sampleid=wildcards.sampleid, readgroup="R1"
                 ).output[0].open() as f:
                     available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
     result = [

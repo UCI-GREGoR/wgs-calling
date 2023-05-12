@@ -91,9 +91,9 @@ checkpoint input_fastq_sample_lanes:
             )
         )[wildcards.readgroup].to_list()[0],
     output:
-        temp("results/fastqs_from_fastq/{projectid}/{sampleid}_expected-lanes.tsv"),
+        temp("results/fastqs_from_fastq/{projectid}/{sampleid}_{readgroup}_expected-lanes.tsv"),
     benchmark:
-        "results/performance_benchmarks/input_fastq_sample_lanes/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/input_fastq_sample_lanes/{projectid}/{sampleid}_{readgroup}.tsv"
     threads: 1
     resources:
         mem_mb=1000,
