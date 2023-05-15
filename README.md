@@ -107,7 +107,7 @@ The following reference files are split out by individual tool.
 ||`exclude-bed`|set of hard-to-call bed intervals to exclude from analysis. though this option is exposed by SvABA, there is no recommended file to use here, so one might just use the lumpy files, for example|
 |`manta`||reference data files specific to [manta](https://github.com/Illumina/manta)|
 ||`calling-range-bed-gz`|bgzip-compressed bedfile of valid calling ranges, e.g. autosomes. manta recommends not providing very many regions here, as it evidently causes problems with its task dispatch heuristics
-|`calling-range-bed-gz-tbi`||tabix index of above compressed bedfile|
+||`calling-range-bed-gz-tbi`|tabix index of above compressed bedfile|
 
 The following columns are expected in the run manifest, by default at `config/manifest.tsv`:
 
