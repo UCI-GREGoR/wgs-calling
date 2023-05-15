@@ -197,22 +197,6 @@ properties:
         required:
           - sites-vcf-gz
         additionalProperties: no
-  dnascope:
-    type: object
-    patternProperties:
-      "^grch[0-9]+$":
-        type: object
-        properties:
-          model:
-            type: string
-          dbsnp-vcf-gz:
-            type: string
-        required:
-          - model
-          - dbsnp-vcf-gz
-        additionalProperties: no
-    required:
-      - grch37
   verifybamid2:
     type: object
     patternProperties:
@@ -304,7 +288,6 @@ required:
   - references
   - bqsr
   - somalier
-  - dnascope
   - verifybamid2
   - deepvariant
   - delly

@@ -65,10 +65,6 @@ bqsr:
     known-indels-vcf-gz-tbi: "s3://broad-references/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi"
     dbsnp138-vcf: "s3://broad-references/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf"
     dbsnp138-vcf-idx: "s3://broad-references/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf.idx"
-dnascope:
-  grch37:
-    model: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/sentieon/SentieonDNAscopeModel1.1.model"
-    dbsnp-vcf-gz: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/sentieon/dbsnp_138.b37.vcf.gz"
 verifybamid2:
   grch37:
     db-V: "s3://invitae-health-chameleon-dev/reference_data/grch37/tool_specific_resources/verifybamid/VerifyBamID/resource/1000g.phase3.100k.b37.vcf.gz.dat.V"
