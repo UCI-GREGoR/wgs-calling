@@ -52,12 +52,12 @@ def map_fastqs_to_manifest(wildcards: Namedlist, manifest: pd.DataFrame, readtag
         )
         == 1
     ):
-        return "results/fastqs_from_fastq/{}_{}_{}_001.fastq.gz".format(
-            wildcards.sampleid, wildcards.lane, readtag
+        return "results/fastqs_from_fastq/{}/{}_{}_{}_001.fastq.gz".format(
+            wildcards.projectid, wildcards.sampleid, wildcards.lane, readtag
         )
     raise ValueError(
-        "no valid manifest entry found for sample {}, lane {}, read {}".format(
-            wildcards.sampleid, wildcards.lane, readtag
+        "no valid manifest entry found for project {}, sample {}, lane {}, read {}".format(
+            wildcards.projectid, wildcards.sampleid, wildcards.lane, readtag
         )
     )
 
