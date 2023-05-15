@@ -25,102 +25,99 @@ Configure the workflow according to your needs via editing the files in the `con
 
 The following settings are recognized in `config/config.yaml`. Note that each reference data option below exists under an arbitrary tag denoting desired reference genome build. This tag is completely arbitrary and will be used to recognize the requested build for the current pipeline run.
 
-- `manifest`: relative path to run manifest
-- `sample-logbook`: local Excel spreadsheet clone of sample manifest information from Google docs
-  - this is upstream input. a local cloned file is preferred due to the possibility of uncontrolled upstream changes
-- `sample-linking`: two column tsv linker files with sample annotation data
-  - `sex`: path to linker containing internal subject ID and self-reported sex data
-  - `external-ids`: path to linker containing internal subject ID and external IDs
-- `multiqc-read-config`: relative path to configuration settings for pre-alignment multiQC report
-- `multiqc-alignment-config`: relative path to configuration settings for post-alignment multiQC report
-- `multiqc-calling-config`: relative path to configuration settings for post-calling multiQC report
-- `genome-build`: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.
-- `behaviors`: user-configurable modifiers to how the pipeline will run
-  - `use-containers`: whether to, when possible, use either the docker or singularity image for each rule, or instead the rule-specific conda environment. See discussion below for how to choose this setting, and how it interacts with snakemake invocations.
-  - `aligner`: which alignment tool to use. permitted values: `bwa-mem2`
-  - `snv-caller`: which calling tool to use for SNVs. permitted values: `deepvariant`
-  - `sv-callers`: which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`
-  - `sv-ensemble`: settings controlling SV ensemble calling. note that the below settings can be applied in combination
-	- `min-count`: the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering
-	- `required-callers`: a list of which tools, if any, a variant absolutely must appear in to survive ensemble filtering
-  - `sv-remove-breakends`: whether or not to filter `SVTYPE=BND` variants from ensemble calling output
-  - `outcome`: which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`; or `release` to prepare results for distribution
-  - `symlink-fastqs`: whether to copy (no) or symlink (yes) input fastqs into workspace. symlinking is faster and more memory-efficient, but
-    less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch.
-  - `trim-adapters-before-alignment`: whether to use adapter trimmed fastq output of `fastp` as input to aligner.
-    permitted values: `yes`, `no`, or `legacy`. legacy behavior for this option is to not use trimmed output for alignment.
-  - `assume-last-sample-sex`: upstream convention is to include a low-depth NA24385 as the final sample in every flowcell. that sample is not annotated
-    in the logbook in a way that the parser understands. to maintain compatibility with Somalier sexcheck, set this to `female`. if no sex should be assumed
-	for the sample, delete this configuration option
-  - `export-directory`: top-level path to where output files should be moved after release run is complete. this is only required if using the special `export_data`
-    target outside of the standard DAG (see below for description)
-  - `export-s3`: parameters for controlling optional upload to s3
-    - `bucket-name`: name of s3 bucket to which to sync data
-    - `profile-name`: optional name of aws profile to use for data sync
-- `parameters`: tool-specific parameters. note that this section is a work in progress, somewhat more than the rest
-  - `bwa`: parameters specific to [bwa](https://bio-bwa.sourceforge.net/)
-    - `K`: chunk size parameter. `bwa` defaults this to `1e7*{threads}`, but to maintain consistency independent of thread count,
-      this is manually fixed. higher numbers improve runtime at the cost of (marginally) increased RAM usage
-  - `bwa-mem2`: parameters specific to [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2)
-    - `K`: chunk size parameter. see the corresponding `bwa` option for detauls
-  - `deepvariant`: parameters specific to [deepvariant](https://github.com/google/deepvariant)
-    - `number-shards`: how many shards to break calling into. needs to be at most the number of available threads in the submission queue
-	- `docker-version`: which docker tag to use when pulling the official DeepVariant docker image
-  - `manta`: parameters specific to [Manta](https://github.com/Illumina/manta)
-    - `config-ini`: relative path to Manta local configuration data. see Manta documentation for more specific information about permitted
-	  values in this config file. the exposure of this file, which is passed to `configManta.py`, is done in anticipation of toggling
-	  settings that can reduce Manta's substantial runtime, e.g. `enableRemoteReadRetrievalForInsertionsInGermlineCallingModes`
-  - `tiddit`: parameters specific to [TIDDIT](https://github.com/SciLifeLab/TIDDIT)
-	- `min-contig-size`: minimum size of contigs on which to make calls, in bases. a minimum size of 2000000 will remove the remaining
-	  non-standard contigs present in the no-alt version of GRCh38, for example. unfortunately, TIDDIT does not directly support calling regions
-- `references`: human genome reference data applicable to multiple tools
-  - `fasta`: human sequence fasta file
-    - note that the other bwa-style index files attached to this fasta used to be imported by the nextflow workflow. however, presumably by accident,
-      these annotation files were getting pulled from various different directories in a way that suggested that they might be delinked from their
-	  source fasta. in reality, the source reference fastas were probably the same; but to avoid any difficulties downstream, now only the fasta
-	  itself is pulled in from remote, and the index files are regenerated. this also substantially cleans up the configuration.
-  - `exclusion-regions-bed`: set of bed regions to be excluded from output SNV data. expected to be from https://doi.org/10.1038/s41598-019-45839-z
-  - `exons-gtf-gz`: gene annotations for genome build. used to extract a bedfile of exon positions
-- `bsqr`: reference files for base quality score recalibration from GATK4
-  - `known-indels-vcf-gz`: VCF of "gold standard" indels for BQSR. intended to be pulled from Broad's cloud files
-  - `known-indels-vcf-gz-tbi`: tabix index for above known indels vcf
-  - `dbsnp138-vcf`: VCF of dbSNP variation for BQSR. intended to be pulled from Broad's cloud files
-  - `dbsnp138-vcf-idx`: .idx index file for above dbSNP vcf
-- `collectwgsmetrics`: reference files specific for GATK4 post-alignment QC utility `CollectWgsMetrics`
-  - `reportable-regions`: set of bed intervals to be considered for `CollectWgsMetrics` output. note that the legacy Nextflow workflow
-    unconditionally applied the NA12878 reportable regions set to all samples. this is likely in error, and as such will need to be changed
-- `dnascope`: reference data files specific to [Sentieon DNAscope](https://support.sentieon.com/manual/DNAscope_usage/dnascope/)
-  - `model`: DNAscope model file
-  - `dbsnp-vcf-gz`: dbSNP backend vcf.gz file
-- `verifybamid2`: reference data files specific to [VerifyBamID2](https://github.com/Griffan/VerifyBamID)
-  - `db-V`: filename for assorted Verify annotation files
-  - `db-UD`: filename for assorted Verify annotation files
-  - `db-mu`: filename for assorted Verify annotation files
-  - `db-bed`: filename for assorted Verify annotation files
-- `deepvariant`: reference data files specific to [deepvariant](https://github.com/google/deepvariant)
-  - `calling-ranges`: list of files containing chromosomal intervals for embarrassingly parallel analysis. these are currently effectively
-    placeholders that just contain the standard human chromosomes, but at some point, this will be extended to contain actual
-	balanced calling intervals
-- `lumpy`: reference data files specific to [lumpy](https://github.com/arq5x/lumpy-sv) or [smoove](https://github.com/brentp/smoove)
-  - `exclude-bed`: set of hard-to-call bed intervals to exclude from analysis. these files are intended to be the ones listed in the tools' documentation,
-    but can be customized if desired
-- `delly`: reference data files specific to [delly](https://github.com/dellytools/delly)
-  - `exclude-bed`: set of hard-to-call bed intervals to exclude from analysis. these files are intended to be the ones listed in the tools' documentation,
-    but can be customized if desired
-- `svaba`: reference data files specific to [svaba](https://github.com/walaj/svaba)
-  - `exclude-bed`: set of hard-to-call bed intervals to exclude from analysis. though this option is exposed by SvABA, there is no recommended file
-    to use here, so one might just use the lumpy files, for example
-- `manta`: reference data files specific to [manta](https://github.com/Illumina/manta)
-  - `calling-range-bed-gz`: bgzip-compressed bedfile of valid calling ranges, e.g. autosomes. manta recommends not providing very many regions here,
-    as it evidently causes problems with its task dispatch heuristics
-  - `calling-range-bed-gz-tbi`: tabix index of above compressed bedfile
+|Configuration Setting|Description|
+|---|---|
+|`manifest`|relative path to run manifest|
+|`sample-logbook`|local Excel spreadsheet clone of sample manifest information from Google docs.<br>This is upstream input. a local cloned file is preferred due to the possibility of uncontrolled upstream changes|
+|`sample-linking`|two column tsv linker files with sample annotation data|
+||`sex`: path to linker containing internal subject ID and self-reported sex data|
+||`external-ids`: path to linker containing internal subject ID and external IDs|
+|`multiqc-read-config`|relative path to configuration settings for pre-alignment multiQC report|
+|`multiqc-alignment-config`|relative path to configuration settings for post-alignment multiQC report|
+|`genome-build`|requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below.|
+
+The following settings are nested under the key `behaviors` and are user-configurable modifiers to how the pipeline will run.
+
+|Behavior|Description|
+|---|---|
+|`use-containers`|whether to, when possible, use either the docker or singularity image for each rule, or instead the rule-specific conda environment. See discussion below for how to choose this setting, and how it interacts with snakemake invocations.
+|`aligner`|which alignment tool to use. permitted values: `bwa`, `bwa-mem2`|
+|`snv-caller`|which calling tool to use for SNVs. permitted values: `deepvariant`|
+|`sv-callers`|which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`
+|`sv-ensemble`|settings controlling SV ensemble calling. note that the below settings can be applied in combination|
+||`min-count`: the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering|
+||`required-callers`: a list of which tools, if any, a variant absolutely must appear in to survive ensemble filtering
+|`sv-remove-breakends`|whether or not to filter `SVTYPE=BND` variants from ensemble calling output
+|`outcome`|which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`; or `release` to prepare results for distribution|
+|`symlink-fastqs`|whether to copy (no) or symlink (yes) input fastqs into workspace. symlinking is faster and more memory-efficient, but less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch.|
+|`trim-adapters-before-alignment`|whether to use adapter trimmed fastq output of `fastp` as input to aligner. permitted values: `yes`, `no`, or `legacy`. legacy behavior for this option is to not use trimmed output for alignment.|
+|`assume-last-sample-sex`|upstream convention is to include a low-depth NA24385 as the final sample in every flowcell. that sample is not annotated in the logbook in a way that the parser understands. to maintain compatibility with Somalier sexcheck, set this to `female`. if no sex should be assumed for the sample, delete this configuration option|
+|`export-directory`|top-level path to where output files should be moved after release run is complete. delete this option to disable.
+|`export-s3`|parameters for controlling optional upload to s3|
+||`bucket-name`: name of s3 bucket to which to sync data|
+||`profile-name`: optional name of aws profile to use for data sync|
+
+The following tool-specific parameters are nested under the key `parameters`.
+
+|Tool|Recognized Parameters|
+|---|---|
+|`bwa`|parameters specific to [bwa](https://bio-bwa.sourceforge.net/)|
+||`K`: chunk size parameter. `bwa` defaults this to `1e7*{threads}`, but to maintain consistency independent of thread count, this is manually fixed. higher numbers improve runtime at the cost of (marginally) increased RAM usage|
+|`bwa-mem2`|parameters specific to [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2)|
+||`K`: chunk size parameter. see the corresponding `bwa` option for details|
+|`deepvariant`|parameters specific to [deepvariant](https://github.com/google/deepvariant)|
+||`number-shards`: how many shards to break calling into. needs to be at most the number of available threads in the submission queue|
+||`docker-version`: which docker tag to use when pulling the official DeepVariant docker image|
+|`manta`|parameters specific to [Manta](https://github.com/Illumina/manta)|
+||`config-ini`: relative path to Manta local configuration data. see Manta documentation for more specific information about permitted values in this config file. the exposure of this file, which is passed to `configManta.py`, is done in anticipation of toggling settings that can reduce Manta's substantial runtime, e.g. `enableRemoteReadRetrievalForInsertionsInGermlineCallingModes`
+|`tiddit`|parameters specific to [TIDDIT](https://github.com/SciLifeLab/TIDDIT)|
+||`min-contig-size`: minimum size of contigs on which to make calls, in bases. a minimum size of 2000000 will remove the remaining non-standard contigs present in the no-alt version of GRCh38, for example. unfortunately, TIDDIT does not directly support calling regions|
+
+The following general genome reference files are nested under the key `parameters`, and are expected to be available to multiple tools in the pipeline.
+
+|Annotation Type|Description|
+|---|---|
+|`fasta`|human sequence fasta file.|
+|`exclusion-regions-bed`|set of bed regions to be excluded from output SNV data. expected to be from https://doi.org/10.1038/s41598-019-45839-z|
+|`exons-gtf-gz`|gene annotations for genome build. used to extract a bedfile of exon positions|
+
+The following reference files are split out by individual tool.
+
+|Tool|Annotation Type|Description|
+|---|---|
+|`bsqr`||reference files for base quality score recalibration from GATK4|
+||`known-indels-vcf-gz`|VCF of "gold standard" indels for BQSR. intended to be pulled from Broad's cloud files|
+||`known-indels-vcf-gz-tbi`|tabix index for above known indels vcf|
+||`dbsnp138-vcf`|VCF of dbSNP variation for BQSR. intended to be pulled from Broad's cloud files|
+||`dbsnp138-vcf-idx`|.idx index file for above dbSNP vcf|
+|`collectwgsmetrics`||reference files specific for GATK4 post-alignment QC utility `CollectWgsMetrics`|
+||`reportable-regions`|set of bed intervals to be considered for `CollectWgsMetrics` output. note that the legacy Nextflow workflow unconditionally applied the NA12878 reportable regions set to all samples. this is likely in error, and as such will need to be changed|
+|`verifybamid2`||reference data files specific to [VerifyBamID2](https://github.com/Griffan/VerifyBamID)|
+||`db-V`|filename for assorted Verify annotation files|
+||`db-UD`|filename for assorted Verify annotation files|
+||`db-mu`|filename for assorted Verify annotation files|
+||`db-bed`|filename for assorted Verify annotation files|
+|`deepvariant`||reference data files specific to [deepvariant](https://github.com/google/deepvariant)|
+||`calling-ranges`|list of files containing chromosomal intervals for embarrassingly parallel analysis. these are currently effectively placeholders that just contain the standard human chromosomes, but at some point, this will be extended to contain actual balanced calling intervals|
+|`lumpy`||reference data files specific to [lumpy](https://github.com/arq5x/lumpy-sv) or [smoove](https://github.com/brentp/smoove)|
+||`exclude-bed`|set of hard-to-call bed intervals to exclude from analysis. these files are intended to be the ones listed in the tools' documentation, but can be customized if desired|
+|`delly`||reference data files specific to [delly](https://github.com/dellytools/delly)|
+||`exclude-bed`|set of hard-to-call bed intervals to exclude from analysis. these files are intended to be the ones listed in the tools' documentation, but can be customized if desired|
+|`svaba`||reference data files specific to [svaba](https://github.com/walaj/svaba)|
+||`exclude-bed`|set of hard-to-call bed intervals to exclude from analysis. though this option is exposed by SvABA, there is no recommended file to use here, so one might just use the lumpy files, for example|
+|`manta`||reference data files specific to [manta](https://github.com/Illumina/manta)|
+||`calling-range-bed-gz`|bgzip-compressed bedfile of valid calling ranges, e.g. autosomes. manta recommends not providing very many regions here, as it evidently causes problems with its task dispatch heuristics
+|`calling-range-bed-gz-tbi`||tabix index of above compressed bedfile|
 
 The following columns are expected in the run manifest, by default at `config/manifest.tsv`:
-- `projectid`: run ID, or other desired grouping of sequencing samples. this will be a subdirectory under individual tools in `results/`
-- `sampleid`: sequencing ID for sample
-- `r1`: R1 fastq.gz file for sample
-- `r2`: R2 fastq.gz file for sample
-- `lane`: (optional) sequencing lane code, with `L00` prefix. if not specified, will be assumed to be `L001`
+
+|Manifest column|Description|
+|---|---|
+|`projectid`|run ID, or other desired grouping of sequencing samples. this will be a subdirectory under individual tools in `results/`|
+|`sampleid`|sequencing ID for sample|
+|`r1`|R1 fastq.gz file for sample|
+|`r2`|R2 fastq.gz file for sample|
+|`lane`|(optional) sequencing lane code, with `L00` prefix. if not specified, will be assumed to be `L001`|
 
 ### Step 3: Install Snakemake
 
