@@ -84,7 +84,7 @@ The following general genome reference files are nested under the key `parameter
 The following reference files are split out by individual tool.
 
 |Tool|Annotation Type|Description|
-|---|---|
+|---|---|---|
 |`bsqr`||reference files for base quality score recalibration from GATK4|
 ||`known-indels-vcf-gz`|VCF of "gold standard" indels for BQSR. intended to be pulled from Broad's cloud files|
 ||`known-indels-vcf-gz-tbi`|tabix index for above known indels vcf|
