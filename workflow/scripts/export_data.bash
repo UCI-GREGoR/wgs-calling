@@ -8,14 +8,21 @@ RESULTS_FILE="$2"
 RESULTS_FILE="$(readlink -m ${RESULTS_FILE})"
 
 # determine jira ticket and flowcell from current path
+# This is legacy support for the workflow when run on a particular
+# infrastructure pre-April 2023. In the absence of the expected jira
+# ticket or flowcell patterns, the workflow will still perform local
+# data export, but the files will be emitted to the top level of
+# the local export directory.
 JIRA_TICKET=$(pwd | sed -r 's/.*(RT-[0-9]{4}).*/\1/')
 FLOWCELL=$(pwd | sed -r 's/.*(RU[0-9]{5}).*/\1/')
-if [[ "${JIRA_TICKET}" != "RT-"* ]] || [[ "${FLOWCELL}" != "RU"* ]] ; then
-    echo "unable to extract jira ticket and flowcell identifier from pwd $(pwd)"
-    exit 2
+TARGET_DIR="${TARGET_DIR}"
+if [[ "${JIRA_TICKET}" == "RT-"* ]]  ; then
+    TARGET_DIR="${TARGET_DIR}/${JIRA_TICKET}"
+fi
+if [[ "${FLOWCELL}" == "RU"* ]] ; then
+    TARGET_DIR="${TARGET_DIR}/${FLOWCELL}"
 fi
 # create output target directory
-TARGET_DIR="${TARGET_DIR}/${JIRA_TICKET}/${FLOWCELL}"
 mkdir -p "${TARGET_DIR}"
 # copy targets
 cp results/export/${FLOWCELL}/*vcf.gz* results/export/${FLOWCELL}/*cram* results/export/${FLOWCELL}/methods* "${TARGET_DIR}"
