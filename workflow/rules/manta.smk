@@ -3,8 +3,8 @@ rule manta_configure:
     Configure manta SV caller on a single bamfile.
     """
     input:
-        bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bai",
+        bam="results/aligned_bams/{projectid}/{sampleid}.bam",
+        bai="results/aligned_bams/{projectid}/{sampleid}.bai",
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),
@@ -43,8 +43,8 @@ rule manta_run:
     After run configuration, actually run manta SV caller.
     """
     input:
-        bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bai",
+        bam="results/aligned_bams/{projectid}/{sampleid}.bam",
+        bai="results/aligned_bams/{projectid}/{sampleid}.bai",
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),

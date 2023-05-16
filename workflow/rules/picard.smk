@@ -138,8 +138,8 @@ rule picard_collectmultiplemetrics:
     Run gatk version of picard CollectMultipleMetrics
     """
     input:
-        bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bai",
+        bam="results/aligned_bams/{fileprefix}.bam",
+        bai="results/aligned_bams/{fileprefix}.bai",
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),
@@ -208,8 +208,8 @@ rule picard_collectgcbiasmetrics:
     Run gatk version of picard CollectGcBiasMetrics
     """
     input:
-        bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bai",
+        bam="results/aligned_bams/{fileprefix}.bam",
+        bai="results/aligned_bams/{fileprefix}.bai",
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),
@@ -255,8 +255,8 @@ rule picard_collectwgsmetrics:
     Run gatk version of picard CollectWgsMetrics
     """
     input:
-        bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bai",
+        bam="results/aligned_bams/{fileprefix}.bam",
+        bai="results/aligned_bams/{fileprefix}.bai",
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),

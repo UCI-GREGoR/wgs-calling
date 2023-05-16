@@ -66,8 +66,8 @@ rule bqsr_apply_bqsr:
         ),
         table="results/bqsr/{projectid}/{sampleid}.recal_table",
     output:
-        bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bai",
+        bam="results/aligned_bams/{projectid}/{sampleid}.bam",
+        bai="results/aligned_bams/{projectid}/{sampleid}.bai",
     params:
         tmpdir=tempDir,
         java_args=config_resources["gatk_bqsr_apply_bqsr"]["java_args"],

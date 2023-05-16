@@ -32,7 +32,7 @@ rule create_cram_export:
     Take bqsr bamfile and turn it into something to release
     """
     input:
-        bam="results/bqsr/{projectid}/{sqid}.bam",
+        bam="results/aligned_bams/{projectid}/{sqid}.bam",
         fasta="reference_data/references/{}/ref.fasta".format(reference_build),
         fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
     output:

@@ -3,8 +3,8 @@ rule duphold_run:
     Use duphold to annotate SVs in a vcf with various quality guesses
     """
     input:
-        bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bai",
+        bam="results/aligned_bams/{projectid}/{sampleid}.bam",
+        bai="results/aligned_bams/{projectid}/{sampleid}.bai",
         snv_vcf=expand(
             "results/{caller}/{{projectid}}/{{sampleid}}.sorted.vcf.gz",
             caller=config["behaviors"]["snv-caller"],
