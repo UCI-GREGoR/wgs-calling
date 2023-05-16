@@ -14,6 +14,7 @@ apptainer-image-dir: "apptainer_images"
 behaviors:
   use-containers: no
   aligner: "bwa"
+  bqsr: yes
   snv-caller: "deepvariant"
   sv-callers:
     - "manta"

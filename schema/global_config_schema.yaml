@@ -31,6 +31,9 @@ properties:
       aligner:
         type: string
         pattern: "^bwa-mem2$|^bwa$"
+      bqsr:
+        type: boolean
+        default: yes
       snv-caller:
         type: string
         pattern: "^deepvariant$"

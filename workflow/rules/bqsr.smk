@@ -71,6 +71,7 @@ rule bqsr_apply_bqsr:
     params:
         tmpdir=tempDir,
         java_args=config_resources["gatk_bqsr_apply_bqsr"]["java_args"],
+        use_bqsr=config["behaviors"]["bqsr"],
     benchmark:
         "results/performance_benchmarks/bqsr_apply_bqsr/{projectid}/{sampleid}.tsv"
     conda:
@@ -84,10 +85,12 @@ rule bqsr_apply_bqsr:
             config_resources["gatk_bqsr_apply_bqsr"]["queue"], config_resources["queues"]
         ),
     shell:
+        'if [[ "{params.use_bqsr}" == "False" ]] ; then cp {input.bam} {output.bam} && cp {input.bai} {output.bai} ; else '
         "mkdir -p {params.tmpdir} && "
         'gatk --java-options "{params.java_args}" ApplyBQSR '
         "--tmp-dir {params.tmpdir} "
         "-R {input.fasta} "
         "-I {input.bam} "
         "--bqsr-recal-file {input.table} "
-        "-O {output.bam}"
+        "-O {output.bam} ; "
+        "fi"
