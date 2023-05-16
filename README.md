@@ -234,24 +234,23 @@ When the pipeline is run in `release` mode, postprocessed output files for each 
 #### (optional) Move Data to External Release Directory
 
 A convenience rule exists for exporting data out of the workflow and into some sort of persistent storage location.
-This rule is executed by running `snakemake -j1 export_data`. This rule has the following assumptions:
+This has been folded into the configuration setting `behaviors -> outcome: "release"`. If the release endpoint is requested,
+and a local export directory has been specified with the configuration setting `behaviors -> export-directory`, the rule will
+do the following:
 
-- it assumes the current working directory has a JIRA ticket formatted `RT-\d{4}` somewhere in its absolute path
-- it assumes the current working directory has a flowcell ID formatted `RU\d{5}` somewhere in its absolute path
-- it assumes a target export directory has been defined in `config/config.yaml` under `behaviors::export-directory`
-- it assumes the workflow has already been run to completion in `release` mode
-
-If the above assumptions are met, the rule will do the following:
-
-- construct a subdirectory under `export-directory` named `{JIRA ticket}/{flowcell ID}`
+- as necessary, the workflow will be run through the steps leading to the `calling` outcome
+- construct the requested `export-directory` if needed
+  - if the _working directory of the pipeline_ contains subdirectories of the patterns
+    `RT-\d+` or `RU\d+`, these will be created as subdirectories under the export directory,
+    and exported files will be placed within. This behavior preserves legacy functionality and is deprecated.
 - move all `*vcf.gz*` and `*cram*` files from `results/export` to that directory
 - move the methods summary from `results/export` to that directory
 - edit the checksum files that were in `results/export` to no longer contain the relative paths specific to the workflow results directory structure
 - run `md5sum -c` on all files with checksums (cram, crai, vcf.gz, tbi) and report the results to `results/export/md5_checks.txt`
 
 These behaviors are controlled by the utility shell script in `workflow/scripts/export_data.bash`, which can be called outside of the pipeline if
-desired as `./export_data.bash {export_directory} {md5_check_outfile.txt}`. This is just included for convenience as this file export step is required
-for all runs of the pipeline for my particular use case, and can be ignored if desired.
+desired as `./export_data.bash {export_directory} {md5_check_outfile.txt}`. Again, this export is optional, but it's the most convenient way
+of getting processed vcfs and crams out of the pipeline at this time.
 
 ### Step 6: Commit changes
 
