@@ -129,5 +129,6 @@ rule input_fastq_to_split_fastq:
         qname=rc.select_queue("small", config_resources["queues"]),
     shell:
         "gunzip -c {input} | "
-        "awk 'BEGIN {{FS = \":\"}} {{lane = $4 ; print ; for (i = 1 ; i <= 3 ; i++) {{getline ; print}}}}' | "
+        'awk \'BEGIN {{FS = ":"}} {{lane = $4 ; if ( lane == "{wildcards.lane}" ) {{ print }} ; '
+        'for (i = 1 ; i <= 3 ; i++) {{getline ; if ( lane == "{wildcards.lane}" ) {{ print }}}}}}\' | '
         "bgzip -c > {output}"
