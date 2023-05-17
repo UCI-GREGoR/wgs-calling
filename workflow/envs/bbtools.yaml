@@ -1,0 +1,6 @@
+channels:
+  - agbiome
+  - bioconda
+  - conda-forge
+dependencies:
+  - bbtools

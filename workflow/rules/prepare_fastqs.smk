@@ -108,6 +108,10 @@ rule input_fastq_to_split_fastq:
     bams will be aligned to the wrong genome, and need to be converted into fastqs
     in preparation for re-alignment. After sorting the bam, convert it to fastq,
     split by lane, bgzip compressed.
+
+    Based on observations, it seems like these fastqs are minimally incompatible
+    with fastp. I'm testing why, but bbtools can fix it; but that needs to be
+    invoked separately.
     """
     input:
         lambda wildcards: manifest.query(
@@ -116,7 +120,7 @@ rule input_fastq_to_split_fastq:
             )
         )[wildcards.readgroup.lower()].to_list()[0],
     output:
-        "results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
+        temp("results/bbtools_input/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz"),
     benchmark:
         "results/performance_benchmarks/input_fastq_to_split_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}.tsv"
     conda:
@@ -132,3 +136,29 @@ rule input_fastq_to_split_fastq:
         'awk \'BEGIN {{FS = ":"}} {{lane = $4 ; if ( lane == "{wildcards.lane}" ) {{ print }} ; '
         'for (i = 1 ; i <= 3 ; i++) {{getline ; if ( lane == "{wildcards.lane}" ) {{ print }}}}}}\' | '
         "bgzip -c > {output}"
+
+
+rule bbtools_repair_fastqs:
+    """
+    Testing the use of bbtools repair.sh to fix incompatibilities between external combined fastqs
+    and fastp.
+    """
+    input:
+        R1="results/bbtools_input/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
+        R2="results/bbtools_input/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
+    output:
+        R1="results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
+        R2="results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
+        singletons=temp(
+            "results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz"
+        ),
+    benchmark:
+        "results/performance_benchmarks/bbtools_repair_fastqs/{projectid}/{sampleid}_L00{lane}_{readgroup}.tsv"
+    conda:
+        "../envs/bbtools.yaml" if not use_containers else None
+    threads: 1
+    resources:
+        mem_mb=8000,
+        qname=rc.select_queue("small", config_resources["queues"]),
+    shell:
+        "repair.sh in1={input.R1} in2={input.R2} out1={output.R1} out2={output.R2} outs={output.singletons} repair"
