@@ -144,16 +144,16 @@ rule bbtools_repair_fastqs:
     and fastp.
     """
     input:
-        R1="results/bbtools_input/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
-        R2="results/bbtools_input/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
+        R1="results/bbtools_input/{projectid}/{sampleid}_L00{lane}_R1_001.fastq.gz",
+        R2="results/bbtools_input/{projectid}/{sampleid}_L00{lane}_R2_001.fastq.gz",
     output:
-        R1="results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
-        R2="results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
+        R1="results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_R1_001.fastq.gz",
+        R2="results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_R2_001.fastq.gz",
         singletons=temp(
-            "results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz"
+            "results/fastqs_from_fastq/{projectid}/{sampleid}_L00{lane}_singletons_001.fastq.gz"
         ),
     benchmark:
-        "results/performance_benchmarks/bbtools_repair_fastqs/{projectid}/{sampleid}_L00{lane}_{readgroup}.tsv"
+        "results/performance_benchmarks/bbtools_repair_fastqs/{projectid}/{sampleid}_L00{lane}.tsv"
     conda:
         "../envs/bbtools.yaml" if not use_containers else None
     threads: 1
