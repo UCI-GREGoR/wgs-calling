@@ -75,7 +75,7 @@ rule deepvariant_make_examples:
         tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "
-        "seq 0 $(({threads}-1)) | parallel -j{threads} --tmpdir ${{TMPDIR}} "
+        "seq 0 $(({threads}-1)) | parallel -j{threads} --tmpdir ${params.tmpdir} "
         "make_examples --mode calling "
         '--ref {input.fasta} --reads {input.bam} --regions "$(cat {input.intervals})" '
         "--examples {params.shard_string} --channels insert_size "
