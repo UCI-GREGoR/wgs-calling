@@ -42,10 +42,10 @@ rule run_multiqc_fastq:
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         multiqc_config=config["multiqc-read-config"],
-        id_linker="results/multiqc/{projectid}/linker.tsv",
+        id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
-        html="results/multiqc/{projectid}/multiqc.lane-specific-study-id-sorted.{projectid}.fastq.html",
-        data_zip="results/multiqc/{projectid}/multiqc.lane-specific-study-id-sorted.{projectid}.fastq_data.zip",
+        html="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.fastq.html",
+        data_zip="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.fastq_data.zip",
     benchmark:
         "results/performance_benchmarks/run_multiqc_fastq/{projectid}.tsv"
     params:
@@ -76,22 +76,31 @@ rule run_multiqc_fastq:
         "-n {output.html}"
 
 
-use rule run_multiqc_fastq as run_multiqc_fastq_index_sortorder with:
+use rule run_multiqc_fastq as run_multiqc_fast_combined_lanes with:
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc", "001_fastqc", True
+            wildcards, manifest, "results/fastqc_combined", "fastqc", True
         ),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_posttrimming", "fastp_fastqc", True
+            wildcards, manifest, "results/fastqc_posttrimming_combined", "fastqc", True
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         multiqc_config=config["multiqc-read-config"],
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
-        html="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.fastq.html",
-        data_zip="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.fastq_data.zip",
+        html="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.fastq.html",
+        data_zip="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.fastq_data.zip",
     benchmark:
-        "results/performance_benchmarks/run_multiqc_fastq_index_sortorder/{projectid}.tsv"
+        "results/performance_benchmarks/run_multiqc_fastq_combined_lanes/{projectid}.tsv"
+    params:
+        target_dirs=list(
+            set(
+                expand(
+                    "results/{toolname}/{{projectid}}",
+                    toolname=["fastqc_combined", "fastp", "fastqc_posttrimming_combined"],
+                )
+            )
+        ),
 
 
 rule run_multiqc_alignment:
@@ -112,10 +121,10 @@ rule run_multiqc_alignment:
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
         multiqc_config=config["multiqc-alignment-config"],
-        id_linker="results/multiqc/{projectid}/linker.tsv",
+        id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
-        html="results/multiqc/{projectid}/multiqc.combined-lanes-study-id-sorted.{projectid}.alignment.html",
-        data_zip="results/multiqc/{projectid}/multiqc.combined-lanes-study-id-sorted.{projectid}.alignment_data.zip",
+        html="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.alignment.html",
+        data_zip="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.alignment_data.zip",
     benchmark:
         "results/performance_benchmarks/run_multiqc_alignment/{projectid}.tsv"
     params:
@@ -161,14 +170,14 @@ rule run_multiqc_alignment:
         "--profile-runtime --zip-data-dir"
 
 
-use rule run_multiqc_alignment as run_multiqc_alignment_index_sortorder with:
+use rule run_multiqc_alignment as run_multiqc_alignment_lane_specific with:
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_combined", "fastqc", False
+            wildcards, manifest, "results/fastqc", "001_fastqc", False
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_posttrimming_combined", "fastqc", False
+            wildcards, manifest, "results/fastqc_posttrimming", "fastp_fastqc", False
         ),
         verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
         alignstats=tc.construct_combined_alignstats_targets,
@@ -178,7 +187,27 @@ use rule run_multiqc_alignment as run_multiqc_alignment_index_sortorder with:
         multiqc_config=config["multiqc-alignment-config"],
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
-        html="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.alignment.html",
-        data_zip="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.alignment_data.zip",
+        html="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.alignment.html",
+        data_zip="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.alignment_data.zip",
     benchmark:
-        "results/performance_benchmarks/run_multiqc_alignment_index_sortorder/{projectid}.tsv"
+        "results/performance_benchmarks/run_multiqc_alignment_lane_specific/{projectid}.tsv"
+    params:
+        target_dirs=list(
+            set(
+                expand(
+                    "results/{toolname}/{{projectid}}",
+                    toolname=[
+                        "fastqc",
+                        "fastqc_posttrimming",
+                        "collectmultiplemetrics",
+                        "collectgcbiasmetrics",
+                        "collectwgsmetrics",
+                        "somalier",
+                        "mosdepth",
+                        "contamination",
+                        "alignstats",
+                        "markdups",
+                    ],
+                )
+            )
+        ),
