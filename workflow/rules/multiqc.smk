@@ -44,8 +44,8 @@ rule run_multiqc_fastq:
         multiqc_config=config["multiqc-read-config"],
         id_linker="results/multiqc/{projectid}/linker.tsv",
     output:
-        html="results/multiqc/{projectid}/multiqc.fastq.html",
-        data_zip="results/multiqc/{projectid}/multiqc.fastq_data.zip",
+        html="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.fastq.html",
+        data_zip="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.fastq_data.zip",
     benchmark:
         "results/performance_benchmarks/run_multiqc_fastq/{projectid}.tsv"
     params:
@@ -88,14 +88,10 @@ use rule run_multiqc_fastq as run_multiqc_fastq_index_sortorder with:
         multiqc_config=config["multiqc-read-config"],
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
-        html="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.fastq.html".format(jira),
-        data_zip="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.fastq_data.zip".format(
-            jira
-        ),
+        html="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.fastq.html",
+        data_zip="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.fastq_data.zip",
     benchmark:
-        "results/performance_benchmarks/run_multiqc_fastq_index_sortorder/{}.{{projectid}}.tsv".format(
-            jira
-        )
+        "results/performance_benchmarks/run_multiqc_fastq_index_sortorder/{projectid}.tsv"
 
 
 rule run_multiqc_alignment:
@@ -118,8 +114,8 @@ rule run_multiqc_alignment:
         multiqc_config=config["multiqc-alignment-config"],
         id_linker="results/multiqc/{projectid}/linker.tsv",
     output:
-        html="results/multiqc/{projectid}/multiqc.alignment.html",
-        data_zip="results/multiqc/{projectid}/multiqc.alignment_data.zip",
+        html="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.alignment.html",
+        data_zip="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.alignment_data.zip",
     benchmark:
         "results/performance_benchmarks/run_multiqc_alignment/{projectid}.tsv"
     params:
@@ -182,11 +178,7 @@ use rule run_multiqc_alignment as run_multiqc_alignment_index_sortorder with:
         multiqc_config=config["multiqc-alignment-config"],
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
-        html="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.alignment.html".format(jira),
-        data_zip="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.alignment_data.zip".format(
-            jira
-        ),
+        html="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.alignment.html",
+        data_zip="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.alignment_data.zip",
     benchmark:
-        "results/performance_benchmarks/run_multiqc_alignment_index_sortorder/{}.{{projectid}}.tsv".format(
-            jira
-        )
+        "results/performance_benchmarks/run_multiqc_alignment_index_sortorder/{projectid}.tsv"

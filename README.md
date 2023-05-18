@@ -42,6 +42,8 @@ The following settings are nested under the key `behaviors` and are user-configu
 |---|---|
 |`use-containers`|whether to, when possible, use either the docker or singularity image for each rule, or instead the rule-specific conda environment. See discussion below for how to choose this setting, and how it interacts with snakemake invocations.
 |`aligner`|which alignment tool to use. permitted values: `bwa`, `bwa-mem2`|
+|`qc-type`|for read and alignment qc: the pipeline can run QC either split by lane or combined across lanes. Either or both can be chosen. Split by lane QC is highly recommended and preferred. Deactivating combined lane QC can result in some substantial runtime improvements in some contexts. Permitted values: `lane-specific` or `combined-lanes` (or both)|
+|`bqsr`|whether to run BQSR (experimental; please just say yes to this)|
 |`snv-caller`|which calling tool to use for SNVs. permitted values: `deepvariant`|
 |`sv-callers`|which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`
 |`sv-ensemble`|settings controlling SV ensemble calling. note that the below settings can be applied in combination|

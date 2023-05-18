@@ -14,6 +14,9 @@ apptainer-image-dir: "apptainer_images"
 behaviors:
   use-containers: no
   aligner: "bwa"
+  qc-type:
+    - "lane-specific"
+    - "combined-lanes"
   bqsr: yes
   snv-caller: "deepvariant"
   sv-callers:
