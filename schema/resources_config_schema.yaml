@@ -50,6 +50,8 @@ properties:
     <<: *defaults
   bcftools:
     <<: *defaults
+  bbtools:
+    <<: *defaults
   bedtools:
     <<: *defaults
   bwa_index:

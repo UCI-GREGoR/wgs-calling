@@ -156,9 +156,9 @@ rule bbtools_repair_fastqs:
         "results/performance_benchmarks/bbtools_repair_fastqs/{projectid}/{sampleid}_L00{lane}.tsv"
     conda:
         "../envs/bbtools.yaml" if not use_containers else None
-    threads: 1
+    threads: config_resources["bbtools"]["threads"]
     resources:
-        mem_mb=8000,
-        qname=rc.select_queue("small", config_resources["queues"]),
+        mem_mb=config_resources["bbtools"]["memory"],
+        qname=rc.select_queue(config_resources["bbtools"]["queue"], config_resources["queues"]),
     shell:
         "repair.sh in1={input.R1} in2={input.R2} out1={output.R1} out2={output.R2} outs={output.singletons} repair"
