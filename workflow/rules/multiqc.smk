@@ -35,10 +35,10 @@ rule run_multiqc_fastq_lane_specific:
     """
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc", "001_fastqc", True
+            wildcards, manifest, checkpoints, "results/fastqc", "001_fastqc", True
         ),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_posttrimming", "fastp_fastqc", True
+            wildcards, manifest, checkpoints, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         multiqc_config=config["multiqc-read-config"],
@@ -79,10 +79,15 @@ rule run_multiqc_fastq_lane_specific:
 use rule run_multiqc_fastq_lane_specific as run_multiqc_fast_combined_lanes with:
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_combined", "fastqc", False
+            wildcards, manifest, checkpoints, "results/fastqc_combined", "fastqc", False
         ),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_posttrimming_combined", "fastqc", False
+            wildcards,
+            manifest,
+            checkpoints,
+            "results/fastqc_posttrimming_combined",
+            "fastqc",
+            False,
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         multiqc_config=config["multiqc-read-config"],
@@ -109,11 +114,16 @@ rule run_multiqc_alignment_combined_lanes:
     """
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_combined", "fastqc", False
+            wildcards, manifest, checkpoints, "results/fastqc_combined", "fastqc", False
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_posttrimming_combined", "fastqc", False
+            wildcards,
+            manifest,
+            checkpoints,
+            "results/fastqc_posttrimming_combined",
+            "fastqc",
+            False,
         ),
         verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
         alignstats=tc.construct_combined_alignstats_targets,
@@ -173,11 +183,11 @@ rule run_multiqc_alignment_combined_lanes:
 use rule run_multiqc_alignment_combined_lanes as run_multiqc_alignment_lane_specific with:
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc", "001_fastqc", True
+            wildcards, manifest, checkpoints, "results/fastqc", "001_fastqc", True
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_posttrimming", "fastp_fastqc", True
+            wildcards, manifest, checkpoints, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
         verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
         alignstats=tc.construct_combined_alignstats_targets,

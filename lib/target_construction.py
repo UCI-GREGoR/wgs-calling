@@ -239,6 +239,7 @@ def construct_somalier_relate_targets(wildcards: Namedlist) -> list:
 def construct_fastqc_targets(
     wildcards: Namedlist,
     manifest: pd.DataFrame,
+    checkpoints: Checkpoints,
     results_prefix: str,
     results_suffix: str,
     include_lane: bool,
@@ -255,13 +256,24 @@ def construct_fastqc_targets(
     ):
         if projectid == wildcards.projectid:
             if include_lane:
+                available_lanes = lane
+                if "bam" in manifest.columns:
+                    with checkpoints.input_bam_sample_lanes.get(
+                        projectid=projectid, sampleid=sampleid
+                    ).output[0].open() as f:
+                        available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
+                elif available_lanes == "combined":
+                    with checkpoints.input_fastq_sample_lanes.get(
+                        projectid=projectid, sampleid=sampleid, readgroup="R1"
+                    ).output[0].open() as f:
+                        available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
                 results.extend(
                     expand(
                         "{resultdir}/{projectdir}/{sampleid}_{lane}_{readgroup}_{suffix}.zip",
                         resultdir=results_prefix,
                         projectdir=projectid,
                         sampleid=sampleid,
-                        lane=lane,
+                        lane=available_lanes,
                         readgroup=["R1", "R2"],
                         suffix=results_suffix,
                     )
