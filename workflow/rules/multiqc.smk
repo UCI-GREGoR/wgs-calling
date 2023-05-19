@@ -29,9 +29,9 @@ rule multiqc_link_ids_index_sortorder:
         'awk -F"\\t" \'/{wildcards.projectid}/ {{print $4"\\t"$4"_"$1}}\' {input} > {output}'
 
 
-rule run_multiqc_fastq:
+rule run_multiqc_fastq_lane_specific:
     """
-    Run multiqc on fastqc and fastp output for input fastqs
+    Run multiqc on fastqc and fastp output for input fastqs split by lane
     """
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
@@ -76,7 +76,7 @@ rule run_multiqc_fastq:
         "-n {output.html}"
 
 
-use rule run_multiqc_fastq as run_multiqc_fast_combined_lanes with:
+use rule run_multiqc_fastq_lane_specific as run_multiqc_fast_combined_lanes with:
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
             wildcards, manifest, "results/fastqc_combined", "fastqc", False
@@ -103,9 +103,9 @@ use rule run_multiqc_fastq as run_multiqc_fast_combined_lanes with:
         ),
 
 
-rule run_multiqc_alignment:
+rule run_multiqc_alignment_combined_lanes:
     """
-    Run multiqc on all steps up to but not including variant calling
+    Run multiqc on all steps up to but not including variant calling, with all lanes combined
     """
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
@@ -170,7 +170,7 @@ rule run_multiqc_alignment:
         "--profile-runtime --zip-data-dir"
 
 
-use rule run_multiqc_alignment as run_multiqc_alignment_lane_specific with:
+use rule run_multiqc_alignment_combined_lanes as run_multiqc_alignment_lane_specific with:
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
             wildcards, manifest, "results/fastqc", "001_fastqc", True
