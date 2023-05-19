@@ -292,7 +292,9 @@ def construct_fastqc_targets(
     return list(set(results))
 
 
-def construct_fastp_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> list:
+def construct_fastp_targets(
+    wildcards: Namedlist, manifest: pd.DataFrame, checkpoints: Checkpoints
+) -> list:
     """
     From basic input manifest entries, construct output targets for
     a run of fastp
@@ -303,8 +305,25 @@ def construct_fastp_targets(wildcards: Namedlist, manifest: pd.DataFrame) -> lis
         manifest["projectid"], manifest["sampleid"], manifest["lane"]
     ):
         if projectid == wildcards.projectid:
-            results.append(
-                "{}/{}/{}_{}_fastp.html".format(results_prefix, projectid, sampleid, lane)
+            available_lanes = lane
+            if "bam" in manifest.columns:
+                with checkpoints.input_bam_sample_lanes.get(
+                    projectid=projectid, sampleid=sampleid
+                ).output[0].open() as f:
+                    available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
+            elif available_lanes == "combined":
+                with checkpoints.input_fastq_sample_lanes.get(
+                    projectid=projectid, sampleid=sampleid, readgroup="R1"
+                ).output[0].open() as f:
+                    available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
+            results.extend(
+                expand(
+                    "{resultdir}/{projectdir}/{sampleid}_{lane}_fastp.html",
+                    resultdir=results_prefix,
+                    projectdir=projectid,
+                    sampleid=sampleid,
+                    lane=available_lanes,
+                )
             )
     return list(set(results))
 

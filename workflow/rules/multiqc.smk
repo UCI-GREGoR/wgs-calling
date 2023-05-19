@@ -40,7 +40,7 @@ rule run_multiqc_fastq_lane_specific:
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
             wildcards, manifest, checkpoints, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
         multiqc_config=config["multiqc-read-config"],
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
@@ -89,7 +89,7 @@ use rule run_multiqc_fastq_lane_specific as run_multiqc_fast_combined_lanes with
             "fastqc",
             False,
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
         multiqc_config=config["multiqc-read-config"],
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
@@ -116,7 +116,7 @@ rule run_multiqc_alignment_combined_lanes:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
             wildcards, manifest, checkpoints, "results/fastqc_combined", "fastqc", False
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
             wildcards,
             manifest,
@@ -185,7 +185,7 @@ use rule run_multiqc_alignment_combined_lanes as run_multiqc_alignment_lane_spec
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
             wildcards, manifest, checkpoints, "results/fastqc", "001_fastqc", True
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
             wildcards, manifest, checkpoints, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
