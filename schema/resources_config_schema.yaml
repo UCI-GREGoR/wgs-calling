@@ -136,7 +136,6 @@ properties:
     <<: *defaults
 required:
   - queues
-  - tmpdir
   - default
   - alignstats
   - awscli

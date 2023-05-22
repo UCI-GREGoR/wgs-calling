@@ -8,6 +8,7 @@ from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 from snakemake.utils import validate
 import subprocess
+import tempfile
 import yaml
 
 S3 = S3RemoteProvider()
@@ -39,7 +40,7 @@ with open("config/config_resources.yaml", "r") as f:
 validate(config, "../schema/global_config_schema.yaml")
 validate(config_resources, "../schema/resources_config_schema.yaml")
 
-tempDir = config_resources["tmpdir"]
+tempDir = config_resources["tmpdir"] if "tmpdir" in config_resources else tempfile.gettempdir()
 manifest = config["manifest"]
 manifest = pd.read_csv(manifest, sep="\t")
 ## note that this variable controls container usage for everything *except DeepVariant*,
