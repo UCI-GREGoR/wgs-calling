@@ -114,6 +114,8 @@ properties:
     <<: *defaults
   samtools:
     <<: *defaults
+  samtools_sort:
+    <<: *defaults
   smoove:
     <<: *defaults
   somalier:

@@ -105,10 +105,12 @@ rule sort_bam:
         "../envs/samtools.yaml" if not use_containers else None
     container:
         "{}/bwa.sif".format(apptainer_images) if use_containers else None
-    threads: config_resources["samtools"]["threads"]
+    threads: config_resources["samtools_sort"]["threads"]
     resources:
-        mem_mb=config_resources["samtools"]["memory"],
-        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
+        mem_mb=config_resources["samtools_sort"]["memory"],
+        qname=rc.select_queue(
+            config_resources["samtools_sort"]["queue"], config_resources["queues"]
+        ),
         tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "
