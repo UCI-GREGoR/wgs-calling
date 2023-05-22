@@ -97,6 +97,8 @@ rule sort_bam:
         bam="{prefix}.bam",
     output:
         bam="{prefix}.sort.bam",
+    params:
+        tmpdir=tempDir,
     benchmark:
         "results/performance_benchmarks/sort_bam/{prefix}.sort.bam.tsv"
     conda:
@@ -107,8 +109,10 @@ rule sort_bam:
     resources:
         mem_mb=config_resources["samtools"]["memory"],
         qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
+        tmpdir=tempDir,
     shell:
-        "samtools sort -@ {threads} -o {output.bam} -O bam {input.bam}"
+        "mkdir -p {params.tmpdir} && "
+        "samtools sort -@ {threads} -T {params.tmpdir} -o {output.bam} -O bam {input.bam}"
 
 
 rule samtools_create_bai:
