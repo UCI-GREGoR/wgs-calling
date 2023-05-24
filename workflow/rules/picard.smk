@@ -197,6 +197,7 @@ rule picard_collectmultiplemetrics:
         "-VALIDATION_STRINGENCY {params.validation_stringency} "
         "-METRIC_ACCUMULATION_LEVEL {params.metric_accumulation_level} "
         "-LEVEL {params.metric_accumulation_level} "
+        "-PROGRAM null "
         "-PROGRAM CollectAlignmentSummaryMetrics "
         "-PROGRAM CollectInsertSizeMetrics "
         "-PROGRAM QualityScoreDistribution "
