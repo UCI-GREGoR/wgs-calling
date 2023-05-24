@@ -160,10 +160,7 @@ rule picard_collectmultiplemetrics:
             "results/collectmultiplemetrics/{{fileprefix}}.picard.{suffix}",
             suffix=[
                 "alignment_summary_metrics.txt",
-                "base_distribution_by_cycle_metrics.txt",
-                "error_summary_metrics.txt",
                 "insert_size_metrics.txt",
-                "quality_by_cycle_metrics.txt",
                 "quality_distribution_metrics.txt",
                 "quality_yield_metrics.txt",
             ],
