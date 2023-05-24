@@ -161,10 +161,8 @@ rule picard_collectmultiplemetrics:
             suffix=[
                 "alignment_summary_metrics.txt",
                 "base_distribution_by_cycle_metrics.txt",
-                "bait_bias_summary_metrics.txt",
                 "error_summary_metrics.txt",
                 "insert_size_metrics.txt",
-                "pre_adapter_summary_metrics.txt",
                 "quality_by_cycle_metrics.txt",
                 "quality_distribution_metrics.txt",
                 "quality_yield_metrics.txt",
@@ -202,7 +200,6 @@ rule picard_collectmultiplemetrics:
         "-PROGRAM CollectAlignmentSummaryMetrics "
         "-PROGRAM CollectInsertSizeMetrics "
         "-PROGRAM QualityScoreDistribution "
-        "-PROGRAM CollectSequencingArtifactMetrics "
         "-PROGRAM CollectQualityYieldMetrics "
         "-INCLUDE_UNPAIRED true "
         "-OUTPUT {params.outprefix} "
