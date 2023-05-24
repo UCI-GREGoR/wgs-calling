@@ -231,7 +231,7 @@ run.construct.linker <- function(logbook.fn,
   )
   df <- df[-1, ]
   if (!is.null(logbook.fn)) {
-    df <- parse.logbook(logbook.fn, out.fn)
+    df <- parse.logbook(logbook.fn)
   }
   if (!is.null(sex.linker.fn)) {
     df <- add.linker.data(df, sex.linker.fn, "sex")
