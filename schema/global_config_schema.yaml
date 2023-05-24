@@ -13,10 +13,6 @@ properties:
       external-ids:
         type: string
     additionalProperties: false
-  multiqc-read-config:
-    type: string
-  multiqc-alignment-config:
-    type: string
   genome-build:
     type: string
     pattern: "^grch[0-9]+$"
@@ -289,8 +285,6 @@ properties:
         additionalProperties: no
 required:
   - manifest
-  - multiqc-read-config
-  - multiqc-alignment-config
   - genome-build
   - behaviors
   - references

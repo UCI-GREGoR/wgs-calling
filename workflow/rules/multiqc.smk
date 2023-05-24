@@ -41,7 +41,7 @@ rule run_multiqc_fastq_lane_specific:
             wildcards, manifest, checkpoints, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
-        multiqc_config=config["multiqc-read-config"],
+        multiqc_config="config/multiqc_read_config_lane_specific.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
         html="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.fastq.html",
@@ -90,7 +90,7 @@ use rule run_multiqc_fastq_lane_specific as run_multiqc_fast_combined_lanes with
             False,
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
-        multiqc_config=config["multiqc-read-config"],
+        multiqc_config="config/multiqc_read_config_combined_lanes.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
         html="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.fastq.html",
@@ -130,7 +130,7 @@ rule run_multiqc_alignment_combined_lanes:
         somalier=tc.construct_somalier_relate_targets,
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
-        multiqc_config=config["multiqc-alignment-config"],
+        multiqc_config="config/multiqc_alignment_config_combined-lanes.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
         html="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.alignment.html",
@@ -194,7 +194,7 @@ use rule run_multiqc_alignment_combined_lanes as run_multiqc_alignment_lane_spec
         somalier=tc.construct_somalier_relate_targets,
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
-        multiqc_config=config["multiqc-alignment-config"],
+        multiqc_config="config/multiqc_alignment_config_combined_lanes.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
         html="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.alignment.html",
