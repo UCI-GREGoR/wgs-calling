@@ -6,6 +6,9 @@ fn_clean_exts:
    - ".mrkdup.sort.bam"
    - "_001.fastq.gz"
    - ".fastq.gz"
+   - "_fastp"
+fn_clean_trim:
+   - "_L001"
 
 
 extra_fn_clean_exts:
