@@ -39,19 +39,10 @@ def map_fastqs_to_manifest(wildcards: Namedlist, manifest: pd.DataFrame, readtag
             wildcards.sampleid, wildcards.lane, readtag
         )
 
-    result_bylane = result.loc[
-        result["lane"] == wildcards.lane,
-    ]
+    result_bylane = result.loc[result["lane"] == wildcards.lane,]
     if len(result_bylane) == 1:
         return result_bylane[readtag.lower()].to_list()[0]
-    if (
-        len(
-            result.loc[
-                result["lane"] == "combined",
-            ]
-        )
-        == 1
-    ):
+    if len(result.loc[result["lane"] == "combined",]) == 1:
         return "results/fastqs_from_fastq/{}/{}_{}_{}_001.fastq.gz".format(
             wildcards.projectid, wildcards.sampleid, wildcards.lane, readtag
         )
