@@ -76,7 +76,7 @@ rule run_multiqc_fastq_lane_specific:
         "-n {output.html}"
 
 
-use rule run_multiqc_fastq_lane_specific as run_multiqc_fast_combined_lanes with:
+use rule run_multiqc_fastq_lane_specific as run_multiqc_fastq_combined_lanes with:
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
             wildcards, manifest, checkpoints, "results/fastqc_combined", "fastqc", False
