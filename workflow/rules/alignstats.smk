@@ -3,8 +3,8 @@ rule run_alignstats:
     Run alignstats utility on post-markdups bams
     """
     input:
-        bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bai",
+        bam="results/aligned_bams/{fileprefix}.bam",
+        bai="results/aligned_bams/{fileprefix}.bai",
     output:
         json="results/alignstats/{fileprefix}.alignstats.json",
     benchmark:

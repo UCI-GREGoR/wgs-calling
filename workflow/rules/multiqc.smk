@@ -29,23 +29,23 @@ rule multiqc_link_ids_index_sortorder:
         'awk -F"\\t" \'/{wildcards.projectid}/ {{print $4"\\t"$4"_"$1}}\' {input} > {output}'
 
 
-rule run_multiqc_fastq:
+rule run_multiqc_fastq_lane_specific:
     """
-    Run multiqc on fastqc and fastp output for input fastqs
+    Run multiqc on fastqc and fastp output for input fastqs split by lane
     """
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc", "001_fastqc", True
+            wildcards, manifest, checkpoints, "results/fastqc", "001_fastqc", True
         ),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_posttrimming", "fastp_fastqc", True
+            wildcards, manifest, checkpoints, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
-        multiqc_config=config["multiqc-read-config"],
-        id_linker="results/multiqc/{projectid}/linker.tsv",
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
+        multiqc_config="config/multiqc_read_config_lane_specific.yaml",
+        id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
-        html="results/multiqc/{projectid}/multiqc.fastq.html",
-        data_zip="results/multiqc/{projectid}/multiqc.fastq_data.zip",
+        html="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.fastq.html",
+        data_zip="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.fastq_data.zip",
     benchmark:
         "results/performance_benchmarks/run_multiqc_fastq/{projectid}.tsv"
     params:
@@ -76,50 +76,65 @@ rule run_multiqc_fastq:
         "-n {output.html}"
 
 
-use rule run_multiqc_fastq as run_multiqc_fastq_index_sortorder with:
+use rule run_multiqc_fastq_lane_specific as run_multiqc_fast_combined_lanes with:
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc", "001_fastqc", True
+            wildcards, manifest, checkpoints, "results/fastqc_combined", "fastqc", False
         ),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_posttrimming", "fastp_fastqc", True
+            wildcards,
+            manifest,
+            checkpoints,
+            "results/fastqc_posttrimming_combined",
+            "fastqc",
+            False,
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
-        multiqc_config=config["multiqc-read-config"],
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
+        multiqc_config="config/multiqc_read_config_combined_lanes.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
-        html="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.fastq.html".format(jira),
-        data_zip="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.fastq_data.zip".format(
-            jira
-        ),
+        html="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.fastq.html",
+        data_zip="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.fastq_data.zip",
     benchmark:
-        "results/performance_benchmarks/run_multiqc_fastq_index_sortorder/{}.{{projectid}}.tsv".format(
-            jira
-        )
+        "results/performance_benchmarks/run_multiqc_fastq_combined_lanes/{projectid}.tsv"
+    params:
+        target_dirs=list(
+            set(
+                expand(
+                    "results/{toolname}/{{projectid}}",
+                    toolname=["fastqc_combined", "fastp", "fastqc_posttrimming_combined"],
+                )
+            )
+        ),
 
 
-rule run_multiqc_alignment:
+rule run_multiqc_alignment_combined_lanes:
     """
-    Run multiqc on all steps up to but not including variant calling
+    Run multiqc on all steps up to but not including variant calling, with all lanes combined
     """
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_combined", "fastqc", False
+            wildcards, manifest, checkpoints, "results/fastqc_combined", "fastqc", False
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_posttrimming_combined", "fastqc", False
+            wildcards,
+            manifest,
+            checkpoints,
+            "results/fastqc_posttrimming_combined",
+            "fastqc",
+            False,
         ),
         verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
         alignstats=tc.construct_combined_alignstats_targets,
         somalier=tc.construct_somalier_relate_targets,
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
-        multiqc_config=config["multiqc-alignment-config"],
-        id_linker="results/multiqc/{projectid}/linker.tsv",
+        multiqc_config="config/multiqc_alignment_config_combined-lanes.yaml",
+        id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
-        html="results/multiqc/{projectid}/multiqc.alignment.html",
-        data_zip="results/multiqc/{projectid}/multiqc.alignment_data.zip",
+        html="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.alignment.html",
+        data_zip="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.alignment_data.zip",
     benchmark:
         "results/performance_benchmarks/run_multiqc_alignment/{projectid}.tsv"
     params:
@@ -165,80 +180,44 @@ rule run_multiqc_alignment:
         "--profile-runtime --zip-data-dir"
 
 
-use rule run_multiqc_alignment as run_multiqc_alignment_index_sortorder with:
+use rule run_multiqc_alignment_combined_lanes as run_multiqc_alignment_lane_specific with:
     input:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_combined", "fastqc", False
+            wildcards, manifest, checkpoints, "results/fastqc", "001_fastqc", True
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
-            wildcards, manifest, "results/fastqc_posttrimming_combined", "fastqc", False
+            wildcards, manifest, checkpoints, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
         verify=lambda wildcards: tc.construct_contamination_targets(wildcards, manifest),
         alignstats=tc.construct_combined_alignstats_targets,
         somalier=tc.construct_somalier_relate_targets,
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
-        multiqc_config=config["multiqc-alignment-config"],
+        multiqc_config="config/multiqc_alignment_config_lane_specific.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
-        html="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.alignment.html".format(jira),
-        data_zip="results/multiqc/{{projectid}}/multiqc.{}.{{projectid}}.alignment_data.zip".format(
-            jira
-        ),
+        html="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.alignment.html",
+        data_zip="results/multiqc/{projectid}/multiqc.lane-specific.{projectid}.alignment_data.zip",
     benchmark:
-        "results/performance_benchmarks/run_multiqc_alignment_index_sortorder/{}.{{projectid}}.tsv".format(
-            jira
-        )
-
-
-rule run_multiqc_calling:
-    """
-    Run multiqc on variant calling only
-    """
-    input:
-        vcf_raw=[
-            x.removesuffix(".gz") + ".stats" for x in tc.construct_snv_targets(config, manifest)
-        ],
-        vcf_export=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "snv.vcf.stats"
-        ),
-        vcf_nonexport=lambda wildcards: ed.construct_nonexport_files(
-            wildcards, manifest, checkpoints, "snv.vcf.stats"
-        ),
-        multiqc_config=config["multiqc-calling-config"],
-        id_linker="results/multiqc/{projectid}/linker.tsv",
-    output:
-        html="results/multiqc/{projectid}/multiqc.calling.html",
-        data_zip="results/multiqc/{projectid}/multiqc.calling_data.zip",
-    benchmark:
-        "results/performance_benchmarks/run_multiqc_calling/{projectid}.tsv"
+        "results/performance_benchmarks/run_multiqc_alignment_lane_specific/{projectid}.tsv"
     params:
         target_dirs=list(
             set(
                 expand(
                     "results/{toolname}/{{projectid}}",
                     toolname=[
-                        "export",
-                        "nonexport",
+                        "fastqc",
+                        "fastqc_posttrimming",
+                        "collectmultiplemetrics",
+                        "collectgcbiasmetrics",
+                        "collectwgsmetrics",
+                        "somalier",
+                        "mosdepth",
+                        "contamination",
+                        "alignstats",
+                        "markdups",
                     ],
                 )
             )
         ),
-    conda:
-        "../envs/multiqc.yaml" if not use_containers else None
-    container:
-        "docker://ewels/multiqc:v1.14" if use_containers else None
-    threads: config_resources["multiqc"]["threads"]
-    resources:
-        mem_mb=config_resources["multiqc"]["memory"],
-        qname=rc.select_queue(config_resources["multiqc"]["queue"], config_resources["queues"]),
-    shell:
-        "multiqc {params.target_dirs} "
-        "--config {input.multiqc_config} "
-        "--replace-names {input.id_linker} "
-        "-m bcftools "
-        "--interactive "
-        "-f -i 'MultiQC for Variant Calling' "
-        "-n {output.html} "
-        "--profile-runtime --zip-data-dir"

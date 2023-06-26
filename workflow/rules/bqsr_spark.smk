@@ -60,8 +60,8 @@ rule bqsr_apply_bqsr_spark:
         ),
         recal_table="results/bqsr/{projectid}/{sampleid}.recal_table",
     output:
-        bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bai",
+        bam="results/aligned_bams/{projectid}/{sampleid}.bam",
+        bai="results/aligned_bams/{projectid}/{sampleid}.bai",
     params:
         tmpdir=tempDir,
     benchmark:

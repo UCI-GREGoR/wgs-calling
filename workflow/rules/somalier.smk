@@ -3,8 +3,8 @@ rule somalier_extract:
     Run somalier extract on a single bam.
     """
     input:
-        bam="results/bqsr/{projectid}/{fileprefix}.bam",
-        bai="results/bqsr/{projectid}/{fileprefix}.bai",
+        bam="results/aligned_bams/{projectid}/{fileprefix}.bam",
+        bai="results/aligned_bams/{projectid}/{fileprefix}.bai",
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),

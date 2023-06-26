@@ -115,4 +115,4 @@ rule bwa_map_and_sort:
         "mkdir -p {params.tmpdir} && "
         '{params.exec_name} mem -t {threads} -Y -R "{params.readgroup}" -K {params.K} '
         "{input.bwa_fasta} {input.fastq1} {input.fastq2} | "
-        "samtools sort -l 1 -m 4G -@ {threads} -T ${{TMPDIR}} -O BAM --write-index -o {output.bam}##idx##{output.bai}"
+        "samtools sort -l 1 -m 4G -@ {threads} -T {params.tmpdir} -O BAM --write-index -o {output.bam}##idx##{output.bai}"

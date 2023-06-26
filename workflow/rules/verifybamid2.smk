@@ -3,8 +3,8 @@ rule estimate_contamination:
     Use verifybamid2 to estimate contamination in samples
     """
     input:
-        bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bai",
+        bam="results/aligned_bams/{fileprefix}.bam",
+        bai="results/aligned_bams/{fileprefix}.bai",
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),

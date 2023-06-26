@@ -19,6 +19,10 @@ awscli:
   threads: 1
   memory: 2000
   queue: "small"
+bbtools:
+  threads: 1
+  memory: 32000
+  queue: "small"
 bcftools:
   threads: 4
   memory: 8000
@@ -110,6 +114,10 @@ r:
   queue: "small"
 samtools:
   threads: 4
+  memory: 8000
+  queue: "small"
+samtools_sort:
+  threads: 2
   memory: 8000
   queue: "small"
 smoove:

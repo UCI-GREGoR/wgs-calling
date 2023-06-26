@@ -55,8 +55,10 @@ rule mark_duplicates:
     in case we ever want to change this around.
     """
     input:
-        bam=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bam"),
-        bai=lambda wildcards: tc.get_bams_by_lane(wildcards, config, manifest, "bam.bai"),
+        bam=lambda wildcards: tc.get_bams_by_lane(wildcards, checkpoints, config, manifest, "bam"),
+        bai=lambda wildcards: tc.get_bams_by_lane(
+            wildcards, checkpoints, config, manifest, "bam.bai"
+        ),
     output:
         bam=temp("results/markdups/{projectid}/{sampleid}.mrkdup.bam"),
         score="results/markdups/{projectid}/{sampleid}.mrkdup.score.txt",
@@ -65,7 +67,7 @@ rule mark_duplicates:
     params:
         tmpdir=tempDir,
         bamlist=lambda wildcards: " -INPUT ".join(
-            tc.get_bams_by_lane(wildcards, config, manifest, "bam")
+            tc.get_bams_by_lane(wildcards, checkpoints, config, manifest, "bam")
         ),
         java_args=config_resources["gatk_mark_duplicates"]["java_args"],
     conda:
@@ -95,18 +97,24 @@ rule sort_bam:
         bam="{prefix}.bam",
     output:
         bam="{prefix}.sort.bam",
+    params:
+        tmpdir=tempDir,
     benchmark:
         "results/performance_benchmarks/sort_bam/{prefix}.sort.bam.tsv"
     conda:
         "../envs/samtools.yaml" if not use_containers else None
     container:
         "{}/bwa.sif".format(apptainer_images) if use_containers else None
-    threads: config_resources["samtools"]["threads"]
+    threads: config_resources["samtools_sort"]["threads"]
     resources:
-        mem_mb=config_resources["samtools"]["memory"],
-        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
+        mem_mb=config_resources["samtools_sort"]["memory"],
+        qname=rc.select_queue(
+            config_resources["samtools_sort"]["queue"], config_resources["queues"]
+        ),
+        tmpdir=tempDir,
     shell:
-        "samtools sort -@ {threads} -o {output.bam} -O bam {input.bam}"
+        "mkdir -p {params.tmpdir} && "
+        "samtools sort -@ {threads} -T {params.tmpdir} -o {output.bam} -O bam {input.bam}"
 
 
 rule samtools_create_bai:
@@ -136,8 +144,8 @@ rule picard_collectmultiplemetrics:
     Run gatk version of picard CollectMultipleMetrics
     """
     input:
-        bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bai",
+        bam="results/aligned_bams/{fileprefix}.bam",
+        bai="results/aligned_bams/{fileprefix}.bai",
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),
@@ -152,12 +160,7 @@ rule picard_collectmultiplemetrics:
             "results/collectmultiplemetrics/{{fileprefix}}.picard.{suffix}",
             suffix=[
                 "alignment_summary_metrics.txt",
-                "base_distribution_by_cycle_metrics.txt",
-                "bait_bias_summary_metrics.txt",
-                "error_summary_metrics.txt",
                 "insert_size_metrics.txt",
-                "pre_adapter_summary_metrics.txt",
-                "quality_by_cycle_metrics.txt",
                 "quality_distribution_metrics.txt",
                 "quality_yield_metrics.txt",
             ],
@@ -191,10 +194,10 @@ rule picard_collectmultiplemetrics:
         "-VALIDATION_STRINGENCY {params.validation_stringency} "
         "-METRIC_ACCUMULATION_LEVEL {params.metric_accumulation_level} "
         "-LEVEL {params.metric_accumulation_level} "
+        "-PROGRAM null "
         "-PROGRAM CollectAlignmentSummaryMetrics "
         "-PROGRAM CollectInsertSizeMetrics "
         "-PROGRAM QualityScoreDistribution "
-        "-PROGRAM CollectSequencingArtifactMetrics "
         "-PROGRAM CollectQualityYieldMetrics "
         "-INCLUDE_UNPAIRED true "
         "-OUTPUT {params.outprefix} "
@@ -206,8 +209,8 @@ rule picard_collectgcbiasmetrics:
     Run gatk version of picard CollectGcBiasMetrics
     """
     input:
-        bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bai",
+        bam="results/aligned_bams/{fileprefix}.bam",
+        bai="results/aligned_bams/{fileprefix}.bai",
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),
@@ -253,8 +256,8 @@ rule picard_collectwgsmetrics:
     Run gatk version of picard CollectWgsMetrics
     """
     input:
-        bam="results/bqsr/{fileprefix}.bam",
-        bai="results/bqsr/{fileprefix}.bai",
+        bam="results/aligned_bams/{fileprefix}.bam",
+        bai="results/aligned_bams/{fileprefix}.bai",
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),

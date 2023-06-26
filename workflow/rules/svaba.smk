@@ -3,8 +3,8 @@ rule svaba_run:
     Run svaba in germline mode
     """
     input:
-        bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bai",
+        bam="results/aligned_bams/{projectid}/{sampleid}.bam",
+        bai="results/aligned_bams/{projectid}/{sampleid}.bai",
         bwa_fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),
@@ -72,7 +72,7 @@ rule svaba_select_output_variants:
         linker=temp("results/svaba/{projectid}/{sampleid}.svaba.reheader_linker.tsv"),
     params:
         tmpdir=tempDir,
-        bam="results/bqsr/{projectid}/{sampleid}.bam",
+        bam="results/aligned_bams/{projectid}/{sampleid}.bam",
         blacklist_definition='##FILTER=<ID=BLACKLIST,Description=\\"Variant is in calling exclusion region\\">',
     benchmark:
         "results/performance_benchmarks/svaba_select_output_variants/{projectid}/{sampleid}.svaba.tsv"

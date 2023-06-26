@@ -6,8 +6,8 @@ rule run_mosdepth:
     name of speed; that can always be adjusted later if desired.
     """
     input:
-        bam="results/bqsr/{projectid}/{prefix}.bam",
-        bai="results/bqsr/{projectid}/{prefix}.bai",
+        bam="results/aligned_bams/{projectid}/{prefix}.bam",
+        bai="results/aligned_bams/{projectid}/{prefix}.bai",
     output:
         assorted_files=expand(
             "results/mosdepth/{{projectid}}/{{prefix}}.{suffix}",
