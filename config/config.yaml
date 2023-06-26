@@ -29,6 +29,8 @@ behaviors:
   symlink-fastqs: no
   trim-adapters-before-alignment: yes
   assume-last-sample-sex: "female"
+  import-s3:
+    profile-name: "ucigrant"
   export-directory: "/locus/data/external_data/research_experiments/pmgrc_u01"
   export-s3:
     bucket-name: "s3://pmgrc-gregor-data"
