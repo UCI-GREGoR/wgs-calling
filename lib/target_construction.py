@@ -35,8 +35,8 @@ def map_fastqs_to_manifest(wildcards: Namedlist, manifest: pd.DataFrame, readtag
     ## try to determine if one of a series of special data types are present
     ## "bam": data were input as pre-aligned bam that needs to be realigned
     if "bam" in manifest.columns:
-        return "results/fastqs_from_bams/{}_{}_{}_001.fastq.gz".format(
-            wildcards.sampleid, wildcards.lane, readtag
+        return "results/fastqs_from_bam/{}/{}_{}_{}_001.fastq.gz".format(
+            wildcards.projectid, wildcards.sampleid, wildcards.lane, readtag
         )
 
     result_bylane = result.loc[result["lane"] == wildcards.lane,]
