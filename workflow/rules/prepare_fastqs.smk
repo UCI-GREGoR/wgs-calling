@@ -7,7 +7,7 @@ rule sort_input_bam:
     input:
         lambda wildcards: tc.locate_input_bam(wildcards, manifest),
     output:
-        temp("results/input_bams/{projectid}/{subjectid}.sorted.bam"),
+        temp("results/input_bams/{projectid}/{sampleid}.sorted.bam"),
     params:
         sort_m=int(config_resources["samtools"]["memory"])
         / (2 * int(config_resources["samtools"]["threads"])),
