@@ -13,12 +13,6 @@ properties:
       external-ids:
         type: string
     additionalProperties: false
-  multiqc-read-config:
-    type: string
-  multiqc-alignment-config:
-    type: string
-  multiqc-calling-config:
-    type: string
   genome-build:
     type: string
     pattern: "^grch[0-9]+$"
@@ -33,6 +27,14 @@ properties:
       aligner:
         type: string
         pattern: "^bwa-mem2$|^bwa$"
+      qc-type:
+        type: array
+        items:
+          type: string
+          pattern: "^lane-specific$|^combined-lanes$"
+      bqsr:
+        type: boolean
+        default: yes
       snv-caller:
         type: string
         pattern: "^deepvariant$"
@@ -199,22 +201,6 @@ properties:
         required:
           - sites-vcf-gz
         additionalProperties: no
-  dnascope:
-    type: object
-    patternProperties:
-      "^grch[0-9]+$":
-        type: object
-        properties:
-          model:
-            type: string
-          dbsnp-vcf-gz:
-            type: string
-        required:
-          - model
-          - dbsnp-vcf-gz
-        additionalProperties: no
-    required:
-      - grch37
   verifybamid2:
     type: object
     patternProperties:
@@ -299,15 +285,11 @@ properties:
         additionalProperties: no
 required:
   - manifest
-  - multiqc-read-config
-  - multiqc-alignment-config
-  - multiqc-calling-config
   - genome-build
   - behaviors
   - references
   - bqsr
   - somalier
-  - dnascope
   - verifybamid2
   - deepvariant
   - delly

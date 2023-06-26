@@ -50,6 +50,8 @@ properties:
     <<: *defaults
   bcftools:
     <<: *defaults
+  bbtools:
+    <<: *defaults
   bedtools:
     <<: *defaults
   bwa_index:
@@ -112,6 +114,8 @@ properties:
     <<: *defaults
   samtools:
     <<: *defaults
+  samtools_sort:
+    <<: *defaults
   smoove:
     <<: *defaults
   somalier:
@@ -132,7 +136,6 @@ properties:
     <<: *defaults
 required:
   - queues
-  - tmpdir
   - default
   - alignstats
   - awscli

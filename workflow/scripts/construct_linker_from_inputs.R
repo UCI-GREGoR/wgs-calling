@@ -97,7 +97,7 @@ parse.logbook <- function(input.fn) {
   for (sheet.name in sheet.names) {
     df <- openxlsx::read.xlsx(input.fn, sheet = sheet.name, check.names = FALSE)
     colnames(df) <- tolower(colnames(df))
-    if (colnames(df)[1] == "subject.id") {
+    if (colnames(df)[1] == "pmgrc.id") {
       ## resolve chaos
       subject.col <- 1
       jira.col <- which(stringr::str_detect(colnames(df), "jira\\.ticket\\.for\\.batches\\.in\\.flight"))
@@ -187,7 +187,8 @@ add.linker.data <- function(df, linker.fn, target.colname) {
     )
     df <- rbind(df, new.df)
   }
-  df[, target.colname] <- linker.df[df[, "subject"], 2]
+  df[df[, "subject"] %in% linker.df[, 1], target.colname] <-
+    linker.df[df[df[, "subject"] %in% linker.df[, 1], "subject"], 2]
   df
 }
 
@@ -231,7 +232,7 @@ run.construct.linker <- function(logbook.fn,
   )
   df <- df[-1, ]
   if (!is.null(logbook.fn)) {
-    df <- parse.logbook(logbook.fn, out.fn)
+    df <- parse.logbook(logbook.fn)
   }
   if (!is.null(sex.linker.fn)) {
     df <- add.linker.data(df, sex.linker.fn, "sex")

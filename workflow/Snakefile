@@ -8,6 +8,7 @@ from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 from snakemake.utils import validate
 import subprocess
+import tempfile
 import yaml
 
 S3 = S3RemoteProvider()
@@ -39,7 +40,7 @@ with open("config/config_resources.yaml", "r") as f:
 validate(config, "../schema/global_config_schema.yaml")
 validate(config_resources, "../schema/resources_config_schema.yaml")
 
-tempDir = config_resources["tmpdir"]
+tempDir = config_resources["tmpdir"] if "tmpdir" in config_resources else tempfile.gettempdir()
 manifest = config["manifest"]
 manifest = pd.read_csv(manifest, sep="\t")
 ## note that this variable controls container usage for everything *except DeepVariant*,
@@ -69,35 +70,45 @@ aligner_index_suffixes["bwa-mem2"] = ["ann", "amb", "bwt.2bit.64", "pac", "sa"]
 
 caller_num_intervals = tc.caller_interval_file_count(config)
 
-jira = re.search("/(RT-[0-9]{4})/", str(pathlib.Path.cwd()))
-if jira is None:
-    jira = "RT"
-else:
-    jira = jira.group(1)
-
 unique_projects = list(manifest["projectid"].unique())
 
-TARGETS = [
-    [
-        "results/multiqc/{}/multiqc.{}.{}.fastq.html".format(projectid, jira, projectid)
-        for projectid in unique_projects
-    ],
-    ["results/multiqc/{}/multiqc.fastq.html".format(projectid) for projectid in unique_projects],
-]
+TARGETS = []
 
-if config["behaviors"]["outcome"] != "fastqc":
-    TARGETS.append(
+if "combined-lanes" in config["behaviors"]["qc-type"]:
+    TARGETS.extend(
         [
-            [
-                "results/multiqc/{}/multiqc.{}.{}.alignment.html".format(projectid, jira, projectid)
-                for projectid in unique_projects
-            ],
-            [
-                "results/multiqc/{}/multiqc.alignment.html".format(projectid)
-                for projectid in unique_projects
-            ],
+            "results/multiqc/{}/multiqc.combined-lanes.{}.fastq.html".format(projectid, projectid)
+            for projectid in unique_projects
         ]
     )
+if "lane-specific" in config["behaviors"]["qc-type"]:
+    TARGETS.extend(
+        [
+            "results/multiqc/{}/multiqc.lane-specific.{}.fastq.html".format(projectid, projectid)
+            for projectid in unique_projects
+        ]
+    )
+
+if config["behaviors"]["outcome"] != "fastqc":
+    if "combined-lanes" in config["behaviors"]["qc-type"]:
+        TARGETS.extend(
+            [
+                "results/multiqc/{}/multiqc.combined-lanes.{}.alignment.html".format(
+                    projectid, projectid
+                )
+                for projectid in unique_projects
+            ]
+        )
+    if "lane-specific" in config["behaviors"]["qc-type"]:
+        TARGETS.extend(
+            [
+                "results/multiqc/{}/multiqc.lane-specific.{}.alignment.html".format(
+                    projectid, projectid
+                )
+                for projectid in unique_projects
+            ]
+        )
+
 
 if config["behaviors"]["outcome"] != "fastqc" and config["behaviors"]["outcome"] != "alignment":
     TARGETS.append(
@@ -186,6 +197,7 @@ include: "rules/mosdepth.smk"
 include: "rules/multiqc.smk"
 include: "rules/performance_benchmarks.smk"
 include: "rules/picard.smk"
+include: "rules/prepare_fastqs.smk"
 include: "rules/references.smk"
 include: "rules/somalier.smk"
 include: "rules/svaba.smk"

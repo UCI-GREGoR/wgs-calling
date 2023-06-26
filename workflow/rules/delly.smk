@@ -3,8 +3,8 @@ rule delly_run:
     Run delly on a single sample bam
     """
     input:
-        bam="results/bqsr/{projectid}/{sampleid}.bam",
-        bai="results/bqsr/{projectid}/{sampleid}.bai",
+        bam="results/aligned_bams/{projectid}/{sampleid}.bam",
+        bai="results/aligned_bams/{projectid}/{sampleid}.bai",
         fasta="reference_data/{}/{}/ref.fasta".format(
             config["behaviors"]["aligner"], reference_build
         ),
