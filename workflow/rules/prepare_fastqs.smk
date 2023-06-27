@@ -1,26 +1,17 @@
-rule sort_input_bam:
-    """
-    For input files provided as pre-aligned bams: the expectation is that these
-    bams will be aligned to the wrong genome, and need to be converted into fastqs
-    in preparation for re-alignment. As a preliminary requirement, sort the bam.
-    """
+"""
+For input files provided as pre-aligned bams: the expectation is that these
+bams will be aligned to the wrong genome, and need to be converted into fastqs
+in preparation for re-alignment. As a preliminary requirement, sort the bam.
+"""
+
+
+use rule sort_bam as sort_input_bam with:
     input:
-        lambda wildcards: tc.locate_input_bam(wildcards, manifest, True),
+        bam=lambda wildcards: tc.locate_input_bam(wildcards, manifest, True),
     output:
-        temp("results/input_bams/{projectid}/{sampleid}.sorted.bam"),
-    params:
-        sort_m=int(config_resources["samtools"]["memory"])
-        / (2 * int(config_resources["samtools"]["threads"])),
-    conda:
-        "../envs/samtools.yaml" if not use_containers else None
-    container:
-        "{}/samtools.sif".format(apptainer_images) if use_containers else None
-    threads: config_resources["samtools"]["threads"]
-    resources:
-        mem_mb=config_resources["samtools"]["memory"],
-        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
-    shell:
-        "samtools sort -@ {threads} -m {params.sort_m} -n -o {output} {input}"
+        bam=temp("results/input_bams/{projectid}/{sampleid}.sorted.bam"),
+    benchmark:
+        "results/performance_benchmarks/sort_input_bam/{projectid}/{sampleid}.tsv"
 
 
 checkpoint input_bam_sample_lanes:
