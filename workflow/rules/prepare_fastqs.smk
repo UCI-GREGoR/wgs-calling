@@ -5,7 +5,7 @@ rule sort_input_bam:
     in preparation for re-alignment. As a preliminary requirement, sort the bam.
     """
     input:
-        lambda wildcards: tc.locate_input_bam(wildcards, manifest),
+        lambda wildcards: tc.locate_input_bam(wildcards, manifest, True),
     output:
         temp("results/input_bams/{projectid}/{sampleid}.sorted.bam"),
     params:

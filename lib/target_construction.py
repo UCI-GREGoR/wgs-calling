@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from snakemake.checkpoints import Checkpoint, Checkpoints
 from snakemake.io import AnnotatedString, Namedlist, expand
+from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
 
 
 def map_fastq_from_project_and_sample(
@@ -53,7 +54,7 @@ def map_fastqs_to_manifest(wildcards: Namedlist, manifest: pd.DataFrame, readtag
     )
 
 
-def locate_input_bam(wildcards: Namedlist, manifest: pd.DataFrame):
+def locate_input_bam(wildcards: Namedlist, manifest: pd.DataFrame, remap_local: bool):
     """
     Attempt to find user-specified bamfile for input. This is expected
     to be specified as an alternative to fastqs; fastqs are preferred.
@@ -61,7 +62,11 @@ def locate_input_bam(wildcards: Namedlist, manifest: pd.DataFrame):
     query = 'projectid == "{}" and sampleid == "{}"'.format(wildcards.projectid, wildcards.sampleid)
     result = manifest.query(query)
     assert not result["bam"].isna().to_list()[0]
-    return result["bam"].to_list()[0]
+    bam = result["bam"].to_list()[0]
+    if remap_local:
+        return "results/imported_bams/{}/{}.bam".format(wildcards.projectid, wildcards.sampleid)
+    else:
+        return bam
 
 
 def get_bams_by_lane(

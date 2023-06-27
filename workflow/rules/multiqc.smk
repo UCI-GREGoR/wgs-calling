@@ -130,7 +130,7 @@ rule run_multiqc_alignment_combined_lanes:
         somalier=tc.construct_somalier_relate_targets,
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
-        multiqc_config="config/multiqc_alignment_config_combined-lanes.yaml",
+        multiqc_config="config/multiqc_alignment_config_combined_lanes.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
         html="results/multiqc/{projectid}/multiqc.combined-lanes.{projectid}.alignment.html",
