@@ -18,7 +18,9 @@ rule merge_sv_vcfs:
     threads: config_resources["svdb"]["threads"]
     resources:
         mem_mb=config_resources["svdb"]["memory"],
-        qname=rc.select_queue(config_resources["svdb"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["svdb"]["queue"], config_resources["queues"]
+        ),
     shell:
         "svdb --merge --vcf {input} | "
         "sed 's/ID=PL,Number=G,Type=Integer/ID=PL,Number=G,Type=Float/' | "
@@ -54,7 +56,9 @@ rule ensemble_sv_vcf:
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
-        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["bcftools"]["queue"], config_resources["queues"]
+        ),
     shell:
         'bcftools filter -i "{params.bcftools_filter_count} {params.bcftools_filter_sources}" -O z -o {output} {input}'
 
@@ -77,6 +81,8 @@ rule summarize_sv_variant_sources:
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
-        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["bcftools"]["queue"], config_resources["queues"]
+        ),
     shell:
         "bcftools query -f '%CHROM\\t%POS\\t%ID\\t%REF\\t%ALT\\t%QUAL\\t%FILTER\\t%INFO/SVTYPE\\t%INFO/svdb_origin\\n' {input} > {output}"

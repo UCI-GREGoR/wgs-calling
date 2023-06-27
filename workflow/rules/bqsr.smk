@@ -34,7 +34,7 @@ rule bqsr_base_recalibrator:
     threads: config_resources["gatk_bqsr_base_recalibrator"]["threads"]
     resources:
         mem_mb=config_resources["gatk_bqsr_base_recalibrator"]["memory"],
-        qname=rc.select_queue(
+        qname=lambda wildcards: rc.select_queue(
             config_resources["gatk_bqsr_base_recalibrator"]["queue"], config_resources["queues"]
         ),
     shell:
@@ -81,7 +81,7 @@ rule bqsr_apply_bqsr:
     threads: config_resources["gatk_bqsr_apply_bqsr"]["threads"]
     resources:
         mem_mb=config_resources["gatk_bqsr_apply_bqsr"]["memory"],
-        qname=rc.select_queue(
+        qname=lambda wildcards: rc.select_queue(
             config_resources["gatk_bqsr_apply_bqsr"]["queue"], config_resources["queues"]
         ),
     shell:

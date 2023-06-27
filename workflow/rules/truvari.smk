@@ -22,7 +22,9 @@ rule truvari_merge_within_caller:
     threads: config_resources["truvari"]["threads"]
     resources:
         mem_mb=config_resources["truvari"]["memory"],
-        qname=rc.select_queue(config_resources["truvari"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["truvari"]["queue"], config_resources["queues"]
+        ),
     shell:
         "truvari collapse -i {input.vcf} -o {output.vcf} -c {output.collapsed} -f {input.fasta} "
         "-p 0.5 -O 0.25 -P 0.5"
@@ -53,7 +55,9 @@ rule bcftools_concat_sv_callers:
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
-        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["bcftools"]["queue"], config_resources["queues"]
+        ),
     shell:
         "bcftools concat -a -d exact -O v {input.vcf} | bcftools sort -O z -o {output.vcf}"
 
@@ -96,7 +100,9 @@ rule truvari_ensemble_sv_vcf:
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
-        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["bcftools"]["queue"], config_resources["queues"]
+        ),
     shell:
         'bcftools filter -i "{params.bcftools_filter_count} {params.bcftools_filter_sources}" -O z -o {output} {input}'
 
@@ -117,6 +123,8 @@ rule truvari_add_variant_sources:
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["default"]["queue"], config_resources["queues"]
+        ),
     script:
         "../scripts/truvari_add_variant_sources.py"

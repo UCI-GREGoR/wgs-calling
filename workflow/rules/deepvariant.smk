@@ -71,7 +71,9 @@ rule deepvariant_make_examples:
     threads: config_resources["deepvariant"]["threads"]
     resources:
         mem_mb=config_resources["deepvariant"]["make_examples_memory"],
-        qname=rc.select_queue(config_resources["deepvariant"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["deepvariant"]["queue"], config_resources["queues"]
+        ),
         tmpdir="/tmp",
     shell:
         "mkdir -p {params.tmpdir} && "
@@ -114,7 +116,9 @@ rule deepvariant_call_variants:
     threads: config_resources["deepvariant"]["threads"]
     resources:
         mem_mb=config_resources["deepvariant"]["call_variants_memory"],
-        qname=rc.select_queue(config_resources["deepvariant"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["deepvariant"]["queue"], config_resources["queues"]
+        ),
     shell:
         "call_variants "
         "--outfile {output.gz} "
@@ -167,7 +171,9 @@ rule deepvariant_postprocess_variants:
     threads: 1
     resources:
         mem_mb=config_resources["deepvariant"]["postprocess_variants_memory"],
-        qname=rc.select_queue(config_resources["deepvariant"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["deepvariant"]["queue"], config_resources["queues"]
+        ),
     shell:
         "postprocess_variants "
         "--ref {input.fasta} "
@@ -198,7 +204,9 @@ rule deepvariant_combine_regions:
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
-        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["bcftools"]["queue"], config_resources["queues"]
+        ),
     shell:
         "bcftools concat --threads {threads} -O z -o {output} {input}"
 

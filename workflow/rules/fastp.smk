@@ -25,7 +25,9 @@ rule run_fastp:
     threads: config_resources["fastp"]["threads"]
     resources:
         mem_mb=config_resources["fastp"]["memory"],
-        qname=rc.select_queue(config_resources["fastp"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["fastp"]["queue"], config_resources["queues"]
+        ),
     shell:
         "fastp -i {input.r1} -I {input.r2} "
         "-o {output.r1_fastq} -O {output.r2_fastq} "
