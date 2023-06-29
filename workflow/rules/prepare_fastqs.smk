@@ -33,12 +33,12 @@ checkpoint input_bam_sample_lanes:
         "{}/samtools.sif".format(apptainer_images) if use_containers else None
     threads: 1
     resources:
-        mem_mb=1000,
+        mem_mb=2000,
         qname=lambda wildcards: rc.select_queue(
             config_resources["samtools"]["queue"], config_resources["queues"]
         ),
     shell:
-        'samtools view -@ 1 {input} | cut -f 4 -d ":" | head -n 100000 | sort | uniq > {output}'
+        "samtools view -@ 1 {input} | awk 'NR <= 100000' | cut -f 4 -d \":\" | sort | uniq > {output}"
 
 
 rule input_bam_to_split_fastq:
@@ -68,7 +68,8 @@ rule input_bam_to_split_fastq:
         ),
     shell:
         "samtools fastq -@ {threads} -s /dev/null -{params.off_target_read_flag} /dev/null -0 /dev/null -n {input} | "
-        "awk 'BEGIN {{FS = \":\"}} {{lane = $4 ; print ; for (i = 1 ; i <= 3 ; i++) {{getline ; print}}}}' | "
+        'awk -v target={wildcards.lane} \'BEGIN {{FS = ":"}} {{lane = $4 ; if (lane == target) {{print}} ; '
+        "for (i = 1 ; i <= 3 ; i++) {{getline ; if (lane == target) {{print}}}}}}' | "
         "bgzip -c > {output}"
 
 
