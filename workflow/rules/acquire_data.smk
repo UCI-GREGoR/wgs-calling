@@ -37,6 +37,10 @@ rule copy_bams:
         else "default",
     benchmark:
         "results/performance_benchmarks/copy_bams/{projectid}/{sampleid}.tsv"
+    conda:
+        "../envs/awscli.yaml" if not use_containers else None
+    container:
+        "{}/awscli.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
