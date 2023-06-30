@@ -18,7 +18,9 @@ rule run_alignstats:
     threads: config_resources["alignstats"]["threads"]
     resources:
         mem_mb=config_resources["alignstats"]["memory"],
-        qname=rc.select_queue(config_resources["alignstats"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["alignstats"]["queue"], config_resources["queues"]
+        ),
     shell:
         "alignstats -C -U "
         "-i {input.bam} "
@@ -41,6 +43,8 @@ rule merge_alignstats:
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["default"]["queue"], config_resources["queues"]
+        ),
     script:
         "../scripts/alignstats_json_to_yaml.py"

@@ -22,7 +22,7 @@ rule create_sequence_dictionary:
     threads: config_resources["gatk_create_sequence_dictionary"]["threads"]
     resources:
         mem_mb=config_resources["gatk_create_sequence_dictionary"]["memory"],
-        qname=rc.select_queue(
+        qname=lambda wildcards: rc.select_queue(
             config_resources["gatk_create_sequence_dictionary"]["queue"],
             config_resources["queues"],
         ),
@@ -77,7 +77,7 @@ rule mark_duplicates:
     threads: config_resources["gatk_mark_duplicates"]["threads"]
     resources:
         mem_mb=config_resources["gatk_mark_duplicates"]["memory"],
-        qname=rc.select_queue(
+        qname=lambda wildcards: rc.select_queue(
             config_resources["gatk_mark_duplicates"]["queue"], config_resources["queues"]
         ),
         tmpdir=tempDir,
@@ -99,6 +99,12 @@ rule sort_bam:
         bam="{prefix}.sort.bam",
     params:
         tmpdir=tempDir,
+        sort_m="{}M".format(
+            int(
+                float(config_resources["samtools"]["memory"])
+                / (2 * float(config_resources["samtools"]["threads"]))
+            )
+        ),
     benchmark:
         "results/performance_benchmarks/sort_bam/{prefix}.sort.bam.tsv"
     conda:
@@ -108,13 +114,13 @@ rule sort_bam:
     threads: config_resources["samtools_sort"]["threads"]
     resources:
         mem_mb=config_resources["samtools_sort"]["memory"],
-        qname=rc.select_queue(
+        qname=lambda wildcards: rc.select_queue(
             config_resources["samtools_sort"]["queue"], config_resources["queues"]
         ),
         tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "
-        "samtools sort -@ {threads} -T {params.tmpdir} -o {output.bam} -O bam {input.bam}"
+        "samtools sort -@ {threads} -T {params.tmpdir} -m {params.sort_m} -o {output.bam} -O bam {input.bam}"
 
 
 rule samtools_create_bai:
@@ -134,7 +140,9 @@ rule samtools_create_bai:
     threads: config_resources["samtools"]["threads"]
     resources:
         mem_mb=config_resources["samtools"]["memory"],
-        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["samtools"]["queue"], config_resources["queues"]
+        ),
     shell:
         "samtools index -@ {threads} -b -o {output.bai} {input.bam}"
 
@@ -181,7 +189,7 @@ rule picard_collectmultiplemetrics:
     threads: config_resources["gatk_collectmultiplemetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectmultiplemetrics"]["memory"],
-        qname=rc.select_queue(
+        qname=lambda wildcards: rc.select_queue(
             config_resources["gatk_collectmultiplemetrics"]["queue"], config_resources["queues"]
         ),
         tmpdir=tempDir,
@@ -236,7 +244,7 @@ rule picard_collectgcbiasmetrics:
     threads: config_resources["gatk_collectgcbiasmetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectgcbiasmetrics"]["memory"],
-        qname=rc.select_queue(
+        qname=lambda wildcards: rc.select_queue(
             config_resources["gatk_collectgcbiasmetrics"]["queue"], config_resources["queues"]
         ),
         tmpdir=tempDir,
@@ -281,7 +289,7 @@ rule picard_collectwgsmetrics:
     threads: config_resources["gatk_collectwgsmetrics"]["threads"]
     resources:
         mem_mb=config_resources["gatk_collectwgsmetrics"]["memory"],
-        qname=rc.select_queue(
+        qname=lambda wildcards: rc.select_queue(
             config_resources["gatk_collectwgsmetrics"]["queue"], config_resources["queues"]
         ),
         tmpdir=tempDir,

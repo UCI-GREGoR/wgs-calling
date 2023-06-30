@@ -25,7 +25,9 @@ rule lumpy_run:
     threads: config_resources["smoove"]["threads"]
     resources:
         mem_mb=config_resources["smoove"]["memory"],
-        qname=rc.select_queue(config_resources["smoove"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["smoove"]["queue"], config_resources["queues"]
+        ),
     shell:
         "smoove call --outdir {params.outdir} --exclude {input.bed} --name {wildcards.sampleid} --fasta {input.fasta} -p 1 --genotype {input.bam} && "
         "mv {params.outdir}/{wildcards.sampleid}-smoove.genotyped.vcf.gz {output.vcf}"

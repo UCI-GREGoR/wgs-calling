@@ -1,26 +1,17 @@
-rule sort_input_bam:
-    """
-    For input files provided as pre-aligned bams: the expectation is that these
-    bams will be aligned to the wrong genome, and need to be converted into fastqs
-    in preparation for re-alignment. As a preliminary requirement, sort the bam.
-    """
+"""
+For input files provided as pre-aligned bams: the expectation is that these
+bams will be aligned to the wrong genome, and need to be converted into fastqs
+in preparation for re-alignment. As a preliminary requirement, sort the bam.
+"""
+
+
+use rule sort_bam as sort_input_bam with:
     input:
-        lambda wildcards: tc.locate_input_bam(wildcards, manifest),
+        bam=lambda wildcards: tc.locate_input_bam(wildcards, manifest, True),
     output:
-        temp("results/input_bams/{projectid}/{subjectid}.sorted.bam"),
-    params:
-        sort_m=int(config_resources["samtools"]["memory"])
-        / (2 * int(config_resources["samtools"]["threads"])),
-    conda:
-        "../envs/samtools.yaml" if not use_containers else None
-    container:
-        "{}/samtools.sif".format(apptainer_images) if use_containers else None
-    threads: config_resources["samtools"]["threads"]
-    resources:
-        mem_mb=config_resources["samtools"]["memory"],
-        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
-    shell:
-        "samtools sort -@ {threads} -m {params.sort_m} -n -o {output} {input}"
+        bam=temp("results/input_bams/{projectid}/{sampleid}.sorted.bam"),
+    benchmark:
+        "results/performance_benchmarks/sort_input_bam/{projectid}/{sampleid}.tsv"
 
 
 checkpoint input_bam_sample_lanes:
@@ -42,10 +33,12 @@ checkpoint input_bam_sample_lanes:
         "{}/samtools.sif".format(apptainer_images) if use_containers else None
     threads: 1
     resources:
-        mem_mb=1000,
-        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
+        mem_mb=2000,
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["samtools"]["queue"], config_resources["queues"]
+        ),
     shell:
-        'samtools view -@ 1 {input} | cut -f 4 -d ":" | head -n 100000 | sort | uniq > {output}'
+        'samtools head -h 0 -n 100000 {input} | cut -f 4 -d ":" | sort | uniq > {output}'
 
 
 rule input_bam_to_split_fastq:
@@ -70,10 +63,13 @@ rule input_bam_to_split_fastq:
     threads: config_resources["samtools"]["threads"]
     resources:
         mem_mb=config_resources["samtools"]["memory"],
-        qname=rc.select_queue(config_resources["samtools"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["samtools"]["queue"], config_resources["queues"]
+        ),
     shell:
         "samtools fastq -@ {threads} -s /dev/null -{params.off_target_read_flag} /dev/null -0 /dev/null -n {input} | "
-        "awk 'BEGIN {{FS = \":\"}} {{lane = $4 ; print ; for (i = 1 ; i <= 3 ; i++) {{getline ; print}}}}' | "
+        'awk -v target={wildcards.lane} \'BEGIN {{FS = ":"}} {{lane = $4 ; if (lane == target) {{print}} ; '
+        "for (i = 1 ; i <= 3 ; i++) {{getline ; if (lane == target) {{print}}}}}}' | "
         "bgzip -c > {output}"
 
 
@@ -97,7 +93,7 @@ checkpoint input_fastq_sample_lanes:
     threads: 1
     resources:
         mem_mb=1000,
-        qname=rc.select_queue("small", config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue("small", config_resources["queues"]),
     shell:
         "gunzip -c {input} | awk 'NF > 1 {{print $1}}' | cut -f 4 -d ':' | sort | uniq > {output}"
 
@@ -130,7 +126,7 @@ rule input_fastq_to_split_fastq:
     threads: 1
     resources:
         mem_mb=1000,
-        qname=rc.select_queue("small", config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue("small", config_resources["queues"]),
     shell:
         "gunzip -c {input} | "
         'awk \'BEGIN {{FS = ":"}} {{lane = $4 ; if ( lane == "{wildcards.lane}" ) {{ print }} ; '
@@ -159,6 +155,8 @@ rule bbtools_repair_fastqs:
     threads: config_resources["bbtools"]["threads"]
     resources:
         mem_mb=config_resources["bbtools"]["memory"],
-        qname=rc.select_queue(config_resources["bbtools"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["bbtools"]["queue"], config_resources["queues"]
+        ),
     shell:
         "repair.sh in1={input.R1} in2={input.R2} out1={output.R1} out2={output.R2} outs={output.singletons} repair"

@@ -76,6 +76,14 @@ properties:
       assume-last-sample-sex:
         type: string
         pattern: "^[fF]emale$|^[mM]ale$"
+      import-s3:
+        type: object
+        properties:
+          profile-name:
+            type: string
+        required:
+          - profile-name
+        additionalProperties: no
       export-directory:
         type: string
       export-s3:
