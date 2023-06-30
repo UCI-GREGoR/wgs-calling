@@ -560,9 +560,12 @@ rule export_data_remote:
         "results/export/{projectid}/s3_transfer_complete.txt",
     params:
         export_dir="results/export/{projectid}",
-        bucketname=config["behaviors"]["export-s3"]["bucket-name"],
+        bucketname=config["behaviors"]["export-s3"]["bucket-name"]
+        if "export-s3" in config["behaviors"]
+        else None,
         profile="--profile {}".format(config["behaviors"]["export-s3"]["profile-name"])
-        if "profile-name" in config["behaviors"]["export-s3"]
+        if "export-s3" in config["behaviors"]
+        and "profile-name" in config["behaviors"]["export-s3"]
         else "",
     threads: config_resources["awscli"]["threads"]
     resources:
@@ -604,9 +607,12 @@ rule export_fastqs_remote:
         "results/fastqs/{projectid}/s3_transfer_complete.txt",
     params:
         export_dir="results/fastqs/{projectid}",
-        bucketname=config["behaviors"]["export-s3"]["bucket-name"],
+        bucketname=config["behaviors"]["export-s3"]["bucket-name"]
+        if "export-s3" in config["behaviors"]
+        else None,
         profile="--profile {}".format(config["behaviors"]["export-s3"]["profile-name"])
-        if "profile-name" in config["behaviors"]["export-s3"]
+        if "export-s3" in config["behaviors"]
+        and "profile-name" in config["behaviors"]["export-s3"]
         else "",
     threads: config_resources["default"]["threads"]
     resources:
