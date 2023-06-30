@@ -32,9 +32,6 @@ rule deepvariant_make_examples:
             config["behaviors"]["aligner"], reference_build
         ),
         intervals="results/deepvariant/split_ranges/{splitnum}.ssv",
-        sif="results/apptainer_images/deepvariant_{}.sif".format(
-            config["parameters"]["deepvariant"]["docker-version"]
-        ),
     output:
         temp(
             expand(
@@ -67,8 +64,10 @@ rule deepvariant_make_examples:
             shardmax=config_resources["deepvariant"]["threads"],
         ),
         tmpdir="/tmp",
-    conda:
-        "../envs/apptainer.yaml" if not use_containers else None
+    container:
+        "docker://google/deepvariant:{}".format(
+            config["parameters"]["deepvariant"]["docker-version"]
+        )
     threads: config_resources["deepvariant"]["threads"]
     resources:
         mem_mb=config_resources["deepvariant"]["make_examples_memory"],
@@ -77,15 +76,13 @@ rule deepvariant_make_examples:
         ),
         tmpdir="/tmp",
     shell:
-        'apptainer exec -B /usr/lib/locale/:/usr/lib/locale/ {input.sif} sh -c "mkdir -p {params.tmpdir} && '
+        "mkdir -p {params.tmpdir} && "
         "seq 0 $(({threads}-1)) | parallel -j{threads} --tmpdir {params.tmpdir} "
         "make_examples --mode calling "
-        "--ref {input.fasta} "
-        "--reads {input.bam} "
-        '--regions "$(cat {input.intervals})" '
+        '--ref {input.fasta} --reads {input.bam} --regions "$(cat {input.intervals})" '
         "--examples {params.shard_string} --channels insert_size "
         "--gvcf {params.gvcf_string} "
-        '--task {{}}"'
+        "--task {{}}"
 
 
 rule deepvariant_call_variants:
@@ -94,16 +91,13 @@ rule deepvariant_call_variants:
     embarrassingly parallel fashion.
     """
     input:
-        infiles=expand(
+        expand(
             "results/deepvariant/{{projectid}}/make_examples/{{sampleid}}.{{splitnum}}.tfrecord-{shardnum}-of-{shardmax}.{suffix}",
             shardnum=[
                 str(i).rjust(5, "0") for i in range(config_resources["deepvariant"]["threads"])
             ],
             shardmax=str(config_resources["deepvariant"]["threads"]).rjust(5, "0"),
             suffix=["gz", "gz.example_info.json"],
-        ),
-        sif="results/apptainer_images/deepvariant_{}.sif".format(
-            config["parameters"]["deepvariant"]["docker-version"]
         ),
     output:
         gz=temp("results/deepvariant/{projectid}/call_variants/{sampleid}.{splitnum}.tfrecord.gz"),
@@ -115,8 +109,10 @@ rule deepvariant_call_variants:
             shardmax=config_resources["deepvariant"]["threads"],
         ),
         docker_model="/opt/models/wgs/model.ckpt",
-    conda:
-        "../envs/apptainer.yaml" if not use_containers else None
+    container:
+        "docker://google/deepvariant:{}".format(
+            config["parameters"]["deepvariant"]["docker-version"]
+        )
     threads: config_resources["deepvariant"]["threads"]
     resources:
         mem_mb=config_resources["deepvariant"]["call_variants_memory"],
@@ -124,11 +120,10 @@ rule deepvariant_call_variants:
             config_resources["deepvariant"]["queue"], config_resources["queues"]
         ),
     shell:
-        'apptainer exec -B /usr/lib/locale/:/usr/lib/locale/ {input.sif} sh -c "'
         "call_variants "
         "--outfile {output.gz} "
         "--examples {params.shard_string} "
-        '--checkpoint \\"{params.docker_model}\\""'
+        '--checkpoint "{params.docker_model}"'
 
 
 rule deepvariant_postprocess_variants:
@@ -151,9 +146,6 @@ rule deepvariant_postprocess_variants:
         fai="reference_data/{}/{}/ref.fasta.fai".format(
             config["behaviors"]["aligner"], reference_build
         ),
-        sif="results/apptainer_images/deepvariant_{}.sif".format(
-            config["parameters"]["deepvariant"]["docker-version"]
-        ),
     output:
         vcf=temp(
             "results/deepvariant/{projectid}/postprocess_variants/{sampleid}.{splitnum}.vcf.gz"
@@ -172,8 +164,10 @@ rule deepvariant_postprocess_variants:
         ),
     benchmark:
         "results/performance_benchmarks/deepvariant_postprocess_variants/{projectid}/{sampleid}.{splitnum}.tsv"
-    conda:
-        "../envs/apptainer.yaml" if not use_containers else None
+    container:
+        "docker://google/deepvariant:{}".format(
+            config["parameters"]["deepvariant"]["docker-version"]
+        )
     threads: 1
     resources:
         mem_mb=config_resources["deepvariant"]["postprocess_variants_memory"],
@@ -181,13 +175,12 @@ rule deepvariant_postprocess_variants:
             config_resources["deepvariant"]["queue"], config_resources["queues"]
         ),
     shell:
-        'apptainer exec -B /usr/lib/locale/:/usr/lib/locale/ {input.sif} sh -c "'
         "postprocess_variants "
         "--ref {input.fasta} "
         "--infile {input.gz} "
         "--nonvariant_site_tfrecord_path {params.gvcf_string} "
         "--gvcf_outfile {output.gvcf} "
-        '--outfile {output.vcf}"'
+        "--outfile {output.vcf}"
 
 
 rule deepvariant_combine_regions:
