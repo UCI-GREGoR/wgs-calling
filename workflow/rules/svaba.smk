@@ -36,7 +36,9 @@ rule svaba_run:
     threads: config_resources["svaba"]["threads"]
     resources:
         mem_mb=config_resources["svaba"]["memory"],
-        qname=rc.select_queue(config_resources["svaba"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["svaba"]["queue"], config_resources["queues"]
+        ),
     shell:
         "svaba run -p {threads} -G {input.bwa_fasta} -I -L 6 -t {input.bam} -B {input.bed} -a {params.outprefix}"
 
@@ -83,7 +85,9 @@ rule svaba_select_output_variants:
     threads: config_resources["bcftools"]["threads"]
     resources:
         mem_mb=config_resources["bcftools"]["memory"],
-        qname=rc.select_queue(config_resources["bcftools"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["bcftools"]["queue"], config_resources["queues"]
+        ),
     shell:
         "mkdir -p {params.tmpdir} && "
         "echo -e '{params.bam}\\t{wildcards.sampleid}' > {output.linker} && "
@@ -110,7 +114,9 @@ rule vcf_to_bedpe:
     threads: config_resources["svtools"]["threads"]
     resources:
         mem_mb=config_resources["svtools"]["memory"],
-        qname=rc.select_queue(config_resources["svtools"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["svtools"]["queue"], config_resources["queues"]
+        ),
     shell:
         "gunzip -c {input} > {output}.tmp && "
         "svtools vcftobedpe -i {output}.tmp -o {output} && "
@@ -128,7 +134,9 @@ rule svaba_resolve_breakends:
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
-        qname=rc.select_queue(config_resources["default"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["default"]["queue"], config_resources["queues"]
+        ),
     script:
         "../scripts/reclassify_svs.py"
 
@@ -150,7 +158,9 @@ rule bedpe_to_vcf:
     threads: config_resources["svtools"]["threads"]
     resources:
         mem_mb=config_resources["svtools"]["memory"],
-        qname=rc.select_queue(config_resources["svtools"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["svtools"]["queue"], config_resources["queues"]
+        ),
         tmpdir=tempDir,
     shell:
         "mkdir -p {params.tmpdir} && "

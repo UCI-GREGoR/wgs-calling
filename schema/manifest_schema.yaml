@@ -34,6 +34,10 @@ oneOf:
       bam:
         type: string
         description: "aligned read bam file for sample"
+      lane:
+        type: string
+        default: "L001"
+        description: "sequencing lane code, with L00 prefix. largely a placeholder for bam input"
     required:
       - projectid
       - sampleid

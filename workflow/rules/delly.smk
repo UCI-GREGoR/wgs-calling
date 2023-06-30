@@ -23,6 +23,8 @@ rule delly_run:
     threads: config_resources["delly"]["threads"]
     resources:
         mem_mb=config_resources["delly"]["memory"],
-        qname=rc.select_queue(config_resources["delly"]["queue"], config_resources["queues"]),
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["delly"]["queue"], config_resources["queues"]
+        ),
     shell:
         "delly call -g {input.fasta} -x {input.bed} {input.bam} | bcftools view -i 'F_MISSING<0.5' -O z -o {output.vcf}"
