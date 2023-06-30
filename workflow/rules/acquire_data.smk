@@ -26,7 +26,8 @@ rule copy_fastqs:
 
 rule copy_bams:
     """
-
+    When input files are bams, grab copies of them from external sources. Unlike with fastqs,
+    these are temp flagged in favor of keeping their downstream converted fastqs.
     """
     output:
         bam=temp("results/imported_bams/{projectid}/{sampleid}.bam"),
