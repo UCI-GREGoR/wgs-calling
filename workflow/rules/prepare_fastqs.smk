@@ -73,6 +73,15 @@ rule input_bam_to_split_fastq:
         "bgzip -c > {output}"
 
 
+use rule copy_fastqs as copy_combined_fastqs with:
+    output:
+        fastq=temp(
+            "results/imported_fastqs/{projectid}/{sampleid}_{lane}_R{readgroup}_{suffix}.fastq.gz"
+        ),
+    benchmark:
+        "results/performance_benchmarks/copy_combined_fastqs/{projectid}/{sampleid}_{lane}_R{readgroup}_{suffix}.fastq.tsv"
+
+
 checkpoint input_fastq_sample_lanes:
     """
     For input files provided as combined fastqs: the expectation is that these
@@ -81,11 +90,7 @@ checkpoint input_fastq_sample_lanes:
     by lane, sniff the fastq for read names and determine which lanes are reportedly present.
     """
     input:
-        lambda wildcards: manifest.query(
-            'projectid == "{}" and sampleid == "{}"'.format(
-                wildcards.projectid, wildcards.sampleid
-            )
-        )[wildcards.readgroup.lower()].to_list()[0],
+        "results/imported_fastqs/{projectid}/{sampleid}_combined_{readgroup}_001.fastq.gz",
     output:
         temp("results/fastqs_from_fastq/{projectid}/{sampleid}_{readgroup}_expected-lanes.tsv"),
     benchmark:
@@ -110,11 +115,7 @@ rule input_fastq_to_split_fastq:
     invoked separately.
     """
     input:
-        lambda wildcards: manifest.query(
-            'projectid == "{}" and sampleid == "{}"'.format(
-                wildcards.projectid, wildcards.sampleid
-            )
-        )[wildcards.readgroup.lower()].to_list()[0],
+        "results/imported_fastqs/{projectid}/{sampleid}_combined_{readgroup}_001.fastq.gz",
     output:
         temp("results/bbtools_input/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz"),
     benchmark:
