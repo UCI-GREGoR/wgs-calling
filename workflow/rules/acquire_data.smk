@@ -4,6 +4,12 @@ rule copy_fastqs:
     now supported, but in that case the symlink-fastqs configuration option cannot
     be respected.
     """
+    input:
+        lambda wildcards: tc.map_fastqs_to_manifest(wildcards, manifest, "R" + wildcards.readgroup)
+        if not tc.map_fastqs_to_manifest(
+            wildcards, manifest, "R" + wildcards.readgroup
+        ).startswith("s3://")
+        else [],
     output:
         fastq="results/fastqs/{projectid}/{sampleid}_{lane}_R{readgroup}_{suffix}.fastq.gz",
     params:
