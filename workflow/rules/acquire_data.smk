@@ -1,17 +1,21 @@
 rule copy_fastqs:
     """
-    Get a local copy of fastq files before analysis
+    Get a local copy of fastq files before analysis. Note that s3 hosted inputs are
+    now supported, but in that case the symlink-fastqs configuration option cannot
+    be respected.
     """
-    input:
-        r1=lambda wildcards: tc.map_fastqs_to_manifest(wildcards, manifest, "R1"),
-        r2=lambda wildcards: tc.map_fastqs_to_manifest(wildcards, manifest, "R2"),
     output:
-        r1="results/fastqs/{projectid}/{sampleid}_{lane}_R1_{suffix}.fastq.gz",
-        r2="results/fastqs/{projectid}/{sampleid}_{lane}_R2_{suffix}.fastq.gz",
+        fastq="results/fastqs/{projectid}/{sampleid}_{lane}_R{readgroup}_{suffix}.fastq.gz",
     params:
+        fastq=lambda wildcards: tc.map_fastqs_to_manifest(
+            wildcards, manifest, "R" + wildcards.readgroup
+        ),
         symlink_target=config["behaviors"]["symlink-fastqs"],
+        profile=config["behaviors"]["import-s3"]["profile-name"]
+        if "import-s3" in config["behaviors"]
+        else "default",
     benchmark:
-        "results/performance_benchmarks/copy_fastqs/{projectid}/{sampleid}_{lane}_{suffix}.fastq.tsv"
+        "results/performance_benchmarks/copy_fastqs/{projectid}/{sampleid}_{lane}_R{readgroup}_{suffix}.fastq.tsv"
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
@@ -19,14 +23,17 @@ rule copy_fastqs:
             config_resources["default"]["queue"], config_resources["queues"]
         ),
     shell:
-        'if [[ "{params.symlink_target}" == "True" ]] ; then '
-        "ln -s $(readlink -m {input.r1}) {output.r1} && ln -s $(readlink -m {input.r2}) {output.r2} ; "
-        "else cp {input.r1} {output.r1} && cp {input.r2} {output.r2} ; fi"
+        'if [[ "{params.fastq}" == "s3://"* ]] ; then '
+        "aws s3 cp --profile {params.profile} {params.fastq} {output.fastq} ; "
+        'elif [[ "{params.symlink_target}" == "True" ]] ; then '
+        "ln -s $(readlink -m {params.fastq}) {output.fastq} ; "
+        "else cp {params.fastq} {output.fastq} ; fi"
 
 
 rule copy_bams:
     """
-
+    When input files are bams, grab copies of them from external sources. Unlike with fastqs,
+    these are temp flagged in favor of keeping their downstream converted fastqs.
     """
     output:
         bam=temp("results/imported_bams/{projectid}/{sampleid}.bam"),

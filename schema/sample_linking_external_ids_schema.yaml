@@ -1,13 +1,13 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 description: an entry in the optional user-configured sample external ID linker
 properties:
-  sqid:
+  subject:
     type: string
-    description: "adapter index ID (e.g. SQ\\d{4})"
+    description: "subject ID (corresponding column in sample manifest, e.g. SQ\\d{4} for legacy data)"
   externalid:
     type: string
     description: "public-facing ID for sample export (e.g. PMGRC-1-1-0_LS\\d+_SQ\\d{4})"
 required:
-  - sqid
+  - subject
   - externalid
 additionalProperties: no
