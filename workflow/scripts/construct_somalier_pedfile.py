@@ -61,10 +61,14 @@ def run_construct_somalier_pedfile(
 
     for ruid, sampleid in zip(ids["ruid"], ids["sampleid"]):
         sample_sex = linker_data.loc[
-            (linker_data["ru"] == ruid) & (linker_data["sq"] == sampleid), "sex"
+            ((linker_data["ru"] == ruid) | (linker_data["ru"].isna()))
+            & (linker_data["sq"] == sampleid),
+            "sex",
         ]
         subject_id = linker_data.loc[
-            (linker_data["ru"] == ruid) & (linker_data["sq"] == sampleid), "subject"
+            ((linker_data["ru"] == ruid) | (linker_data["ru"].isna()))
+            & (linker_data["sq"] == sampleid),
+            "subject",
         ]
         if len(sample_sex) == 1:
             ## new: deal with IDs that don't actually look like "PMGRC-\d+-\d+-\d"
