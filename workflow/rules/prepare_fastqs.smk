@@ -1,17 +1,76 @@
-"""
-For input files provided as pre-aligned bams: the expectation is that these
-bams will be aligned to the wrong genome, and need to be converted into fastqs
-in preparation for re-alignment. As a preliminary requirement, sort the bam.
-"""
+rule sort_input_bam:
+    """
+    For input files provided as pre-aligned bams: the expectation is that these
+    bams will be aligned to the wrong genome, and need to be converted into fastqs
+    in preparation for re-alignment. As a preliminary requirement, sort the bam.
 
-
-use rule sort_bam as sort_input_bam with:
+    This bam will be passed along to samtools fixmate, and as such needs to be
+    sorted with -n.
+    """
     input:
         bam=lambda wildcards: tc.locate_input_bam(wildcards, manifest, True),
     output:
         bam=temp("results/input_bams/{projectid}/{sampleid}.sorted.bam"),
     benchmark:
         "results/performance_benchmarks/sort_input_bam/{projectid}/{sampleid}.tsv"
+    params:
+        tmpdir=tempDir,
+        sort_m="{}M".format(
+            int(
+                float(config_resources["samtools"]["memory"])
+                / (2 * float(config_resources["samtools"]["threads"]))
+            )
+        ),
+    conda:
+        "../envs/samtools.yaml" if not use_containers else None
+    container:
+        "{}/bwa.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["samtools_sort"]["threads"]
+    resources:
+        mem_mb=config_resources["samtools_sort"]["memory"],
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["samtools_sort"]["queue"], config_resources["queues"]
+        ),
+        tmpdir=tempDir,
+    shell:
+        "mkdir -p {params.tmpdir} && "
+        "samtools sort -@ {threads} -T {params.tmpdir} -m {params.sort_m} -n -o {output.bam} -O bam {input.bam}"
+
+
+rule fix_mate_bam:
+    """
+    Some, but not all, of the bams this pipeline has been receiving require samtools
+    fixmate to be run on them before running samtools fastq; without this step,
+    the vast majority of reads are removed as singletons, in spite of the fact
+    that samtools flagstat doesn't think that singleton behavior should happen.
+    """
+    input:
+        bam="results/input_bams/{projectid}/{sampleid}.sorted.bam",
+    output:
+        bam=temp("results/input_bams/{projectid}/{sampleid}.fixmate.bam"),
+    benchmark:
+        "results/performance_benchmarks/fix_mate_bam/{projectid}/{sampleid}.tsv"
+    params:
+        tmpdir=tempDir,
+        sort_m="{}M".format(
+            int(
+                float(config_resources["samtools"]["memory"])
+                / (2 * float(config_resources["samtools"]["threads"]))
+            )
+        ),
+    conda:
+        "../envs/samtools.yaml" if not use_containers else None
+    container:
+        "{}/bwa.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["samtools"]["threads"]
+    resources:
+        mem_mb=config_resources["samtools"]["memory"],
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["samtools"]["queue"], config_resources["queues"]
+        ),
+        tmpdir=tempDir,
+    shell:
+        "samtools fixmate -@ 16 {input.bam} {output.bam}"
 
 
 checkpoint input_bam_sample_lanes:
@@ -22,7 +81,7 @@ checkpoint input_bam_sample_lanes:
     by lane, sniff the bam for read names and determine which lanes are reportedly present.
     """
     input:
-        "results/input_bams/{projectid}/{sampleid}.sorted.bam",
+        "results/input_bams/{projectid}/{sampleid}.fixmate.bam",
     output:
         temp("results/fastqs_from_bam/{projectid}/{sampleid}_expected-lanes.tsv"),
     benchmark:
@@ -49,7 +108,7 @@ rule input_bam_to_split_fastq:
     split by lane, bgzip compressed.
     """
     input:
-        "results/input_bams/{projectid}/{sampleid}.sorted.bam",
+        "results/input_bams/{projectid}/{sampleid}.fixmate.bam",
     output:
         "results/fastqs_from_bam/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
     benchmark:
