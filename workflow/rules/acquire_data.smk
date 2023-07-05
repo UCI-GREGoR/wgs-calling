@@ -23,6 +23,10 @@ rule copy_fastqs:
     benchmark:
         "results/performance_benchmarks/copy_fastqs/{projectid}/{sampleid}_{lane}_R{readgroup}_{suffix}.fastq.tsv"
     threads: config_resources["default"]["threads"]
+    conda:
+        "../envs/awscli.yaml" if not use_containers else None
+    container:
+        "{}/awscli.sif".format(apptainer_images) if use_containers else None
     resources:
         mem_mb=config_resources["default"]["memory"],
         qname=lambda wildcards: rc.select_queue(
