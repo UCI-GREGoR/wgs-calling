@@ -180,7 +180,7 @@ add.linker.data <- function(df, linker.fn, target.colname) {
       subject = new.subjects,
       jira = NA,
       ru = NA,
-      sq = NA,
+      sq = new.subjects,
       ls = NA,
       sex = NA,
       output = NA
