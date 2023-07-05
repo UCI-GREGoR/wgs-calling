@@ -83,7 +83,7 @@ checkpoint input_bam_sample_lanes:
     input:
         "results/input_bams/{projectid}/{sampleid}.fixmate.bam",
     output:
-        temp("results/fastqs_from_bam/{projectid}/{sampleid}_expected-lanes.tsv"),
+        "results/fastqs_from_bam/{projectid}/{sampleid}_expected-lanes.tsv",
     benchmark:
         "results/performance_benchmarks/input_bam_sample_lanes/{projectid}/{sampleid}.tsv"
     conda:
@@ -108,7 +108,8 @@ rule input_bam_to_split_fastq:
     split by lane, bgzip compressed.
     """
     input:
-        "results/input_bams/{projectid}/{sampleid}.fixmate.bam",
+        bam="results/input_bams/{projectid}/{sampleid}.fixmate.bam",
+        expected="results/fastqs_from_bam/{projectid}/{sampleid}_expected-lanes.tsv",
     output:
         "results/fastqs_from_bam/{projectid}/{sampleid}_L00{lane}_{readgroup}_001.fastq.gz",
     benchmark:
@@ -126,7 +127,7 @@ rule input_bam_to_split_fastq:
             config_resources["samtools"]["queue"], config_resources["queues"]
         ),
     shell:
-        "samtools fastq -@ {threads} -s /dev/null -{params.off_target_read_flag} /dev/null -0 /dev/null -n {input} | "
+        "samtools fastq -@ {threads} -s /dev/null -{params.off_target_read_flag} /dev/null -0 /dev/null -n {input.bam} | "
         'awk -v target={wildcards.lane} \'BEGIN {{FS = ":"}} {{lane = $4 ; if (lane == target) {{print}} ; '
         "for (i = 1 ; i <= 3 ; i++) {{getline ; if (lane == target) {{print}}}}}}' | "
         "bgzip -c > {output}"
