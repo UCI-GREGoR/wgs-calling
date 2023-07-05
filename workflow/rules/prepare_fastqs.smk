@@ -97,7 +97,7 @@ checkpoint input_bam_sample_lanes:
             config_resources["samtools"]["queue"], config_resources["queues"]
         ),
     shell:
-        'samtools head -h 0 -n 100000 {input} | cut -f 4 -d ":" | sort | uniq > {output}'
+        'samtools view {input} | cut -f 4 -d ":" | sort | uniq > {output}'
 
 
 rule input_bam_to_split_fastq:
