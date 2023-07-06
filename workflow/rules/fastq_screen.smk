@@ -5,7 +5,7 @@ rule fastq_screen_get_references:
     output:
         "reference_data/FastQ_Screen_Genomes/fastq_screen.conf",
     params:
-        outdir="reference_data/FastQ_Screen_Genomes",
+        outdir="reference_data",
     benchmark:
         "results/performance_benchmarks/fastq_screen_get_references/metrics.tsv"
     conda:
@@ -19,9 +19,7 @@ rule fastq_screen_get_references:
             config_resources["fastq_screen"]["queue"], config_resources["queues"]
         ),
     shell:
-        "fastq_screen --threads {threads} --get_genomes --outdir {params.outdir} && "
-        "mv {params.outdir}/ftp1.babraham.ac.uk/*/FastQ_Screen_Genomes/* {params.outdir} && "
-        "rm -Rf {params.outdir}/ftp1.babraham.ac.uk"
+        "fastq_screen --threads {threads} --get_genomes --outdir {params.outdir}"
 
 
 rule fastq_screen_run:
