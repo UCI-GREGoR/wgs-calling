@@ -12,11 +12,11 @@ rule fastq_screen_get_references:
         "../envs/fastq_screen.yaml" if not use_containers else None
     container:
         "{}/fastq_screen.sif".format(apptainer_images) if use_containers else None
-    threads: config_resources["fastq-screen"]["threads"]
+    threads: config_resources["fastq_screen"]["threads"]
     resources:
-        mem_mb=config_resources["fastq-screen"]["memory"],
+        mem_mb=config_resources["fastq_screen"]["memory"],
         qname=lambda wildcards: rc.select_queue(
-            config_resources["fastq-screen"]["queue"], config_resources["queues"]
+            config_resources["fastq_screen"]["queue"], config_resources["queues"]
         ),
     shell:
         "fastq_screen --get_genomes --outdir {params.outdir} && "

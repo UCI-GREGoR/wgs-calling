@@ -61,6 +61,10 @@ fastqc:
   threads: 2
   memory: 12000
   queue: "small"
+fastq_screen:
+  threads: 4
+  memory: 8000
+  queue: "small"
 gatk_bqsr_base_recalibrator:
   threads: 2
   memory: 16000
