@@ -90,6 +90,8 @@ properties:
     <<: *defaults
   fastqc:
     <<: *defaults
+  fastq_screen:
+    <<: *defaults
   gatk_bqsr_base_recalibrator:
     <<: *defaults_with_java
   gatk_bqsr_apply_bqsr:
