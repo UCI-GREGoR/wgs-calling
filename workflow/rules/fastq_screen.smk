@@ -32,7 +32,10 @@ rule fastq_screen_run:
         fastq="results/fastqs/{projectid}/{sampleid}_{lane}_{read}_001.fastq.gz",
         config="reference_data/FastQ_Screen_Genomes/fastq_screen.conf",
     output:
-        "results/fastq_screen/{projectid}/{sampleid}_{lane}_{read}_001.fastq_screen.txt",
+        expand(
+            "results/fastq_screen/{{projectid}}/{{sampleid}}_{{lane}}_{{read}}_001_screen.{suffix}",
+            suffix=["txt", "png", "html"],
+        ),
     params:
         outdir="results/fastq_screen/{projectid}",
     conda:
