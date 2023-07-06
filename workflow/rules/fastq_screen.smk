@@ -19,7 +19,7 @@ rule fastq_screen_get_references:
             config_resources["fastq_screen"]["queue"], config_resources["queues"]
         ),
     shell:
-        "fastq_screen --get_genomes --outdir {params.outdir} && "
+        "fastq_screen --threads {threads} --get_genomes --outdir {params.outdir} && "
         "mv {params.outdir}/ftp1.babraham.ac.uk/*/FastQ_Screen_Genomes/* {params.outdir} && "
         "rm -Rf {params.outdir}/ftp1.babraham.ac.uk"
 
