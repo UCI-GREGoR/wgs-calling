@@ -19,7 +19,9 @@ rule fastq_screen_get_references:
             config_resources["fastq_screen"]["queue"], config_resources["queues"]
         ),
     shell:
-        "fastq_screen --threads {threads} --get_genomes --outdir {params.outdir}"
+        "fastq_screen --threads {threads} --get_genomes --outdir {params.outdir} && "
+        "sed -r 's|(DATABASE\\t[^\\t]+\\t).*(reference_data/.*)|\\1\\2|' {params.outdir}/fastq_screen.conf > {params.outdir}/fastq_screen.conf.tmp && "
+        "mv {params.outdir}/fastq_screen.conf.tmp {params.outdir}/fastq_screen.conf"
 
 
 rule fastq_screen_run:
@@ -42,4 +44,4 @@ rule fastq_screen_run:
         mem_mb=config_resources["fastq_screen"]["memory"],
         qname=rc.select_queue(config_resources["fastq_screen"]["queue"], config_resources["queues"]),
     shell:
-        "fastq_screen --threads {threads} --conf {input.config} --outdir {params.outdir}"
+        "fastq_screen --threads {threads} --conf {input.config} --aligner bowtie2 --outdir {params.outdir} {input.fastq}"
