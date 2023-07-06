@@ -41,6 +41,9 @@ rule run_multiqc_fastq_lane_specific:
             wildcards, manifest, checkpoints, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
+        fastq_screen=lambda wildcards: tc.construct_fastq_screen_targets(
+            wildcards, manifest, checkpoints
+        ),
         multiqc_config="config/multiqc_read_config_lane_specific.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
@@ -53,7 +56,7 @@ rule run_multiqc_fastq_lane_specific:
             set(
                 expand(
                     "results/{toolname}/{{projectid}}",
-                    toolname=["fastqc", "fastp", "fastqc_posttrimming"],
+                    toolname=["fastqc", "fastp", "fastqc_posttrimming", "fastq_screen"],
                 )
             )
         ),
@@ -92,6 +95,9 @@ use rule run_multiqc_fastq_lane_specific as run_multiqc_fastq_combined_lanes wit
             False,
         ),
         fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
+        fastq_screen=lambda wildcards: tc.construct_fastq_screen_targets(
+            wildcards, manifest, checkpoints
+        ),
         multiqc_config="config/multiqc_read_config_combined_lanes.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
@@ -104,7 +110,12 @@ use rule run_multiqc_fastq_lane_specific as run_multiqc_fastq_combined_lanes wit
             set(
                 expand(
                     "results/{toolname}/{{projectid}}",
-                    toolname=["fastqc_combined", "fastp", "fastqc_posttrimming_combined"],
+                    toolname=[
+                        "fastqc_combined",
+                        "fastp",
+                        "fastqc_posttrimming_combined",
+                        "fastq_screen",
+                    ],
                 )
             )
         ),
@@ -132,6 +143,9 @@ rule run_multiqc_alignment_combined_lanes:
         somalier=tc.construct_somalier_relate_targets,
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
+        fastq_screen=lambda wildcards: tc.construct_fastq_screen_targets(
+            wildcards, manifest, checkpoints
+        ),
         multiqc_config="config/multiqc_alignment_config_combined_lanes.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
@@ -152,6 +166,7 @@ rule run_multiqc_alignment_combined_lanes:
                         "collectwgsmetrics",
                         "somalier",
                         "mosdepth",
+                        "fastq_screen",
                         "contamination",
                         "alignstats",
                         "markdups",
@@ -173,7 +188,7 @@ rule run_multiqc_alignment_combined_lanes:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
         "--replace-names {input.id_linker} "
-        "-m fastqc -m fastp -m verifybamid -m picard -m somalier -m mosdepth -m custom_content "
+        "-m fastqc -m fastp -m verifybamid -m picard -m somalier -m mosdepth -m fastq_screen -m custom_content "
         "--interactive "
         "-x '*.js' "
         "-x '*.bam' "
@@ -198,6 +213,9 @@ use rule run_multiqc_alignment_combined_lanes as run_multiqc_alignment_lane_spec
         somalier=tc.construct_somalier_relate_targets,
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
+        fastq_screen=lambda wildcards: tc.construct_fastq_screen_targets(
+            wildcards, manifest, checkpoints
+        ),
         multiqc_config="config/multiqc_alignment_config_lane_specific.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
     output:
@@ -218,6 +236,7 @@ use rule run_multiqc_alignment_combined_lanes as run_multiqc_alignment_lane_spec
                         "collectwgsmetrics",
                         "somalier",
                         "mosdepth",
+                        "fastq_screen",
                         "contamination",
                         "alignstats",
                         "markdups",
