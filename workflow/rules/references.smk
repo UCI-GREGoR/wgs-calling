@@ -62,6 +62,8 @@ use rule index_vcf as index_vcf_export with:
         "results/export/{projectid}/{prefix}.vcf.gz",
     output:
         temp("results/export/{projectid}/{prefix}.vcf.gz.tbi"),
+    benchmark:
+        "results/performance_benchmarks/index_vcf_export/{projectid}/{prefix}.tsv"
 
 
 rule adjust_fasta_formatting:
