@@ -73,6 +73,7 @@ module_order:
   - picard
   - somalier
   - verifybamid
+  - fastq_screen
   - mosdepth
   - alignstats
   - custom_content

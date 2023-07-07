@@ -288,6 +288,43 @@ def construct_fastqc_targets(
     return list(set(results))
 
 
+def construct_fastq_screen_targets(
+    wildcards: Namedlist,
+    manifest: pd.DataFrame,
+    checkpoints: Checkpoints,
+) -> list:
+    """
+    From basic input manifest entries, construct output targets for
+    a run of fastq_screen.
+    """
+    results = []
+    for projectid, sampleid, lane in zip(
+        manifest["projectid"], manifest["sampleid"], manifest["lane"]
+    ):
+        if projectid == wildcards.projectid:
+            available_lanes = lane
+            if "bam" in manifest.columns:
+                with checkpoints.input_bam_sample_lanes.get(
+                    projectid=projectid, sampleid=sampleid
+                ).output[0].open() as f:
+                    available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
+            elif available_lanes == "combined":
+                with checkpoints.input_fastq_sample_lanes.get(
+                    projectid=projectid, sampleid=sampleid, readgroup="R1"
+                ).output[0].open() as f:
+                    available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
+            results.extend(
+                expand(
+                    "results/fastq_screen/{projectdir}/{sampleid}_{lane}_{readgroup}_001_screen.txt",
+                    projectdir=projectid,
+                    sampleid=sampleid,
+                    lane=available_lanes,
+                    readgroup=["R1", "R2"],
+                )
+            )
+    return list(set(results))
+
+
 def construct_fastp_targets(
     wildcards: Namedlist, manifest: pd.DataFrame, checkpoints: Checkpoints
 ) -> list:

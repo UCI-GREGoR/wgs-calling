@@ -171,6 +171,7 @@ ruleorder: index_vcf > download_reference_data
 ruleorder: create_sequence_dictionary > download_reference_data
 ruleorder: adjust_fasta_formatting > download_reference_data
 ruleorder: manta_run > index_vcf
+ruleorder: index_vcf_export > index_vcf
 
 
 rule all:
@@ -190,6 +191,7 @@ include: "rules/ensemble_sv_calling.smk"
 include: "rules/export_data.smk"
 include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
+include: "rules/fastq_screen.smk"
 include: "rules/lumpy.smk"
 include: "rules/manta.smk"
 include: "rules/methods.smk"

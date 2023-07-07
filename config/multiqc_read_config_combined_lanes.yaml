@@ -24,3 +24,4 @@ module_order:
       target: ''
       path_filters:
         - 'results/fastqc_posttrimming_combined/*/*_fastqc.zip'
+  - fastq_screen
