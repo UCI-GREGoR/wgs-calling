@@ -190,7 +190,7 @@ rule create_snv_vcf_export:
 
 use rule create_snv_vcf_export as create_snv_vcf_nonexport with:
     output:
-        "results/nonexport/{projectid}/{sqid}.snv-allregions.vcf.gz",
+        temp("results/nonexport/{projectid}/{sqid}.snv-allregions.vcf.gz"),
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
@@ -199,18 +199,18 @@ use rule create_snv_vcf_export as create_snv_vcf_nonexport with:
         "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
 
 
-rule remove_snv_region_exclusions:
+rule remove_snv_region_exclusions_export:
     """
     Once SNV output data have had hard filters applied, further remove configurable exclusion regions.
     These are intended to be pulled from https://github.com/Boyle-Lab/Blacklist
     """
     input:
-        vcf="{prefix}.snv-allregions.vcf.gz",
+        vcf="results/export/{projectid}/{sqid}.snv-allregions.vcf.gz",
         bed="reference_data/references/{}/ref.exclusion.regions.bed".format(reference_build),
     output:
-        vcf=temp("{prefix}.snv.vcf.gz"),
+        vcf=temp("results/export/{projectid}/{sqid}.snv.vcf.gz"),
     benchmark:
-        "results/remove_snv_region_exclusions/{prefix}.tsv"
+        "results/remove_snv_region_exclusions_export/{projectid}/{sqid}.tsv"
     conda:
         "../envs/bedtools.yaml" if not use_containers else None
     container:
@@ -223,6 +223,16 @@ rule remove_snv_region_exclusions:
         ),
     shell:
         "bedtools intersect -a {input.vcf} -b {input.bed} -wa -v -header | bgzip -c > {output}"
+
+
+use rule remove_snv_region_exclusions_export as remove_snv_region_exclusions_nonexport with:
+    input:
+        vcf="results/nonexport/{projectid}/{sqid}.snv-allregions.vcf.gz",
+        bed="reference_data/references/{}/ref.exclusion.regions.bed".format(reference_build),
+    output:
+        vcf="results/nonexport/{projectid}/{sqid}.snv.vcf.gz",
+    benchmark:
+        "results/remove_snv_region_exclusions_nonexport/{projectid}/{sqid}.tsv"
 
 
 rule create_sv_vcf_export:
