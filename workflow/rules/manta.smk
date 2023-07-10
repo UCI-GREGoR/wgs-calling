@@ -17,11 +17,11 @@ rule manta_configure:
             reference_build
         ),
     output:
-        temp("{}/manta_workdir/{{projectid}}/{{sampleid}}/runWorkflow.py".format(tempDir)),
+        temp("temp/manta_workdir/{projectid}/{sampleid}/runWorkflow.py"),
     benchmark:
         "results/performance_benchmarks/manta_configure/{projectid}/{sampleid}.tsv"
     params:
-        tmpdir=expand("{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}", tempdir=tempDir),
+        tmpdir="temp/manta_workdir/{projectid}/{sampleid}",
     conda:
         "../envs/manta.yaml" if not use_containers else None
     container:
@@ -32,9 +32,7 @@ rule manta_configure:
         qname=lambda wildcards: rc.select_queue(
             config_resources["default"]["queue"], config_resources["queues"]
         ),
-        tmpdir=lambda wildcards: "{}/manta_workdir/{}/{}".format(
-            tempDir, wildcards.projectid, wildcards.sampleid
-        ),
+        tmpdir=tempDir,
     shell:
         "configManta.py --config {input.manta_config} --bam {input.bam} --reference {input.fasta} "
         "--callRegions {input.calling_region} --runDir {params.tmpdir}"
@@ -53,50 +51,30 @@ rule manta_run:
         fai="reference_data/{}/{}/ref.fasta.fai".format(
             config["behaviors"]["aligner"], reference_build
         ),
-        script=expand(
-            "{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}/runWorkflow.py", tempdir=tempDir
-        ),
+        script="temp/manta_workdir/{projectid}/{sampleid}/runWorkflow.py",
     output:
         diploid_vcf=temp(
-            expand(
-                "{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}/results/variants/diploidSV.vcf.gz",
-                tempdir=tempDir,
-            )
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/diploidSV.vcf.gz",
         ),
         diploid_tbi=temp(
-            expand(
-                "{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}/results/variants/diploidSV.vcf.gz.tbi",
-                tempdir=tempDir,
-            )
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/diploidSV.vcf.gz.tbi",
         ),
         candidatesv_vcf=temp(
-            expand(
-                "{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}/results/variants/candidateSV.vcf.gz",
-                tempdir=tempDir,
-            )
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/candidateSV.vcf.gz",
         ),
         candidatesv_tbi=temp(
-            expand(
-                "{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}/results/variants/candidateSV.vcf.gz.tbi",
-                tempdir=tempDir,
-            )
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/candidateSV.vcf.gz.tbi",
         ),
         candidatesmallindels_vcf=temp(
-            expand(
-                "{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}/results/variants/candidateSmallIndels.vcf.gz",
-                tempdir=tempDir,
-            )
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/candidateSmallIndels.vcf.gz",
         ),
         candidatesmallindels_tbi=temp(
-            expand(
-                "{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}/results/variants/candidateSmallIndels.vcf.gz.tbi",
-                tempdir=tempDir,
-            )
+            "temp/manta_workdir/{projectid}/{sampleid}/results/variants/candidateSmallIndels.vcf.gz.tbi",
         ),
     benchmark:
         "results/performance_benchmarks/manta_run/{projectid}/{sampleid}.tsv"
     params:
-        tmpdir=expand("{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}", tempdir=tempDir),
+        tmpdir="temp/manta_workdir/{projectid}/{sampleid}",
     conda:
         "../envs/manta.yaml" if not use_containers else None
     container:
@@ -107,9 +85,7 @@ rule manta_run:
         qname=lambda wildcards: rc.select_queue(
             config_resources["manta"]["queue"], config_resources["queues"]
         ),
-        tmpdir=lambda wildcards: "{}/manta_workdir/{}/{}".format(
-            tempDir, wildcards.projectid, wildcards.sampleid
-        ),
+        tmpdir=tempDir,
     shell:
         "python2 {input.script} -j {threads}"
 
@@ -119,20 +95,14 @@ rule manta_sort_output:
     After running manta, sort the vcf output.
     """
     input:
-        vcf=expand(
-            "{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}/results/variants/diploidSV.vcf.gz",
-            tempdir=tempDir,
-        ),
-        tbi=expand(
-            "{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}/results/variants/diploidSV.vcf.gz.tbi",
-            tempdir=tempDir,
-        ),
+        vcf="temp/manta_workdir/{projectid}/{sampleid}/results/variants/diploidSV.vcf.gz",
+        tbi="temp/manta_workdir/{projectid}/{sampleid}/results/variants/diploidSV.vcf.gz.tbi",
     output:
         vcf="results/manta/{projectid}/{sampleid}.manta.vcf.gz",
     benchmark:
         "results/performance_benchmarks/manta_sort_output/{projectid}/{sampleid}.tsv"
     params:
-        tmpdir=expand("{tempdir}/manta_workdir/{{projectid}}/{{sampleid}}", tempdir=tempDir),
+        tmpdir=tempDir,
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:
@@ -143,8 +113,6 @@ rule manta_sort_output:
         qname=lambda wildcards: rc.select_queue(
             config_resources["bcftools"]["queue"], config_resources["queues"]
         ),
-        tmpdir=lambda wildcards: "{}/manta_workdir/{}/{}".format(
-            tempDir, wildcards.projectid, wildcards.sampleid
-        ),
+        tmpdir=tempDir,
     shell:
         "bcftools sort --temp-dir {params.tmpdir} -O z -o {output.vcf} {input.vcf}"
