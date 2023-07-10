@@ -128,7 +128,7 @@ rule create_snv_gvcf_export:
 
 use rule create_snv_gvcf_export as create_snv_gvcf_nonexport with:
     output:
-        temp("results/nonexport/{projectid}/{sqid}.snv.g.vcf.gz"),
+        "results/nonexport/{projectid}/{sqid}.snv.g.vcf.gz",
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
@@ -199,18 +199,18 @@ use rule create_snv_vcf_export as create_snv_vcf_nonexport with:
         "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
 
 
-rule remove_snv_region_exclusions:
+rule remove_snv_region_exclusions_export:
     """
     Once SNV output data have had hard filters applied, further remove configurable exclusion regions.
     These are intended to be pulled from https://github.com/Boyle-Lab/Blacklist
     """
     input:
-        vcf="{prefix}.snv-allregions.vcf.gz",
+        vcf="results/export/{projectid}/{sqid}.snv-allregions.vcf.gz",
         bed="reference_data/references/{}/ref.exclusion.regions.bed".format(reference_build),
     output:
-        vcf=temp("{prefix}.snv.vcf.gz"),
+        vcf=temp("results/export/{projectid}/{sqid}.snv.vcf.gz"),
     benchmark:
-        "results/remove_snv_region_exclusions/{prefix}.tsv"
+        "results/remove_snv_region_exclusions_export/{projectid}/{sqid}.tsv"
     conda:
         "../envs/bedtools.yaml" if not use_containers else None
     container:
@@ -223,6 +223,16 @@ rule remove_snv_region_exclusions:
         ),
     shell:
         "bedtools intersect -a {input.vcf} -b {input.bed} -wa -v -header | bgzip -c > {output}"
+
+
+use rule remove_snv_region_exclusions_export as remove_snv_region_exclusions_nonexport with:
+    input:
+        vcf="results/nonexport/{projectid}/{sqid}.snv-allregions.vcf.gz",
+        bed="reference_data/references/{}/ref.exclusion.regions.bed".format(reference_build),
+    output:
+        vcf="results/nonexport/{projectid}/{sqid}.snv.vcf.gz",
+    benchmark:
+        "results/remove_snv_region_exclusions_nonexport/{projectid}/{sqid}.tsv"
 
 
 rule create_sv_vcf_export:
@@ -270,7 +280,7 @@ rule create_sv_vcf_export:
 
 use rule create_sv_vcf_export as create_sv_vcf_nonexport with:
     output:
-        temp("results/nonexport/{projectid}/{sqid}.sv.with-bnd.vcf.gz"),
+        "results/nonexport/{projectid}/{sqid}.sv.with-bnd.vcf.gz",
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
@@ -306,14 +316,14 @@ rule remove_breakends:
         "fi"
 
 
-rule checksum:
+rule checksum_export:
     """
     Create checksum files to go along with transported files
     """
     input:
-        "results/{export_status}/{projectid}/{prefix}",
+        "results/export/{projectid}/{prefix}",
     output:
-        temp("results/{export_status}/{projectid}/{prefix}.md5"),
+        temp("results/export/{projectid}/{prefix}.md5"),
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
@@ -322,6 +332,13 @@ rule checksum:
         ),
     shell:
         "md5sum {input} | sed -r 's|  .*/([^/ ]+)$|  \\1|' > {output}"
+
+
+use rule checksum_export as checksum_nonexport with:
+    input:
+        "results/nonexport/{projectid}/{prefix}",
+    output:
+        "results/nonexport/{projectid}/{prefix}.md5",
 
 
 localrules:

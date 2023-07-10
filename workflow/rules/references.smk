@@ -57,6 +57,15 @@ rule index_vcf:
         "tabix -p vcf {input}"
 
 
+use rule index_vcf as index_vcf_export with:
+    input:
+        "results/export/{projectid}/{prefix}.vcf.gz",
+    output:
+        temp("results/export/{projectid}/{prefix}.vcf.gz.tbi"),
+    benchmark:
+        "results/performance_benchmarks/index_vcf_export/{projectid}/{prefix}.tsv"
+
+
 rule adjust_fasta_formatting:
     """
     exclusively because of idiosyncrasies in tiddit>=3, the fasta description lines can only
