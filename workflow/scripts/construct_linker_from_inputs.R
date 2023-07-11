@@ -240,6 +240,9 @@ run.construct.linker <- function(logbook.fn,
   if (!is.null(external.id.linker.fn)) {
     df <- add.linker.data(df, external.id.linker.fn, "output")
   }
+  ## deal with possibility that no external ID has been provided
+  df[is.na(df[, "output"]), "output"] <- df[is.na(df[, "output"]), "subject"]
+
   write.table(df, out.fn, row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 }
 

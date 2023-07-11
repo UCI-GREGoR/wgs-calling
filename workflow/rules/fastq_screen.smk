@@ -5,7 +5,7 @@ rule fastq_screen_get_references:
     output:
         "reference_data/FastQ_Screen_Genomes/fastq_screen.conf",
     params:
-        outdir="reference_data",
+        outdir="reference_data/FastQ_Screen_Genomes",
     benchmark:
         "results/performance_benchmarks/fastq_screen_get_references/metrics.tsv"
     conda:

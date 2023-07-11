@@ -63,6 +63,46 @@ rule create_cram_export:
         "samtools view -C -T {input.fasta} -o {output}"
 
 
+rule create_cram_export_simplified_id:
+    """
+    Take bqsr bamfile and turn it into something to release.
+    The prior version of this rule was designed for use with old-style
+    labbook annotations including analyte ID, etc. This streamlined version
+    removes some of the distinctiveness of IDs in favor of streamlined output.
+    """
+    input:
+        bam="results/aligned_bams/{projectid}/{sampleid}.bam",
+        fasta="reference_data/references/{}/ref.fasta".format(reference_build),
+        fai="reference_data/references/{}/ref.fasta.fai".format(reference_build),
+    output:
+        temp("results/export/{projectid}/{sampleid}.cram"),
+    params:
+        pipeline_version=pipeline_version,
+        reference_url=config["references"][reference_build]["fasta"],
+    benchmark:
+        "results/performance_benchmarks/create_cram_export_simplified_id/{projectid}/{sampleid}.tsv"
+    conda:
+        "../envs/samtools.yaml" if not use_containers else None
+    container:
+        "{}/bwa.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["samtools"]["threads"]
+    resources:
+        mem_mb=config_resources["samtools"]["memory"],
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["samtools"]["queue"], config_resources["queues"]
+        ),
+    shell:
+        "samtools reheader -c 'sed -r \""
+        "s/SM:[^ \\t]+([ \\t]+)/SM:{wildcards.sampleid}\\1/ ; "
+        "s/LB:[^ \\t]+([ \\t]+)/LB:{wildcards.sampleid}\\1/ ; "
+        "s/PU:[^ \\t]+([ \\t]+)/PU:{wildcards.sampleid}\\1/ ; "
+        "s/SM:[^ \\t]+$/SM:{wildcards.sampleid}/ ; "
+        "s/LB:[^ \\t]+$/LB:{wildcards.sampleid}/ ; "
+        "s/PU:[^ \\t]+$/PU:{wildcards.sampleid}/ ; "
+        "\\$a@CO\\twgs-pipelineVersion={params.pipeline_version}\\n@CO\\treferenceUrl={params.reference_url}\"' {input.bam} | "
+        "samtools view -C -T {input.fasta} -o {output}"
+
+
 rule create_crai_export:
     """
     Index export cram file
@@ -137,6 +177,52 @@ use rule create_snv_gvcf_export as create_snv_gvcf_nonexport with:
         "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
 
 
+rule create_snv_gvcf_export_simplified_id:
+    """
+    Take snv g.vcf output and turn it into something to release
+
+    *Some* of the modifications applied to snv vcfs are applied here, but
+    filtering is deferred to downstream calling.
+    """
+    input:
+        expand(
+            "results/{toolname}/{{projectid}}/{{sampleid}}.sorted.g.vcf.gz",
+            toolname=config["behaviors"]["snv-caller"],
+        ),
+    output:
+        temp("results/export/{projectid}/{sampleid}.snv.g.vcf.gz"),
+    params:
+        pipeline_version=pipeline_version,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
+        exportid="{sampleid}",
+    benchmark:
+        "results/performance_benchmarks/create_snv_gvcf_export_simplified_id/export/{projectid}/{sampleid}.tsv"
+    conda:
+        "../envs/bcftools.yaml" if not use_containers else None
+    container:
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["bcftools"]["threads"]
+    resources:
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["bcftools"]["queue"], config_resources["queues"]
+        ),
+    shell:
+        'bcftools annotate -h <(echo -e "##wgs-pipelineVersion={params.pipeline_version}\\n##reference={params.reference_build}") -O v {input} | '
+        "sed 's|\\t1/0:|\\t0/1:|' | bgzip -c > {output}"
+
+
+use rule create_snv_gvcf_export_simplified_id as create_snv_gvcf_nonexport_simplified_id with:
+    output:
+        "results/nonexport/{projectid}/{sampleid}.snv.g.vcf.gz",
+    params:
+        pipeline_version=pipeline_version,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
+        exportid="{sampleid}",
+    benchmark:
+        "results/performance_benchmarks/create_snv_vcf_export_simplified_id/nonexport/{projectid}/{sampleid}.tsv"
+
+
 rule create_snv_vcf_export:
     """
     Take snv vcf output and turn it into something to release
@@ -197,6 +283,67 @@ use rule create_snv_vcf_export as create_snv_vcf_nonexport with:
         exportid="{sqid}",
     benchmark:
         "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
+
+
+rule create_snv_vcf_export_simplified_id:
+    """
+    Take snv vcf output and turn it into something to release
+
+    Note the following things that have nothing to do with actual vcf spec compliance:
+
+    - Moon, the first intended downstream user of this file, has some truly absurd logic
+    for determining reference genome build that involves sniffing the vcf header for the
+    case-sensitive strings 'GRCh38' 'hg38' 'GRCh37' 'hg19'. as such, the user configuration
+    genome build tag is modified to try to meet that format restriction
+
+    - Moon commits the cardinal sin of reimplementing a vcf parser. It does not seem
+    to bother to implement a handler for unphased heterozygotes encoded as '1/0', even
+    though they are completely valid and equivalent to hets encoded as '0/1'. I don't
+    know at this time whether this is actually causing any particular issue with Moon,
+    but I'm going to resentfully change these genotypes manually in anticipation.
+    """
+    input:
+        expand(
+            "results/{toolname}/{{projectid}}/{{sampleid}}.sorted.vcf.gz",
+            toolname=config["behaviors"]["snv-caller"],
+        ),
+    output:
+        temp("results/export/{projectid}/{sampleid}.snv-allregions.vcf.gz"),
+    params:
+        pipeline_version=pipeline_version,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
+        exportid="{sampleid}",
+    benchmark:
+        "results/performance_benchmarks/create_snv_vcf_export_simplified_id/export/{projectid}/{sampleid}.tsv"
+    conda:
+        "../envs/bcftools.yaml" if not use_containers else None
+    container:
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["bcftools"]["threads"]
+    resources:
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["bcftools"]["queue"], config_resources["queues"]
+        ),
+    shell:
+        'bcftools annotate -h <(echo -e "##wgs-pipelineVersion={params.pipeline_version}\\n##reference={params.reference_build}") -O u {input} | '
+        'bcftools view -i \'(FILTER = "PASS" | FILTER = ".")\' -O u | '
+        "bcftools norm -m -both -O u | "
+        "bcftools view -i 'FORMAT/DP >= 10 & FORMAT/GQ >= 20 & "
+        '((FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) >= 0.2 & FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) <= 0.8 & GT != "1/1") | '
+        ' (FORMAT/AD[0:0] / (FORMAT/AD[0:0] + FORMAT/AD[0:1]) <= 0.05 & GT = "1/1"))\' -O v | '
+        "sed 's|\\t1/0:|\\t0/1:|' | bgzip -c > {output}"
+
+
+use rule create_snv_vcf_export_simplified_id as create_snv_vcf_nonexport_simplified_id with:
+    output:
+        temp("results/nonexport/{projectid}/{sampleid}.snv-allregions.vcf.gz"),
+    params:
+        pipeline_version=pipeline_version,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
+        exportid="{sampleid}",
+    benchmark:
+        "results/performance_benchmarks/create_snv_vcf_export_simplified_id/nonexport/{projectid}/{sampleid}.tsv"
 
 
 rule remove_snv_region_exclusions_export:
@@ -287,6 +434,59 @@ use rule create_sv_vcf_export as create_sv_vcf_nonexport with:
         exportid="{sqid}",
     benchmark:
         "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
+
+
+rule create_sv_vcf_export_simplified_id:
+    """
+    Take sv vcf output and turn it into something to release
+
+    Note the following things that have nothing to do with actual vcf spec compliance:
+
+    - Moon, the first intended downstream user of this file, has some truly absurd logic
+    for determining reference genome build that involves sniffing the vcf header for the
+    case-sensitive strings 'GRCh38' 'hg38' 'GRCh37' 'hg19'. as such, the user configuration
+    genome build tag is modified to try to meet that format restriction
+
+    - Moon commits the cardinal sin of reimplementing a vcf parser. It does not seem
+    to bother to implement a handler for unphased heterozygotes encoded as '1/0', even
+    though they are completely valid and equivalent to hets encoded as '0/1'. I don't
+    know at this time whether this is actually causing any particular issue with Moon,
+    but I'm going to resentfully change these genotypes manually in anticipation.
+    """
+    input:
+        "results/final/{projectid}/{sampleid}.sv.vcf.gz",
+    output:
+        temp("results/export/{projectid}/{sampleid}.sv.with-bnd.vcf.gz"),
+    params:
+        pipeline_version=pipeline_version,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
+        exportid="{sampleid}",
+    benchmark:
+        "results/performance_benchmarks/create_sv_vcf_export_simplified_id/export/{projectid}/{sampleid}.tsv"
+    conda:
+        "../envs/bcftools.yaml" if not use_containers else None
+    container:
+        "{}/bcftools.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["bcftools"]["threads"]
+    resources:
+        mem_mb=config_resources["bcftools"]["memory"],
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["bcftools"]["queue"], config_resources["queues"]
+        ),
+    shell:
+        'bcftools annotate -h <(echo -e "##wgs-pipelineVersion={params.pipeline_version}\\n##reference={params.reference_build}") -O v {input} | '
+        "sed 's|\\t1/0:|\\t0/1:|' | bgzip -c > {output}"
+
+
+use rule create_sv_vcf_export_simplified_id as create_sv_vcf_nonexport_simplified_id with:
+    output:
+        "results/nonexport/{projectid}/{sampleid}.sv.with-bnd.vcf.gz",
+    params:
+        pipeline_version=pipeline_version,
+        reference_build=lambda wildcards: sm.format_reference_build(reference_build),
+        exportid="{sampleid}",
+    benchmark:
+        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sampleid}.tsv"
 
 
 rule remove_breakends:
