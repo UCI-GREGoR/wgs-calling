@@ -18,9 +18,6 @@ def construct_export_files(
         ((manifest["projectid"] == wildcards.projectid) | manifest["projectid"].isna().to_list()),
         "sampleid",
     ].to_list()
-    print(subjectids)
-    print(linker_df)
-    print(linker_df["sq"])
     targets = linker_df.loc[
         ((linker_df["ru"] == wildcards.projectid) | linker_df["ru"].isna().to_list())
         & [x in subjectids for x in linker_df["sq"]],
