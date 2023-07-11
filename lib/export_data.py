@@ -14,9 +14,16 @@ def construct_export_files(
     res = []
     linker_fn = checkpoints.generate_linker.get().output[0]
     linker_df = pd.read_csv(linker_fn, sep="\t")
-    subjectids = manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
+    subjectids = manifest.loc[
+        ((manifest["projectid"] == wildcards.projectid) | manifest["projectid"].isna().to_list()),
+        "sampleid",
+    ].to_list()
+    print(subjectids)
+    print(linker_df)
+    print(linker_df["sq"])
     targets = linker_df.loc[
-        (linker_df["ru"] == wildcards.projectid) & [x in subjectids for x in linker_df["sq"]],
+        ((linker_df["ru"] == wildcards.projectid) | linker_df["ru"].isna().to_list())
+        & [x in subjectids for x in linker_df["sq"]],
         "output",
     ]
     res = expand(
@@ -25,6 +32,7 @@ def construct_export_files(
         file_prefix=targets.to_list(),
         file_suffix=suffix,
     )
+    print(res)
     return res
 
 
@@ -40,8 +48,13 @@ def construct_nonexport_files(
     res = []
     linker_fn = checkpoints.generate_linker.get().output[0]
     linker_df = pd.read_csv(linker_fn, sep="\t")
-    subjectids = manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"].to_list()
-    targets = linker_df.loc[linker_df["ru"] == wildcards.projectid, "sq"].to_list()
+    subjectids = manifest.loc[
+        (manifest["projectid"] == wildcards.projectid) | manifest["projectid"].isna().to_list(),
+        "sampleid",
+    ].to_list()
+    targets = linker_df.loc[
+        (linker_df["ru"] == wildcards.projectid) | linker_df["ru"].isna().to_list(), "sq"
+    ].to_list()
     nonexport_targets = [subject for subject in subjectids if subject not in targets]
     res = expand(
         "results/nonexport/{projectid}/{file_prefix}.{file_suffix}",
