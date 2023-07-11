@@ -1,18 +1,5 @@
 localrules:
-    multiqc_link_ids,
     multiqc_link_ids_index_sortorder,
-
-
-rule multiqc_link_ids:
-    """
-    Link SQ IDs to subject IDs for user convenience in multiqc reports
-    """
-    input:
-        "results/export/linker.tsv",
-    output:
-        "results/multiqc/{projectid}/linker.tsv",
-    shell:
-        'awk -F"\\t" \'/{wildcards.projectid}/ {{print $4"\\t"$1}}\' {input} > {output}'
 
 
 rule multiqc_link_ids_index_sortorder:
@@ -26,7 +13,7 @@ rule multiqc_link_ids_index_sortorder:
     output:
         "results/multiqc/{projectid}/linker_index_sortorder.tsv",
     shell:
-        'awk -F"\\t" \'/{wildcards.projectid}/ {{print $4"\\t"$4"_"$1}}\' {input} > {output}'
+        'awk -F"\\t" \'/{wildcards.projectid}/ && $1 != $4 {{print $4"\\t"$4"_"$1}}\' {input} > {output}'
 
 
 rule run_multiqc_fastq_lane_specific:
