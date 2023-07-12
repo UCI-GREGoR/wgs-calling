@@ -5,7 +5,8 @@ rule fastq_screen_get_references:
     output:
         "reference_data/FastQ_Screen_Genomes/fastq_screen.conf",
     params:
-        outdir="reference_data/FastQ_Screen_Genomes",
+        intermediate="reference_data/FastQ_Screen_Genomes",
+        outdir="reference_data",
     benchmark:
         "results/performance_benchmarks/fastq_screen_get_references/metrics.tsv"
     conda:
@@ -20,8 +21,8 @@ rule fastq_screen_get_references:
         ),
     shell:
         "fastq_screen --threads {threads} --get_genomes --outdir {params.outdir} && "
-        "sed -r 's|(DATABASE\\t[^\\t]+\\t).*(reference_data/.*)|\\1\\2|' {params.outdir}/fastq_screen.conf > {params.outdir}/fastq_screen.conf.tmp && "
-        "mv {params.outdir}/fastq_screen.conf.tmp {params.outdir}/fastq_screen.conf"
+        "sed -r 's|(DATABASE\\t[^\\t]+\\t).*(reference_data/.*)|\\1\\2|' {params.intermediate}/fastq_screen.conf > {params.intermediate}/fastq_screen.conf.tmp && "
+        "mv {params.intermediate}/fastq_screen.conf.tmp {params.intermediate}/fastq_screen.conf"
 
 
 rule fastq_screen_run:
