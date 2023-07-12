@@ -19,9 +19,9 @@ def construct_export_files(
         "sampleid",
     ].to_list()
     targets = linker_df.loc[
-        ((linker_df["ru"] == wildcards.projectid) | linker_df["ru"].isna().to_list())
-        & [x in subjectids for x in linker_df["sq"]],
-        "output",
+        ((linker_df["project"] == wildcards.projectid) | linker_df["project"].isna().to_list())
+        & [x in subjectids for x in linker_df["index"]],
+        "external",
     ]
     res = expand(
         "results/export/{projectid}/{file_prefix}.{file_suffix}",
@@ -50,7 +50,8 @@ def construct_nonexport_files(
         "sampleid",
     ].to_list()
     targets = linker_df.loc[
-        (linker_df["ru"] == wildcards.projectid) | linker_df["ru"].isna().to_list(), "sq"
+        (linker_df["project"] == wildcards.projectid) | linker_df["project"].isna().to_list(),
+        "index",
     ].to_list()
     nonexport_targets = [subject for subject in subjectids if subject not in targets]
     res = expand(

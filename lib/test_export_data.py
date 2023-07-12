@@ -18,7 +18,7 @@ def manifest_data() -> pd.DataFrame:
     """
     df = pd.DataFrame(
         {
-            "projectid": ["RU00001", "RU00002", "RU00002", "RU00004"],
+            "projectid": ["PR00001", "PR00002", "PR00002", "PR00004"],
             "sampleid": ["internal_id2", "internal_id3", "internal_id5", "internal_id9"],
         }
     )
@@ -32,13 +32,13 @@ def linker_data() -> pd.DataFrame:
     """
     df = pd.DataFrame(
         {
-            "pmgrc": ["study_id1", "study_id2", "study_id3", "study_id1"],
-            "jira": ["RT-0001", "RT-0001", "RT-0002", "RT-0003"],
-            "ru": ["RU00001", "RU00001", "RU00002", "RU00003"],
-            "sq": ["internal_id1", "internal_id2", "internal_id3", "internal_id4"],
-            "ls": ["LS001", "LS002", "LS003", "LS004"],
+            "internal": ["study_id1", "study_id2", "study_id3", "study_id1"],
+            "jira": ["JT0001", "JT0001", "JT0002", "JT0003"],
+            "project": ["PR00001", "PR00001", "PR00002", "PR00003"],
+            "index": ["internal_id1", "internal_id2", "internal_id3", "internal_id4"],
+            "analyte": ["AN001", "AN002", "AN003", "AN004"],
             "sex": ["Female", "Male", "Unknown", "Female"],
-            "output": ["external_id1", "external_id2", "external_id3", "external_id4"],
+            "external": ["external_id1", "external_id2", "external_id3", "external_id4"],
         }
     )
     return df
@@ -104,7 +104,7 @@ def export_wildcards() -> Wildcards:
     Note that the Wildcards class is just an alias for the
     standard snakemake Namedlist
     """
-    return Namedlist(fromdict={"projectid": "RU00001"})
+    return Namedlist(fromdict={"projectid": "PR00001"})
 
 
 @pytest.fixture
@@ -114,7 +114,7 @@ def nonexport_wildcards() -> Wildcards:
     Note that the Wildcards class is just an alias for the
     standard snakemake Namedlist
     """
-    return Namedlist(fromdict={"projectid": "RU00002"})
+    return Namedlist(fromdict={"projectid": "PR00002"})
 
 
 @pytest.mark.parametrize(
@@ -123,13 +123,13 @@ def nonexport_wildcards() -> Wildcards:
         (
             "vcf.gz",
             [
-                "results/export/RU00001/external_id2.vcf.gz",
+                "results/export/PR00001/external_id2.vcf.gz",
             ],
         ),
         (
             "cram.md5",
             [
-                "results/export/RU00001/external_id2.cram.md5",
+                "results/export/PR00001/external_id2.cram.md5",
             ],
         ),
     ],
@@ -153,13 +153,13 @@ def test_construct_export_files(
         (
             "vcf.gz",
             [
-                "results/nonexport/RU00002/internal_id5.vcf.gz",
+                "results/nonexport/PR00002/internal_id5.vcf.gz",
             ],
         ),
         (
             "cram.md5",
             [
-                "results/nonexport/RU00002/internal_id5.cram.md5",
+                "results/nonexport/PR00002/internal_id5.cram.md5",
             ],
         ),
     ],
@@ -174,6 +174,4 @@ def test_construct_nonexport_files(
     observed = ed.construct_nonexport_files(
         nonexport_wildcards, manifest_data, linker_checkpoints, suffix
     )
-    print(expected)
-    print(observed)
     assert expected == observed
