@@ -28,7 +28,7 @@ def add_problem(problems: dict, sampleid: str, problem: str) -> dict:
 
 
 def run_construct_somalier_pedfile(
-    linker: str, ruid: str, sampleids: list, last_sample_sex: str, outfn: str, problemfn: str
+    linker: str, projectid: str, sampleids: list, last_sample_sex: str, outfn: str, problemfn: str
 ) -> None:
     """
     Create a somalier format pedfile for linking sample id to sex annotation.
@@ -38,7 +38,7 @@ def run_construct_somalier_pedfile(
     ## Due to fastqs from multiple lanes, the input sample list may contain duplicates,
     ## which is not acceptable in this context.
     ids = pd.DataFrame(
-        data={"ruid": [ruid for x in range(len(sampleids))], "sampleid": sampleids}
+        data={"projectid": [projectid for x in range(len(sampleids))], "sampleid": sampleids}
     ).drop_duplicates()
 
     ## load linker information formatted from the lab logbook
@@ -53,21 +53,25 @@ def run_construct_somalier_pedfile(
     mat_id = []
     pat_id = []
     parent_data = {}
-    for subjectid, ruid, sqid in zip(linker_data["subject"], linker_data["ru"], linker_data["sq"]):
+    for subjectid, projectid, indexid in zip(
+        linker_data["subject"], linker_data["project"], linker_data["index"]
+    ):
         parsed_sample_id = subjectid.split("-")
         ## new: permit non-compliant IDs to not actually break everything
         if len(parsed_sample_id) == 4:
-            parent_data["{}_{}-{}".format(ruid, parsed_sample_id[2], parsed_sample_id[3])] = sqid
+            parent_data[
+                "{}_{}-{}".format(projectid, parsed_sample_id[2], parsed_sample_id[3])
+            ] = indexid
 
-    for ruid, sampleid in zip(ids["ruid"], ids["sampleid"]):
+    for projectid, sampleid in zip(ids["projectid"], ids["sampleid"]):
         sample_sex = linker_data.loc[
-            ((linker_data["ru"] == ruid) | (linker_data["ru"].isna()))
-            & (linker_data["sq"] == sampleid),
+            ((linker_data["project"] == projectid) | (linker_data["project"].isna()))
+            & (linker_data["index"] == sampleid),
             "sex",
         ]
         subject_id = linker_data.loc[
-            ((linker_data["ru"] == ruid) | (linker_data["ru"].isna()))
-            & (linker_data["sq"] == sampleid),
+            ((linker_data["project"] == projectid) | (linker_data["project"].isna()))
+            & (linker_data["index"] == sampleid),
             "subject",
         ]
         if len(sample_sex) == 1:
@@ -115,17 +119,17 @@ def run_construct_somalier_pedfile(
             else:
                 self_reported_sex.append(0)
             if (
-                "{}_{}-1".format(ruid, parsed_sample_id[1]) in parent_data
+                "{}_{}-1".format(projectid, parsed_sample_id[1]) in parent_data
                 and not invalid_family_structure
             ):
-                pat_id.append(parent_data["{}_{}-1".format(ruid, parsed_sample_id[1])])
+                pat_id.append(parent_data["{}_{}-1".format(projectid, parsed_sample_id[1])])
             else:
                 pat_id.append("0")
             if (
-                "{}_{}-2".format(ruid, parsed_sample_id[1]) in parent_data
+                "{}_{}-2".format(projectid, parsed_sample_id[1]) in parent_data
                 and not invalid_family_structure
             ):
-                mat_id.append(parent_data["{}_{}-2".format(ruid, parsed_sample_id[1])])
+                mat_id.append(parent_data["{}_{}-2".format(projectid, parsed_sample_id[1])])
             else:
                 mat_id.append("0")
             family_id.append(parsed_sample_id[2])
@@ -159,7 +163,7 @@ def run_construct_somalier_pedfile(
 
 run_construct_somalier_pedfile(
     snakemake.input[0],  # noqa: F821
-    snakemake.params["ruid"],  # noqa: F821
+    snakemake.params["projectid"],  # noqa: F821
     snakemake.params["subjectids"],  # noqa: F821
     snakemake.params["last_sample_sex"],  # noqa: F821
     snakemake.output["ped"],  # noqa: F821

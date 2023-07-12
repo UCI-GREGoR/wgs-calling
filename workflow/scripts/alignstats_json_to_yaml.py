@@ -7,12 +7,8 @@ import yaml
 
 def run_alignstats_json_to_yaml(infiles, outfile):
     """
-    Once upon a time, this was a python script from
-    https://github.com/invitae-internal/nextflow-clo-alignstats.
-    However, upon some inspection, it looks like multiqc's custom
-    content support is not fully featured when reading from tsv,
-    and in fact strongly prefers multiqc-specific yaml or json.
-    We can provide it that.
+    Create multiqc-specific yaml for structured ingestion
+    of alignstats output.
     """
     out_dict = {}
     out_dict["id"] = "Alignstats"
