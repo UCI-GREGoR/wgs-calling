@@ -111,7 +111,9 @@ The following reference files are split out by individual tool.
 ||`calling-range-bed-gz`|string; bgzip-compressed bedfile of valid calling ranges, e.g. autosomes. manta recommends not providing very many regions here, as it evidently causes problems with its task dispatch heuristics
 ||`calling-range-bed-gz-tbi`|string; tabix index of above compressed bedfile|
 
-Two manifest formats are accepted, depending on the format of input available. For fastq input, the following columns are expected in the run manifest, by default at `config/manifest.tsv`:
+Two manifest formats are accepted, depending on the format of input available.
+
+For **fastq** input, the following columns are expected in the run manifest, by default at `config/manifest.tsv`:
 
 |Manifest column|Description|
 |---|---|
@@ -121,7 +123,7 @@ Two manifest formats are accepted, depending on the format of input available. F
 |`r2`|R2 fastq.gz file for sample|
 |`lane`|(optional) sequencing lane code, with `L00` prefix. if not specified, will be assumed to be `L001`. if the input fastq has combined lane data, specify as `combined`|
 
-For bam input, which will be back-converted to fastq and realigned to the configured genome, the following columns are expected in the run manigest:
+For **bam** input, which will be back-converted to fastq and realigned to the configured genome, the following columns are expected in the run manigest:
 
 |Manifest column|Description|
 |---|---|
