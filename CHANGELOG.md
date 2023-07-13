@@ -6,18 +6,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- input fastqs can be on S3, with credentials specified in userspace
 - optional automated data export to s3
 - container support for all rules with existing conda environments
+- separate userspace configuration of resources for all tools
+- allow rules to be randomly assigned to multiple dispatch queues
+- plaintext specification of sample metadata for sex and external IDs
+- optionally remove BND structural variants from processed output vcfs
+- [FastQ Screen](https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/) for cross-species contamination
+- bam input, where reads are extracted, cleaned, and realigned from scratch
+- combined fastq input, where reads are split out by lane and then processed
+- manifest format modifications for each of the above two options
+- expand tests (still needs lots more)
 
 ### Changed
+- temp handling: user can optionally specify a temp directory that can be rendered relative to the compute partition;
+  but if the setting is not specified, the workflow falls back to snakemake's default tmp space behavior specific
+  to each compute node
 - `export_data` target still exists, but local (and optionally s3) export are now linked
   to the standard `release` endpoint
+- make BQSR optional (but still recommended)
+- multiqc for both fastqs and alignments can be combined across lanes or split by lane (or both)
+- updated precommit hook versions
+- updated deepvariant version
+- improved README
+- cleaned up multiqc configuration yamls
 
 ### Fixed
 - increased memory provisions to assorted rules
+- bwa/bwa-mem2 K parameter set to reasonable standard
+
+### Deprecated
+- TIDDIT
+- logbook specification of sample metadata
 
 ### Removed
 - Octopus
+- GRCh37
+- test VEP functionality
+- test post-calling bcftools stats/multiqc
 
 ## [0.3.0] - Ensemble SV Calling
 
