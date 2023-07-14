@@ -292,6 +292,7 @@ def construct_fastq_screen_targets(
     wildcards: Namedlist,
     manifest: pd.DataFrame,
     checkpoints: Checkpoints,
+    use_combined: bool,
 ) -> list:
     """
     From basic input manifest entries, construct output targets for
@@ -303,7 +304,9 @@ def construct_fastq_screen_targets(
     ):
         if projectid == wildcards.projectid:
             available_lanes = lane
-            if "bam" in manifest.columns:
+            if use_combined:
+                available_lanes = ["combined"]
+            elif "bam" in manifest.columns:
                 with checkpoints.input_bam_sample_lanes.get(
                     projectid=projectid, sampleid=sampleid
                 ).output[0].open() as f:

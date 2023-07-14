@@ -30,11 +30,11 @@ rule fastq_screen_run:
     Run fastq-screen on a single fastq to estimate species contributions
     """
     input:
-        fastq="results/fastqs/{projectid}/{sampleid}_{lane}_{read}_001.fastq.gz",
+        fastq="results/fastqs/{projectid}/{sampleid}_L00{lane}_{read}_001.fastq.gz",
         config="reference_data/FastQ_Screen_Genomes/fastq_screen.conf",
     output:
         expand(
-            "results/fastq_screen/{{projectid}}/{{sampleid}}_{{lane}}_{{read}}_001_screen.{suffix}",
+            "results/fastq_screen/{{projectid}}/{{sampleid}}_L00{{lane}}_{{read}}_001_screen.{suffix}",
             suffix=["txt", "png", "html"],
         ),
     params:
@@ -49,3 +49,14 @@ rule fastq_screen_run:
         qname=rc.select_queue(config_resources["fastq_screen"]["queue"], config_resources["queues"]),
     shell:
         "fastq_screen --threads {threads} --conf {input.config} --aligner bowtie2 --outdir {params.outdir} {input.fastq}"
+
+
+use rule fastq_screen_run as fastq_screen_run_combined with:
+    input:
+        fastq="results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{readgroup}.fastq.gz",
+        config="reference_data/FastQ_Screen_Genomes/fastq_screen.conf",
+    output:
+        expand(
+            "results/fastq_screen/{{projectid}}/{{sampleid}}_combined_{{read}}_001_screen.{suffix}",
+            suffix=["txt", "png", "html"],
+        ),
