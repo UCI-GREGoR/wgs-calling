@@ -27,9 +27,9 @@ rule run_multiqc_fastq_lane_specific:
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
             wildcards, manifest, checkpoints, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints, False),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
         fastq_screen=lambda wildcards: tc.construct_fastq_screen_targets(
-            wildcards, manifest, checkpoints, False
+            wildcards, manifest, checkpoints
         ),
         multiqc_config="config/multiqc_read_config_lane_specific.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
@@ -81,9 +81,9 @@ use rule run_multiqc_fastq_lane_specific as run_multiqc_fastq_combined_lanes wit
             "fastqc",
             False,
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints, True),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
         fastq_screen=lambda wildcards: tc.construct_fastq_screen_targets(
-            wildcards, manifest, checkpoints, True
+            wildcards, manifest, checkpoints
         ),
         multiqc_config="config/multiqc_read_config_combined_lanes.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
@@ -116,7 +116,7 @@ rule run_multiqc_alignment_combined_lanes:
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
             wildcards, manifest, checkpoints, "results/fastqc_combined", "fastqc", False
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints, True),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
             wildcards,
             manifest,
@@ -131,7 +131,7 @@ rule run_multiqc_alignment_combined_lanes:
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
         fastq_screen=lambda wildcards: tc.construct_fastq_screen_targets(
-            wildcards, manifest, checkpoints, True
+            wildcards, manifest, checkpoints
         ),
         multiqc_config="config/multiqc_alignment_config_combined_lanes.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
@@ -192,7 +192,7 @@ use rule run_multiqc_alignment_combined_lanes as run_multiqc_alignment_lane_spec
         fastqc=lambda wildcards: tc.construct_fastqc_targets(
             wildcards, manifest, checkpoints, "results/fastqc", "001_fastqc", True
         ),
-        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints, False),
+        fastp=lambda wildcards: tc.construct_fastp_targets(wildcards, manifest, checkpoints),
         fastqc_posttrimming=lambda wildcards: tc.construct_fastqc_targets(
             wildcards, manifest, checkpoints, "results/fastqc_posttrimming", "fastp_fastqc", True
         ),
@@ -202,7 +202,7 @@ use rule run_multiqc_alignment_combined_lanes as run_multiqc_alignment_lane_spec
         picard=lambda wildcards: tc.construct_picard_qc_targets(wildcards, manifest),
         mosdepth=lambda wildcards: tc.construct_mosdepth_targets(wildcards, manifest),
         fastq_screen=lambda wildcards: tc.construct_fastq_screen_targets(
-            wildcards, manifest, checkpoints, False
+            wildcards, manifest, checkpoints
         ),
         multiqc_config="config/multiqc_alignment_config_lane_specific.yaml",
         id_linker="results/multiqc/{projectid}/linker_index_sortorder.tsv",
