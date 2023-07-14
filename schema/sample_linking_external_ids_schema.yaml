@@ -3,10 +3,10 @@ description: an entry in the optional user-configured sample external ID linker
 properties:
   subject:
     type: string
-    description: "subject ID (corresponding column in sample manifest, e.g. SQ\\d{4} for legacy data)"
+    description: "subject ID (corresponding column in sample manifest)"
   externalid:
     type: string
-    description: "public-facing ID for sample export (e.g. PMGRC-1-1-0_LS\\d+_SQ\\d{4})"
+    description: "public-facing ID for sample export"
 required:
   - subject
   - externalid
