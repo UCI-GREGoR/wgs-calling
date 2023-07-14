@@ -37,6 +37,8 @@ rule fastq_screen_run:
             "results/fastq_screen/{{projectid}}/{{sampleid}}_L00{{lane}}_{{read}}_001_screen.{suffix}",
             suffix=["txt", "png", "html"],
         ),
+    benchmark:
+        "results/performance_benchmarks/fastq_screen_run/{projectid}/{sampleid}_L00{lane}_{read}.tsv"
     params:
         outdir="results/fastq_screen/{projectid}",
     conda:
@@ -53,10 +55,12 @@ rule fastq_screen_run:
 
 use rule fastq_screen_run as fastq_screen_run_combined with:
     input:
-        fastq="results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{readgroup}.fastq.gz",
+        fastq="results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{read}.fastq.gz",
         config="reference_data/FastQ_Screen_Genomes/fastq_screen.conf",
     output:
         expand(
             "results/fastq_screen/{{projectid}}/{{sampleid}}_combined_{{read}}_001_screen.{suffix}",
             suffix=["txt", "png", "html"],
         ),
+    benchmark:
+        "results/performance_benchmarks/fastq_screen_run_combined/{projectid}/{sampleid}_{read}.tsv"
