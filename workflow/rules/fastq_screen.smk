@@ -53,14 +53,28 @@ rule fastq_screen_run:
         "fastq_screen --threads {threads} --conf {input.config} --aligner bowtie2 --outdir {params.outdir} {input.fastq}"
 
 
-use rule fastq_screen_run as fastq_screen_run_combined with:
+rule fastq_screen_run_combined:
     input:
         fastq="results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{read}.fastq.gz",
         config="reference_data/FastQ_Screen_Genomes/fastq_screen.conf",
     output:
-        expand(
-            "results/fastq_screen/{{projectid}}/{{sampleid}}_combined_{{read}}_001_screen.{suffix}",
-            suffix=["txt", "png", "html"],
-        ),
+        txt="results/fastq_screen/{projectid}/{sampleid}_combined_{read}_screen.txt",
+        png="results/fastq_screen/{projectid}/{sampleid}_combined_{read}_screen.png",
+        html="results/fastq_screen/{projectid}/{sampleid}_combined_{read}_screen.html",
     benchmark:
         "results/performance_benchmarks/fastq_screen_run_combined/{projectid}/{sampleid}_{read}.tsv"
+    params:
+        outdir="results/fastq_screen/{projectid}",
+    conda:
+        "../envs/fastq_screen.yaml" if not use_containers else None
+    container:
+        "{}/fastq_screen.sif".format(apptainer_images) if use_containers else None
+    threads: config_resources["fastq_screen"]["threads"]
+    resources:
+        mem_mb=config_resources["fastq_screen"]["memory"],
+        qname=rc.select_queue(config_resources["fastq_screen"]["queue"], config_resources["queues"]),
+    shell:
+        "fastq_screen --threads {threads} --conf {input.config} --aligner bowtie2 --outdir {params.outdir} {input.fastq} && "
+        "mv {params.outdir}/{wildcards.sampleid}_{wildcards.read}_screen.txt {output.txt} && "
+        "mv {params.outdir}/{wildcards.sampleid}_{wildcards.read}_screen.png {output.png} && "
+        "mv {params.outdir}/{wildcards.sampleid}_{wildcards.read}_screen.html {output.html}"
