@@ -99,9 +99,9 @@ use rule run_multiqc_fastq_lane_specific as run_multiqc_fastq_combined_lanes wit
                     "results/{toolname}/{{projectid}}",
                     toolname=[
                         "fastqc_combined",
-                        "fastp_combined",
+                        "fastp",
                         "fastqc_posttrimming_combined",
-                        "fastq_screen_combined",
+                        "fastq_screen",
                     ],
                 )
             )
@@ -153,8 +153,7 @@ rule run_multiqc_alignment_combined_lanes:
                         "collectwgsmetrics",
                         "somalier",
                         "mosdepth",
-                        "fastp_combined",
-                        "fastq_screen_combined",
+                        "fastq_screen",
                         "contamination",
                         "alignstats",
                         "markdups",
@@ -224,7 +223,6 @@ use rule run_multiqc_alignment_combined_lanes as run_multiqc_alignment_lane_spec
                         "collectwgsmetrics",
                         "somalier",
                         "mosdepth",
-                        "fastp",
                         "fastq_screen",
                         "contamination",
                         "alignstats",
