@@ -4,8 +4,8 @@ localrules:
 
 rule multiqc_link_ids_index_sortorder:
     """
-    Link SQ IDs to subject IDs for user convenience in multiqc reports,
-    but due to user feedback, have it be sorted by SQ index code instead
+    Link original sequencing index IDs to subject IDs for user convenience in multiqc reports,
+    but due to user feedback, have it be sorted by sequencing index code instead
     of study ID.
     """
     input:
