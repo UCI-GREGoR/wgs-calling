@@ -360,7 +360,8 @@ def construct_fastq_screen_targets(
                     available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
             results.extend(
                 expand(
-                    "results/fastq_screen/{projectdir}/{sampleid}_{lane}_{readgroup}_001_screen.txt",
+                    "results/fastq_screen{suffix}/{projectdir}/{sampleid}_{lane}_{readgroup}_001_screen.txt",
+                    suffix="_combined" if use_combined else "",
                     projectdir=projectid,
                     sampleid=sampleid,
                     lane=available_lanes,

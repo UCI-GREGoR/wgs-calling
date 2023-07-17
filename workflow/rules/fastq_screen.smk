@@ -58,13 +58,13 @@ rule fastq_screen_run_combined:
         fastq="results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{read}.fastq.gz",
         config="reference_data/FastQ_Screen_Genomes/fastq_screen.conf",
     output:
-        txt="results/fastq_screen/{projectid}/{sampleid}_combined_{read}_screen.txt",
-        png="results/fastq_screen/{projectid}/{sampleid}_combined_{read}_screen.png",
-        html="results/fastq_screen/{projectid}/{sampleid}_combined_{read}_screen.html",
+        txt="results/fastq_screen_combined/{projectid}/{sampleid}_combined_{read}_screen.txt",
+        png="results/fastq_screen_combined/{projectid}/{sampleid}_combined_{read}_screen.png",
+        html="results/fastq_screen_combined/{projectid}/{sampleid}_combined_{read}_screen.html",
     benchmark:
         "results/performance_benchmarks/fastq_screen_run_combined/{projectid}/{sampleid}_{read}.tsv"
     params:
-        outdir="results/fastq_screen/{projectid}",
+        outdir="results/fastq_screen_combined/{projectid}",
     conda:
         "../envs/fastq_screen.yaml" if not use_containers else None
     container:
