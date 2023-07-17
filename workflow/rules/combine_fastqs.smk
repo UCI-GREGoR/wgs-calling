@@ -30,7 +30,7 @@ rule combine_input_fastqs_by_lane:
             config_resources["default"]["queue"], config_resources["queues"]
         ),
     shell:
-        "gunzip -c {input} | bgzip -c > {output}"
+        "cat {input} > {output}"
 
 
 use rule combine_input_fastqs_by_lane as combine_fastp_fastqs_by_lane with:
