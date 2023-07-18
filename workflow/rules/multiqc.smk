@@ -61,7 +61,7 @@ rule run_multiqc_fastq_lane_specific:
         "multiqc {params.target_dirs} "
         "--config {input.multiqc_config} "
         "--replace-names {input.id_linker} "
-        "-m fastqc -m fastp "
+        "-m fastqc -m fastp -m fastq_screen "
         "-x '*.fastq.gz' -x '*.fastq' "
         "--profile-runtime --zip-data-dir "
         "-f -i 'MultiQC for Pre-alignment Data' "
