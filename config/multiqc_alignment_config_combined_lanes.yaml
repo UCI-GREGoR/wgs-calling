@@ -2,6 +2,7 @@ fn_clean_exts:
    - "_L001.bam"
    - ".bam"
    - "_L001"
+   - "_combined"
    - ".mrkdup.sort.bam"
    - "_001.fastq.gz"
    - ".fastq.gz"

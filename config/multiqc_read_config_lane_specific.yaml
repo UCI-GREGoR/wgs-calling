@@ -5,6 +5,7 @@ fn_clean_exts:
    - ".fastq.gz"
    - "_fastp"
    - "_fastp.fastq.gz"
+   - "_001_screen.txt"
 
 
 module_order:
