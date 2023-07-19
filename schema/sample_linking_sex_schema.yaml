@@ -3,7 +3,7 @@ description: an entry in the optional user-configured sample sex linker
 properties:
   subject:
     type: string
-    description: "subject ID (corresponding column in sample manifest, e.g. SQ\\d{4} for legacy data)"
+    description: "subject ID"
   sex:
     type: string
     description: "sample self-reported sex"

@@ -67,12 +67,6 @@ rule somalier_relate:
 rule somalier_build_pedfile:
     """
     Generate a pedfile for sex check for somalier.
-
-    In the post 0.3.0 world, this is going to try to suck in self-reported sex
-    information from the newly-generated sample ID linker. However, this information
-    is only unreliably reported upstream, and as such this sexcheck will still be
-    very incomplete. This is flagged to eventually be replaced with queries to retool,
-    once that is actually implemented and operational.
     """
     input:
         linker="results/export/linker.tsv",
@@ -85,7 +79,7 @@ rule somalier_build_pedfile:
         subjectids=lambda wildcards: manifest.loc[
             manifest["projectid"] == wildcards.projectid, "sampleid"
         ].to_list(),
-        ruid=lambda wildcards: wildcards.projectid,
+        projectid=lambda wildcards: wildcards.projectid,
         last_sample_sex=config["behaviors"]["assume-last-sample-sex"]
         if "assume-last-sample-sex" in config["behaviors"]
         else "unknown",

@@ -1,9 +1,3 @@
-# inputs are harmonized, duphold-applied, duphold- and pass-filtered files
-# and also collapsed???  Depends on ensembler.
-# run jasmine or truvari and then apply a voting schematic of some kind (or let the ensembler do it?)
-# how do jasmine/truvari handle BNDs?
-
-
 rule compare_sv_callers:
     """
     Generate an html report summarizing the apparent relationships

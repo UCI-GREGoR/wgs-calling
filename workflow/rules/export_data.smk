@@ -31,7 +31,7 @@ checkpoint generate_linker:
 
 rule create_cram_export:
     """
-    Take bqsr bamfile and turn it into something to release
+    Take (conceptually) post-bqsr bamfile and turn it into something to release
     """
     input:
         bam="results/aligned_bams/{projectid}/{sqid}.bam",
@@ -65,7 +65,7 @@ rule create_cram_export:
 
 rule create_cram_export_simplified_id:
     """
-    Take bqsr bamfile and turn it into something to release.
+    Take (conceptually) post-bqsr bamfile and turn it into something to release.
     The prior version of this rule was designed for use with old-style
     labbook annotations including analyte ID, etc. This streamlined version
     removes some of the distinctiveness of IDs in favor of streamlined output.
@@ -105,10 +105,10 @@ rule create_cram_export_simplified_id:
 
 rule create_crai_export:
     """
-    Index export cram file
+    Index export cram file.
 
     This isn't using rule inheritance from the rule in the picard code
-    due to idiosyncratic requirements of loading order of rules with inheritance
+    due to idiosyncratic requirements of loading order of rules with inheritance.
     """
     input:
         cram="results/export/{prefix}.cram",
@@ -132,7 +132,7 @@ rule create_crai_export:
 
 rule create_snv_gvcf_export:
     """
-    Take snv g.vcf output and turn it into something to release
+    Take snv g.vcf output and turn it into something to release.
 
     *Some* of the modifications applied to snv vcfs are applied here, but
     filtering is deferred to downstream calling.
@@ -179,7 +179,7 @@ use rule create_snv_gvcf_export as create_snv_gvcf_nonexport with:
 
 rule create_snv_gvcf_export_simplified_id:
     """
-    Take snv g.vcf output and turn it into something to release
+    Take snv g.vcf output and turn it into something to release.
 
     *Some* of the modifications applied to snv vcfs are applied here, but
     filtering is deferred to downstream calling.
@@ -225,20 +225,14 @@ use rule create_snv_gvcf_export_simplified_id as create_snv_gvcf_nonexport_simpl
 
 rule create_snv_vcf_export:
     """
-    Take snv vcf output and turn it into something to release
+    Take snv vcf output and turn it into something to release.
 
     Note the following things that have nothing to do with actual vcf spec compliance:
 
-    - Moon, the first intended downstream user of this file, has some truly absurd logic
-    for determining reference genome build that involves sniffing the vcf header for the
-    case-sensitive strings 'GRCh38' 'hg38' 'GRCh37' 'hg19'. as such, the user configuration
-    genome build tag is modified to try to meet that format restriction
+    - for some tool compatibility, modify genome build code to standardized format
 
-    - Moon commits the cardinal sin of reimplementing a vcf parser. It does not seem
-    to bother to implement a handler for unphased heterozygotes encoded as '1/0', even
-    though they are completely valid and equivalent to hets encoded as '0/1'. I don't
-    know at this time whether this is actually causing any particular issue with Moon,
-    but I'm going to resentfully change these genotypes manually in anticipation.
+    - some non-compliant vcf parsers cannot handle the valid unphased heterozygote '1/0',
+    and as such the genotypes are "simplified" to '0/1'
     """
     input:
         expand(
@@ -287,20 +281,15 @@ use rule create_snv_vcf_export as create_snv_vcf_nonexport with:
 
 rule create_snv_vcf_export_simplified_id:
     """
-    Take snv vcf output and turn it into something to release
+    Take snv vcf output and turn it into something to release, but with a slightly
+    simpler ID format.
 
     Note the following things that have nothing to do with actual vcf spec compliance:
 
-    - Moon, the first intended downstream user of this file, has some truly absurd logic
-    for determining reference genome build that involves sniffing the vcf header for the
-    case-sensitive strings 'GRCh38' 'hg38' 'GRCh37' 'hg19'. as such, the user configuration
-    genome build tag is modified to try to meet that format restriction
+    - for some tool compatibility, modify genome build code to standardized format
 
-    - Moon commits the cardinal sin of reimplementing a vcf parser. It does not seem
-    to bother to implement a handler for unphased heterozygotes encoded as '1/0', even
-    though they are completely valid and equivalent to hets encoded as '0/1'. I don't
-    know at this time whether this is actually causing any particular issue with Moon,
-    but I'm going to resentfully change these genotypes manually in anticipation.
+    - some non-compliant vcf parsers cannot handle the valid unphased heterozygote '1/0',
+    and as such the genotypes are "simplified" to '0/1'
     """
     input:
         expand(
@@ -388,16 +377,10 @@ rule create_sv_vcf_export:
 
     Note the following things that have nothing to do with actual vcf spec compliance:
 
-    - Moon, the first intended downstream user of this file, has some truly absurd logic
-    for determining reference genome build that involves sniffing the vcf header for the
-    case-sensitive strings 'GRCh38' 'hg38' 'GRCh37' 'hg19'. as such, the user configuration
-    genome build tag is modified to try to meet that format restriction
+    - for some tool compatibility, modify genome build code to standardized format
 
-    - Moon commits the cardinal sin of reimplementing a vcf parser. It does not seem
-    to bother to implement a handler for unphased heterozygotes encoded as '1/0', even
-    though they are completely valid and equivalent to hets encoded as '0/1'. I don't
-    know at this time whether this is actually causing any particular issue with Moon,
-    but I'm going to resentfully change these genotypes manually in anticipation.
+    - some non-compliant vcf parsers cannot handle the valid unphased heterozygote '1/0',
+    and as such the genotypes are "simplified" to '0/1'
     """
     input:
         "results/final/{projectid}/{sqid}.sv.vcf.gz",
@@ -438,20 +421,15 @@ use rule create_sv_vcf_export as create_sv_vcf_nonexport with:
 
 rule create_sv_vcf_export_simplified_id:
     """
-    Take sv vcf output and turn it into something to release
+    Take sv vcf output and turn it into something to release, but with a slightly
+    simpler ID format
 
     Note the following things that have nothing to do with actual vcf spec compliance:
 
-    - Moon, the first intended downstream user of this file, has some truly absurd logic
-    for determining reference genome build that involves sniffing the vcf header for the
-    case-sensitive strings 'GRCh38' 'hg38' 'GRCh37' 'hg19'. as such, the user configuration
-    genome build tag is modified to try to meet that format restriction
+    - for some tool compatibility, modify genome build code to standardized format
 
-    - Moon commits the cardinal sin of reimplementing a vcf parser. It does not seem
-    to bother to implement a handler for unphased heterozygotes encoded as '1/0', even
-    though they are completely valid and equivalent to hets encoded as '0/1'. I don't
-    know at this time whether this is actually causing any particular issue with Moon,
-    but I'm going to resentfully change these genotypes manually in anticipation.
+    - some non-compliant vcf parsers cannot handle the valid unphased heterozygote '1/0',
+    and as such the genotypes are "simplified" to '0/1'
     """
     input:
         "results/final/{projectid}/{sampleid}.sv.vcf.gz",
@@ -606,10 +584,11 @@ rule create_export_manifest:
 
 rule create_nonexported_manifest:
     """
-    At least one library in each run is expected
-    to not be exported. I'm still interested in those
-    libraries' variant calling performance. Don't bother
-    constructing crams, as they're gigantic and annoying.
+    Periodically, one or more libraries in a run are
+    not expected to be exported. Regardless, we might still
+    be interested in those libraries' variant calling
+    performance. Don't bother constructing crams, as they're
+    gigantic and annoying.
     """
     input:
         vcf=lambda wildcards: ed.construct_nonexport_files(

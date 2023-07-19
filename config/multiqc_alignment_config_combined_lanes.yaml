@@ -1,10 +1,8 @@
-max_table_rows:
-  3000
-
 fn_clean_exts:
    - "_L001.bam"
    - ".bam"
    - "_L001"
+   - "_combined"
    - ".mrkdup.sort.bam"
    - "_001.fastq.gz"
    - ".fastq.gz"
@@ -17,9 +15,6 @@ extra_fn_clean_exts:
     pattern: "_001.*"
   - type: regex
     pattern: ".mosdepth.*"
-
-
-log_filesize_limit: 2000000000 # 2GB limit for parsing
 
 picard_config:
   general_stats_target_coverage:
@@ -76,6 +71,3 @@ module_order:
   - mosdepth
   - alignstats
   - custom_content
-
-exclude_modules:
-  - snippy

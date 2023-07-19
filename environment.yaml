@@ -2,6 +2,5 @@ name: wgs-pipeline
 channels:
   - bioconda
   - conda-forge
-  - defaults
 dependencies:
   - snakemake

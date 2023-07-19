@@ -177,7 +177,7 @@ properties:
           - exons-gtf-gz
         additionalProperties: no
     required:
-      - grch37
+      - grch38
   bqsr:
     type: object
     patternProperties:
@@ -230,7 +230,7 @@ properties:
           - db-bed
         additionalProperties: no
     required:
-      - grch37
+      - grch38
   deepvariant:
     type: object
     patternProperties:
@@ -243,7 +243,7 @@ properties:
           - calling-ranges
         additionalProperties: no
     required:
-      - grch37
+      - grch38
   delly:
     type: object
     patternProperties:

@@ -21,8 +21,7 @@ from lib import string_manipulations as sm
 def test_format_reference_build(input, expected):
     """
     Test that format_reference_build can ingest a variety
-    of reference genome code specifications and emit a reliable
-    output that is something recognizable by Moon.
+    of reference genome code specifications.
     """
     output = sm.format_reference_build(input)
     assert output == expected

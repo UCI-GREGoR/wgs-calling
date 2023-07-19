@@ -21,7 +21,7 @@ fi
 # create output target directory and copy targets
 for projectid in $(find results/export -mindepth 1 -maxdepth 1 -type d -print | sed 's|results/export/||') ; do
     mkdir -p ${TARGET_DIR}/${projectid}
-    find results/export/${projectid} \( -name "*vcf.gz*" -o -name "*cram*" -o -name "methods*" \) -exec cp {} "${TARGET_DIR}/${projectid}" \;
+    find results/export/${projectid} \( -name "*vcf.gz*" -o -name "*cram*" -o -name "*crai*" -o -name "methods*" \) -exec cp {} "${TARGET_DIR}/${projectid}" \;
     RETURN_LOCATION="$(pwd)"
     cd "${TARGET_DIR}/${projectid}"
     # run checksums
