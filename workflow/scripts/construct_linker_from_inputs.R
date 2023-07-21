@@ -142,7 +142,7 @@ parse.logbook <- function(input.fn) {
   res <- res[!(is.na(res[, 1]) & is.na(res[, 2]) & is.na(res[, 3]) & is.na(res[, 4]) & is.na(res[, 5])), ]
   ## construct output stems for deliverables, if sufficient information is present to fit the accepted format
   output.stems <- construct.output.stems(res)
-  res$output <- output.stems
+  res$external <- output.stems
   res
 }
 
