@@ -59,6 +59,9 @@ finer-grained configuration is available in [the readme](README.md).
           Samples without linker data in this file will be set to missing. This information is used exclusively
           for sexcheck in [somalier](https://github.com/brentp/somalier).
 - Update `wrapper.bash` to point to the installed UGE profile directory.
+
+## Running the workflow
+
 - Launch the workflow: `qsub -N run_pipeline -V -q small -cwd -S /bin/bash ./wrapper.bash`, for example.
 - Wait.
 - Check UGE job status.
