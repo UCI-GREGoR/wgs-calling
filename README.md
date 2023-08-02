@@ -10,7 +10,7 @@ New global targets should be added in `workflow/Snakefile`. Content in `workflow
 
 ## Quickstart
 
-If desired, see [quickstart guide] for abbreviated, minimal description of standard workflow run.
+If desired, see [quickstart guide](quickstart.md) for abbreviated, minimal description of standard workflow run.
 
 ## Usage
 
