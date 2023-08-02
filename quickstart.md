@@ -11,13 +11,13 @@ finer-grained configuration is available in [the readme](README.md).
 - Download a suitable HPC scheduler profile.
     - slurm support is now (snakemake 7.25 or so) cooked into snakemake.
     - profiles are available [here](https://github.com/Snakemake-Profiles).
-    - for internal UGE support, a pre-configured profile is available: `git@gitlab.com:lightning.auriga1/pmgrc-sge-profile.git`
+    - for internal UGE support, a pre-configured profile is available in the github repo `pmgrc-sge-profile`.
 
 ## Configuration for each workflow deployment
-- Clone repo from this github/ssh link: `git@gitlab.com:lightning.auriga1/wgs-pipeline.git`
+- Clone repo from the github repo `wgs-pipeline`.
 - Checkout latest release version.
 - Update configuration for run in `config/config.yaml`:
-    - choose a run mode in `behaviors/outcome`. Options are `fastq`, `alignment`, `calling`, and `release`.
+    - choose a run mode in `behaviors/outcome`. Options are `fastqc`, `alignment`, `calling`, and `release`.
       For most runs, setting this first to `calling` is appropriate, as it will hopefully flag any issues
       with the data and provide a point where the user can inspect QC results before proceeding. Once the
       run has completed to the user's satisfaction, set this to `release` and rerun, and it will prepare
