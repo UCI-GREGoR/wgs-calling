@@ -18,13 +18,14 @@ finer-grained configuration is available in [the readme](README.md).
 - Clone repo from the github repo `wgs-pipeline`.
 - Checkout latest release version.
 - Update configuration for run in `config/config.yaml`:
-    - choose a run mode in `behaviors/outcome`. Options are `fastqc`, `alignment`, `calling`, and `release`.
-      For most runs, setting this first to `calling` is appropriate, as it will hopefully flag any issues
-      with the data and provide a point where the user can inspect QC results before proceeding. Once the
-      run has completed to the user's satisfaction, set this to `release` and rerun, and it will prepare
-      a data export (cram and crai for alignments; vcf.gz and tbi for SNV and SV calls; and checksums)
-      and send it to one of the configured export locations (see below). Alternatively, you can set this
-      to `release` from the start and live on the edge.
+    - choose a run mode in `behaviors/outcome`.
+        - options are `fastqc`, `alignment`, `calling`, and `release`.
+        - For most runs, setting this first to `calling` is appropriate, as it will hopefully flag any issues
+          with the data and provide a point where the user can inspect QC results before proceeding.
+        - once the calling run has completed to the user's satisfaction, set this to `release` and rerun,
+          and it will prepare a data export (cram and crai for alignments; vcf.gz and tbi for SNV and SV calls;
+          and checksums) and send it to one of the configured export locations (see below).
+        - alternatively, you can set this to `release` from the start and live on the edge.
     - for most analyses, you will need to adjust the following, but only if their functionality is required:
         - `behaviors/import-s3/profile-name`: name of aws-cli profile in environment, for accessing remote s3 input fastqs.
           If you have local fastqs, this is not required. Remote fastqs are detected as having `s3://` prefixes
