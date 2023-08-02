@@ -1,9 +1,6 @@
 rule run_mosdepth:
     """
-    Use mosdepth to compute base coverage. This is extracted from archival marigold
-    behaviors in https://github.com/invitae-internal/marigold-pipes/blob/main/workflow/rules/mosdepth.smk.
-    That doc is a mess, but I agree with its internal settings that sacrifice granularity in the
-    name of speed; that can always be adjusted later if desired.
+    Use mosdepth to compute base coverage.
     """
     input:
         bam="results/aligned_bams/{projectid}/{prefix}.bam",

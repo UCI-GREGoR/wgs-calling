@@ -14,24 +14,24 @@ linker.df <- data.frame(
     NA, "internalid6"
   ),
   jira = c(
-    "RT-0001", "RT-0001",
-    "RT-0002", "RT-0002",
-    "RT-0003", NA
+    "JT0001", "JT0001",
+    "JT0002", "JT0002",
+    "JT0003", NA
   ),
-  ru = c(
-    "RU00001", "RU00001",
-    "RU00002", "RU00003",
-    "RU00004", "RU00004"
+  project = c(
+    "PR00001", "PR00001",
+    "PR00002", "PR00003",
+    "PR00004", "PR00004"
   ),
-  sq = c(
-    "SQ0001", "SQ0002",
-    NA, "SQ0004",
-    "SQ0005", "SQ0006"
+  index = c(
+    "SI0001", "SI0002",
+    NA, "SI0004",
+    "SI0005", "SI0006"
   ),
-  ls = c(
-    "LS00001", "LS00002",
-    "LS00003", NA,
-    "LS00005", "LS00006"
+  analyte = c(
+    "AN00001", "AN00002",
+    "AN00003", NA,
+    "AN00005", "AN00006"
   ),
   sex = c(
     "Female", "Unknown",
@@ -42,12 +42,12 @@ linker.df <- data.frame(
 
 test_that("construct.output.stems can construct IDs from valid input data", {
   expected.out <- c(
-    "internalid1_LS00001_SQ0001",
-    "internalid2_LS00002_SQ0002",
+    "internalid1_AN00001_SI0001",
+    "internalid2_AN00002_SI0002",
     NA,
     NA,
     NA,
-    "internalid6_LS00006_SQ0006"
+    "internalid6_AN00006_SI0006"
   )
   observed.out <- construct.output.stems(linker.df)
   expect_identical(expected.out, observed.out)
@@ -59,15 +59,15 @@ test_that("construct.output.stems detects the absence of the required subject co
   expect_error(construct.output.stems(broken.linker))
 })
 
-test_that("construct.output.stems detects the absence of the required ls column", {
+test_that("construct.output.stems detects the absence of the required analyte column", {
   broken.linker <- linker.df
-  broken.linker$ls <- NULL
+  broken.linker$analyte <- NULL
   expect_error(construct.output.stems(broken.linker))
 })
 
-test_that("construct.output.stems detects the absence of the required sq column", {
+test_that("construct.output.stems detects the absence of the required index column", {
   broken.linker <- linker.df
-  broken.linker$sq <- NULL
+  broken.linker$index <- NULL
   expect_error(construct.output.stems(broken.linker))
 })
 

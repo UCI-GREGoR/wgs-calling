@@ -14,12 +14,11 @@ rule combine_input_fastqs_by_lane:
     If these were reliably bgzipped, we could just cat them; but it seems like this isn't guaranteed.
     """
     input:
-        lambda wildcards: expand(
-            "results/fastqs/{{projectid}}/{{sampleid}}_{lane}_{{readgroup}}_001.fastq.gz",
-            lane=manifest.loc[manifest["sampleid"] == wildcards.sampleid, "lane"],
+        lambda wildcards: tc.get_fastqs_by_lane(
+            wildcards, checkpoints, config, manifest, "001.fastq.gz"
         ),
     output:
-        temp("results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{readgroup}.fastq.gz"),
+        temp("results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{readgroup}_001.fastq.gz"),
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:
@@ -31,14 +30,13 @@ rule combine_input_fastqs_by_lane:
             config_resources["default"]["queue"], config_resources["queues"]
         ),
     shell:
-        "gunzip -c {input} | bgzip -c > {output}"
+        "cat {input} > {output}"
 
 
 use rule combine_input_fastqs_by_lane as combine_fastp_fastqs_by_lane with:
     input:
-        lambda wildcards: expand(
-            "results/fastp/{{projectid}}/{{sampleid}}_{lane}_{{readgroup}}_fastp.fastq.gz",
-            lane=manifest.loc[manifest["sampleid"] == wildcards.sampleid, "lane"],
+        lambda wildcards: tc.get_fastqs_by_lane(
+            wildcards, checkpoints, config, manifest, "fastq.fastq.gz"
         ),
     output:
-        temp("results/fastqs_combined/posttrimming/{projectid}/{sampleid}_{readgroup}.fastq.gz"),
+        temp("results/fastqs_combined/posttrimming/{projectid}/{sampleid}_{readgroup}_001.fastq.gz"),

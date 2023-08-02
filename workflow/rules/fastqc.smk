@@ -66,13 +66,13 @@ rule run_fastqc_posttrimming:
 
 use rule run_fastqc_pretrimming as run_fastqc_pretrimming_combined with:
     input:
-        r1="results/fastqs_combined/pretrimming/{projectid}/{sampleid}_R1.fastq.gz",
-        r2="results/fastqs_combined/pretrimming/{projectid}/{sampleid}_R2.fastq.gz",
+        r1="results/fastqs_combined/pretrimming/{projectid}/{sampleid}_R1_001.fastq.gz",
+        r2="results/fastqs_combined/pretrimming/{projectid}/{sampleid}_R2_001.fastq.gz",
     output:
-        r1_zip="results/fastqc_combined/{projectid}/{sampleid}_R1_fastqc.zip",
-        r2_zip="results/fastqc_combined/{projectid}/{sampleid}_R2_fastqc.zip",
-        r1_html="results/fastqc_combined/{projectid}/{sampleid}_R1_fastqc.html",
-        r2_html="results/fastqc_combined/{projectid}/{sampleid}_R2_fastqc.html",
+        r1_zip="results/fastqc_combined/{projectid}/{sampleid}_R1_001_fastqc.zip",
+        r2_zip="results/fastqc_combined/{projectid}/{sampleid}_R2_001_fastqc.zip",
+        r1_html="results/fastqc_combined/{projectid}/{sampleid}_R1_001_fastqc.html",
+        r2_html="results/fastqc_combined/{projectid}/{sampleid}_R2_001_fastqc.html",
     benchmark:
         "results/performance_benchmarks/run_fastqc_pretrimming_combined/{projectid}/{sampleid}_fastqc.tsv"
     params:
@@ -82,13 +82,13 @@ use rule run_fastqc_pretrimming as run_fastqc_pretrimming_combined with:
 
 use rule run_fastqc_posttrimming as run_fastqc_posttrimming_combined with:
     input:
-        r1="results/fastqs_combined/posttrimming/{projectid}/{sampleid}_R1.fastq.gz",
-        r2="results/fastqs_combined/posttrimming/{projectid}/{sampleid}_R2.fastq.gz",
+        r1="results/fastqs_combined/posttrimming/{projectid}/{sampleid}_R1_001.fastq.gz",
+        r2="results/fastqs_combined/posttrimming/{projectid}/{sampleid}_R2_001.fastq.gz",
     output:
-        r1_zip="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R1_fastqc.zip",
-        r2_zip="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R2_fastqc.zip",
-        r1_html="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R1_fastqc.html",
-        r2_html="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R2_fastqc.html",
+        r1_zip="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R1_001_fastqc.zip",
+        r2_zip="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R2_001_fastqc.zip",
+        r1_html="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R1_001_fastqc.html",
+        r2_html="results/fastqc_posttrimming_combined/{projectid}/{sampleid}_R2_001_fastqc.html",
     benchmark:
         "results/performance_benchmarks/run_fastqc_posttrimming_combined/{projectid}/{sampleid}_fastqc.tsv"
     params:

@@ -2,7 +2,8 @@ rule bqsr_base_recalibrator_spark:
     """
     Recalibrate base quality scores, but with the spark implementation and run locally.
 
-    Not sure exactly how this is gonna go but I think it's worth a shot.
+    This is *apparently* functional, but the spark implementation itself is flagged as
+    in permanent beta and not ready for production.
     """
     input:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",
@@ -42,7 +43,8 @@ rule bqsr_apply_bqsr_spark:
     """
     Apply BQSR to sample, but with the spark implementation and run locally.
 
-    Not sure exactly how this is gonna go but I think it's worth a shot.
+    This is not functional, and the spark implementation itself is flagged as
+    in permanent beta and not ready for production.
     """
     input:
         bam="results/markdups/{projectid}/{sampleid}.mrkdup.sort.bam",

@@ -69,6 +69,48 @@ def locate_input_bam(wildcards: Namedlist, manifest: pd.DataFrame, remap_local: 
         return bam
 
 
+def get_fastqs_by_lane(
+    wildcards: Namedlist,
+    checkpoints: Checkpoints,
+    config: dict,
+    manifest: pd.DataFrame,
+    suffix: str,
+) -> list:
+    """
+    For a project and sample, get all the expected fastqs for the subject based on manifest lanes
+    """
+    query = 'projectid == "{}" and sampleid == "{}"'.format(wildcards.projectid, wildcards.sampleid)
+    result = manifest.query(query)
+    if "bam" in manifest.columns:
+        with checkpoints.input_bam_sample_lanes.get(
+            projectid=wildcards.projectid, sampleid=wildcards.sampleid
+        ).output[0].open() as f:
+            available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
+    else:
+        available_lanes = result["lane"]
+        if len(available_lanes) == 1:
+            ## determine if one of a series of special lane types is present.
+            ## if any of them are present, will probably need a checkpoint's output
+            ## to determine the expected set of lanes.
+            available_lane = available_lanes.to_list()[0]
+            if available_lane == "combined":
+                with checkpoints.input_fastq_sample_lanes.get(
+                    projectid=wildcards.projectid,
+                    sampleid=wildcards.sampleid,
+                    readgroup=wildcards.readgroup,
+                ).output[0].open() as f:
+                    available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
+    result = expand(
+        "results/fastqs/{projectid}/{sampleid}_{lane}_{readgroup}_{suffix}",
+        projectid=wildcards.projectid,
+        sampleid=wildcards.sampleid,
+        lane=available_lanes,
+        readgroup=wildcards.readgroup,
+        suffix=suffix,
+    )
+    return result
+
+
 def get_bams_by_lane(
     wildcards: Namedlist,
     checkpoints: Checkpoints,
@@ -292,6 +334,7 @@ def construct_fastq_screen_targets(
     wildcards: Namedlist,
     manifest: pd.DataFrame,
     checkpoints: Checkpoints,
+    use_combined: bool,
 ) -> list:
     """
     From basic input manifest entries, construct output targets for
@@ -303,7 +346,9 @@ def construct_fastq_screen_targets(
     ):
         if projectid == wildcards.projectid:
             available_lanes = lane
-            if "bam" in manifest.columns:
+            if use_combined:
+                available_lanes = ["combined"]
+            elif "bam" in manifest.columns:
                 with checkpoints.input_bam_sample_lanes.get(
                     projectid=projectid, sampleid=sampleid
                 ).output[0].open() as f:
@@ -315,7 +360,8 @@ def construct_fastq_screen_targets(
                     available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
             results.extend(
                 expand(
-                    "results/fastq_screen/{projectdir}/{sampleid}_{lane}_{readgroup}_001_screen.txt",
+                    "results/fastq_screen{suffix}/{projectdir}/{sampleid}_{lane}_{readgroup}_001_screen.txt",
+                    suffix="_combined" if use_combined else "",
                     projectdir=projectid,
                     sampleid=sampleid,
                     lane=available_lanes,

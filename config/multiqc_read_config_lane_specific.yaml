@@ -1,6 +1,3 @@
-max_table_rows:
-  3000
-
 plots_force_interactive: true
 
 fn_clean_exts:
@@ -8,9 +5,8 @@ fn_clean_exts:
    - ".fastq.gz"
    - "_fastp"
    - "_fastp.fastq.gz"
+   - "_001_screen.txt"
 
-
-log_filesize_limit: 2000000000 # 2GB limit for parsing
 
 module_order:
   - fastqc:
