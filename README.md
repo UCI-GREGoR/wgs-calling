@@ -8,6 +8,10 @@ New global targets should be added in `workflow/Snakefile`. Content in `workflow
 
 * Lightning Auriga (@lightning.auriga)
 
+## Quickstart
+
+If desired, see [quickstart guide](quickstart.md) for abbreviated, minimal description of standard workflow run.
+
 ## Usage
 
 ### Step 1: Obtain a copy of this workflow

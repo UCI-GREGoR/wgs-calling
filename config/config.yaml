@@ -27,9 +27,8 @@ behaviors:
   outcome: "release"
   symlink-fastqs: no
   trim-adapters-before-alignment: yes
-  assume-last-sample-sex: "female"
   import-s3:
-    profile-name: "ucigrant"
+    profile-name: "profile-name"
   export-directory: "/path/to/top/level/exports"
   export-s3:
     bucket-name: "s3://bucket-name"
@@ -71,6 +70,15 @@ deepvariant:
 delly:
   grch38:
     exclude-bed: "https://raw.githubusercontent.com/dellytools/delly/main/excludeTemplates/human.hg38.excl.tsv"
+giraffe:
+  grch38:
+    graph-gbz: "https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/freeze1/minigraph-cactus/hprc-v1.1-mc-grch38/hprc-v1.1-mc-grch38.gbz"
+    graph-dist: "https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/freeze1/minigraph-cactus/hprc-v1.1-mc-grch38/hprc-v1.1-mc-grch38.dist"
+    graph-min: "https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/freeze1/minigraph-cactus/hprc-v1.1-mc-grch38/hprc-v1.1-mc-grch38.min"
+  chm13:
+    graph-gbz: "https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/freeze1/minigraph-cactus/hprc-v1.1-mc-chm13/hprc-v1.1-mc-chm13.gbz"
+    graph-dist: "https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/freeze1/minigraph-cactus/hprc-v1.1-mc-chm13/hprc-v1.1-mc-chm13.dist"
+    graph-min: "https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/freeze1/minigraph-cactus/hprc-v1.1-mc-chm13/hprc-v1.1-mc-chm13.min"
 lumpy:
   grch38:
     exclude-bed: "https://raw.githubusercontent.com/hall-lab/speedseq/master/annotations/exclude.cnvnator_100bp.GRCh38.20170403.bed"
