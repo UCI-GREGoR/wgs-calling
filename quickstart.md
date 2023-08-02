@@ -7,13 +7,14 @@ finer-grained configuration is available in [the readme](README.md).
 ## One time only: install mamba
 - Follow instructions [here](https://mamba.readthedocs.io/en/latest/installation.html) to install mambaforge.
 - Create a deployment environment containing snakemake:
-    - `mamba install -c bioconda -c conda-forge -n snakemake "snakemake>=7"`
+    - `mamba install -c bioconda -c conda-forge -n snakemake "snakemake>=7" git`
 - Download a suitable HPC scheduler profile.
     - slurm support is now (snakemake 7.25 or so) cooked into snakemake.
     - profiles are available [here](https://github.com/Snakemake-Profiles).
     - for internal UGE support, a pre-configured profile is available in the github repo `pmgrc-sge-profile`.
 
 ## Configuration for each workflow deployment
+- Make sure appropriate conda environment is active.
 - Clone repo from the github repo `wgs-pipeline`.
 - Checkout latest release version.
 - Update configuration for run in `config/config.yaml`:
