@@ -62,6 +62,9 @@ finer-grained configuration is available in [the readme](README.md).
 
 ## Running the workflow
 
+- Dryrun the workflow, to find any immediate configuration issues: `snakemake -n --rerun-triggers mtime -p`
+  - this should cause a large amount of colorful text to explode in the terminal.
+  - dryrun errors are reported in red.
 - Launch the workflow: `qsub -N run_pipeline -V -q small -cwd -S /bin/bash ./wrapper.bash`, for example.
 - Wait.
 - Check UGE job status.
