@@ -68,14 +68,14 @@ finer-grained configuration is available in [the readme](README.md).
     - `qstat` shows a tabular summary of running jobs, for example.
     - workflow run length varies wildly depending on input size and configuration settings.
     - expect at least 1-2 days for full run from scratch.
-- Check workflow output, in `run_pipeline.e\*` if the above command was used.
-    - a nice simple check is `grep Error run_pipeline.e\*` (note case). If it ran successfully, this should return nothing.
-    - `tail run_pipeline.e\*` should contain lines like:
+- Check workflow output, in `run_pipeline.e*` if the above command was used.
+    - a nice simple check is `grep Error run_pipeline.e*` (note case). If it ran successfully, this should return nothing.
+    - `tail run_pipeline.e*` should contain lines like:
         - `3000 of 3000 steps (100%) done`
         - `Complete log: .snakemake/log/{some stuff}.snakemake.log`
 - If it goes down with `Error`s:
     - debug.
     - file bug report, if developer is available.
     - just try rerunning as-is, sometimes HPCs are unstable.
-- Check multiqc output, at `results/multiqc/{project_id}/\*.html`.
+- Check multiqc output, at `results/multiqc/{project_id}/*.html`.
 - Good luck!
