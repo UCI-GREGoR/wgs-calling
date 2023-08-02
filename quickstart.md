@@ -20,7 +20,7 @@ finer-grained configuration is available in [the readme](README.md).
 - Update configuration for run in `config/config.yaml`:
     - choose a run mode in `behaviors/outcome`.
         - options are `fastqc`, `alignment`, `calling`, and `release`.
-        - For most runs, setting this first to `calling` is appropriate, as it will hopefully flag any issues
+        - for most runs, setting this first to `calling` is appropriate, as it will hopefully flag any issues
           with the data and provide a point where the user can inspect QC results before proceeding.
         - once the calling run has completed to the user's satisfaction, set this to `release` and rerun,
           and it will prepare a data export (cram and crai for alignments; vcf.gz and tbi for SNV and SV calls;
