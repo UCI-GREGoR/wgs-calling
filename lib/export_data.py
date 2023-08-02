@@ -29,7 +29,6 @@ def construct_export_files(
         file_prefix=targets.to_list(),
         file_suffix=suffix,
     )
-    print(res)
     return res
 
 

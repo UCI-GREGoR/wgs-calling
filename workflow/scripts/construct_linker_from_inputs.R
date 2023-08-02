@@ -142,7 +142,7 @@ parse.logbook <- function(input.fn) {
   res <- res[!(is.na(res[, 1]) & is.na(res[, 2]) & is.na(res[, 3]) & is.na(res[, 4]) & is.na(res[, 5])), ]
   ## construct output stems for deliverables, if sufficient information is present to fit the accepted format
   output.stems <- construct.output.stems(res)
-  res$output <- output.stems
+  res$external <- output.stems
   res
 }
 
@@ -242,6 +242,11 @@ run.construct.linker <- function(logbook.fn,
   }
   ## deal with possibility that no external ID has been provided
   df[is.na(df[, "external"]), "external"] <- df[is.na(df[, "external"]), "subject"]
+
+  ## deal with apparent internal newlines
+  for (index in seq_len(ncol(df))) {
+    df[, index] <- stringr::str_replace_all(df[, index], "\n", " ")
+  }
 
   write.table(df, out.fn, row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 }
