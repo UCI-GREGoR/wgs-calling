@@ -304,4 +304,4 @@ required:
   - lumpy
   - svaba
   - manta
-additionalProperties: no
+additionalProperties: yes
