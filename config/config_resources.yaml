@@ -66,15 +66,15 @@ fastq_screen:
   memory: 8000
   queue: "small"
 gatk_bqsr_base_recalibrator:
-  threads: 2
+  threads: 8
   memory: 16000
   queue: "large"
-  java_args: "-Xmx8000m -XX:+UseParallelGC -XX:ParallelGCThreads=2"
+  java_args: "-XX:+UseParallelGC -XX:ParallelGCThreads=2"
 gatk_bqsr_apply_bqsr:
-  threads: 1
+  threads: 8
   memory: 20000
   queue: "large"
-  java_args: "-Xmx10000m"
+  java_args: ""
 gatk_collectgcbiasmetrics:
   threads: 1
   memory: 4000
