@@ -634,6 +634,23 @@ rule create_nonexported_manifest:
         "{input.sv_vcf} {input.sv_tbi} | sed 's/ /\\n/g' > {output}"
 
 
+rule zip_vcfs:
+    """
+    At downstream user request, zip all vcfs without indices for single download.
+    """
+    input:
+        vcf=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz"
+        ),
+        sv_vcf=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "sv.vcf.gz"
+        ),
+    output:
+        "results/export/{projectid}/{projectid}_vcfs.zip",
+    shell:
+        "zip -j {output} {input.vcf} {input.sv_vcf}"
+
+
 rule export_data_local:
     """
     Move results/export data contents to deployment directory
@@ -684,6 +701,9 @@ rule export_data_local:
         ),
         sv_tbi_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "sv.vcf.gz.tbi.md5"
+        ),
+        vcf_zip=expand(
+            "results/export/{projectid}/{projectid}_vcfs.{suffix}", suffix=["zip", "zip.md5"]
         ),
         manifest="results/export/{projectid}/manifest.tsv",
     output:
