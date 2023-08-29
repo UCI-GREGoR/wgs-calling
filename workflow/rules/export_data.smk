@@ -703,7 +703,7 @@ rule export_data_local:
             wildcards, manifest, checkpoints, "sv.vcf.gz.tbi.md5"
         ),
         vcf_zip=expand(
-            "results/export/{projectid}/{projectid}_vcfs.{suffix}", suffix=["zip", "zip.md5"]
+            "results/export/{{projectid}}/{{projectid}}_vcfs.{suffix}", suffix=["zip", "zip.md5"]
         ),
         manifest="results/export/{projectid}/manifest.tsv",
     output:
