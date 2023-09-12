@@ -806,30 +806,42 @@ rule export_fastqs_remote:
     """
     input:
         fastqs_r1=lambda wildcards: [
-            tc.get_fastqs_by_lane_and_sampleid(
-                projectid, sampleid, "R1", checkpoints, manifest, "001.fastq.gz"
-            )
-            for projectid, sampleid in list(
-                set(
-                    zip(
-                        manifest.loc[manifest["projectid"] == wildcards.projectid, "projectid"],
-                        manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+            z
+            for y in [
+                tc.get_fastqs_by_lane_and_sampleid(
+                    projectid, sampleid, "R1", checkpoints, manifest, "001.fastq.gz"
+                )
+                for projectid, sampleid in list(
+                    set(
+                        zip(
+                            manifest.loc[
+                                manifest["projectid"] == wildcards.projectid, "projectid"
+                            ],
+                            manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                        )
                     )
                 )
-            )
+            ]
+            for z in y
         ],
         fastqs_r2=lambda wildcards: [
-            tc.get_fastqs_by_lane_and_sampleid(
-                projectid, sampleid, "R2", checkpoints, manifest, "001.fastq.gz"
-            )
-            for projectid, sampleid in list(
-                set(
-                    zip(
-                        manifest.loc[manifest["projectid"] == wildcards.projectid, "projectid"],
-                        manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+            z
+            for y in [
+                tc.get_fastqs_by_lane_and_sampleid(
+                    projectid, sampleid, "R2", checkpoints, manifest, "001.fastq.gz"
+                )
+                for projectid, sampleid in list(
+                    set(
+                        zip(
+                            manifest.loc[
+                                manifest["projectid"] == wildcards.projectid, "projectid"
+                            ],
+                            manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                        )
                     )
                 )
-            )
+            ]
+            for z in y
         ],
     output:
         "results/fastqs/{projectid}/s3_transfer_complete.txt",
