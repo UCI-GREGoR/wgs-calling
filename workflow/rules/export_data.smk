@@ -806,18 +806,42 @@ rule export_fastqs_remote:
     """
     input:
         fastqs_r1=lambda wildcards: [
-            "results/fastqs/{}/{}_{}_R1_001.fastq.gz".format(wildcards.projectid, sampleid, lane)
-            for sampleid, lane in zip(
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "lane"],
-            )
+            z
+            for y in [
+                tc.get_fastqs_by_lane_and_sampleid(
+                    projectid, sampleid, "R1", checkpoints, manifest, "001.fastq.gz"
+                )
+                for projectid, sampleid in list(
+                    set(
+                        zip(
+                            manifest.loc[
+                                manifest["projectid"] == wildcards.projectid, "projectid"
+                            ],
+                            manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                        )
+                    )
+                )
+            ]
+            for z in y
         ],
         fastqs_r2=lambda wildcards: [
-            "results/fastqs/{}/{}_{}_R2_001.fastq.gz".format(wildcards.projectid, sampleid, lane)
-            for sampleid, lane in zip(
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "lane"],
-            )
+            z
+            for y in [
+                tc.get_fastqs_by_lane_and_sampleid(
+                    projectid, sampleid, "R2", checkpoints, manifest, "001.fastq.gz"
+                )
+                for projectid, sampleid in list(
+                    set(
+                        zip(
+                            manifest.loc[
+                                manifest["projectid"] == wildcards.projectid, "projectid"
+                            ],
+                            manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                        )
+                    )
+                )
+            ]
+            for z in y
         ],
     output:
         "results/fastqs/{projectid}/s3_transfer_complete.txt",
@@ -837,5 +861,5 @@ rule export_fastqs_remote:
             config_resources["default"]["queue"], config_resources["queues"]
         ),
     shell:
-        'aws s3 sync {params.profile} --exclude="*" --include="*.fastq.gz" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/fastqs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*001.fastq.gz" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/fastqs && '
         "touch {output}"

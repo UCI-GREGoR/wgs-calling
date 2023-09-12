@@ -69,22 +69,20 @@ def locate_input_bam(wildcards: Namedlist, manifest: pd.DataFrame, remap_local: 
         return bam
 
 
-def get_fastqs_by_lane(
-    wildcards: Namedlist,
+def get_fastqs_by_lane_and_sampleid(
+    projectid: str,
+    sampleid: str,
+    readgroup: str,
     checkpoints: Checkpoints,
-    config: dict,
     manifest: pd.DataFrame,
     suffix: str,
 ) -> list:
-    """
-    For a project and sample, get all the expected fastqs for the subject based on manifest lanes
-    """
-    query = 'projectid == "{}" and sampleid == "{}"'.format(wildcards.projectid, wildcards.sampleid)
+    query = 'projectid == "{}" and sampleid == "{}"'.format(projectid, sampleid)
     result = manifest.query(query)
     if "bam" in manifest.columns:
-        with checkpoints.input_bam_sample_lanes.get(
-            projectid=wildcards.projectid, sampleid=wildcards.sampleid
-        ).output[0].open() as f:
+        with checkpoints.input_bam_sample_lanes.get(projectid=projectid, sampleid=sampleid).output[
+            0
+        ].open() as f:
             available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
     else:
         available_lanes = result["lane"]
@@ -95,20 +93,34 @@ def get_fastqs_by_lane(
             available_lane = available_lanes.to_list()[0]
             if available_lane == "combined":
                 with checkpoints.input_fastq_sample_lanes.get(
-                    projectid=wildcards.projectid,
-                    sampleid=wildcards.sampleid,
-                    readgroup=wildcards.readgroup,
+                    projectid=projectid,
+                    sampleid=sampleid,
+                    readgroup=readgroup,
                 ).output[0].open() as f:
                     available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
     result = expand(
         "results/fastqs/{projectid}/{sampleid}_{lane}_{readgroup}_{suffix}",
-        projectid=wildcards.projectid,
-        sampleid=wildcards.sampleid,
+        projectid=projectid,
+        sampleid=sampleid,
         lane=available_lanes,
-        readgroup=wildcards.readgroup,
+        readgroup=readgroup,
         suffix=suffix,
     )
     return result
+
+
+def get_fastqs_by_lane(
+    wildcards: Namedlist,
+    checkpoints: Checkpoints,
+    manifest: pd.DataFrame,
+    suffix: str,
+) -> list:
+    """
+    For a project and sample, get all the expected fastqs for the subject based on manifest lanes
+    """
+    return get_fastqs_by_lane_and_sampleid(
+        wildcards.projectid, wildcards.sampleid, wildcards.readgroup, checkpoints, manifest, suffix
+    )
 
 
 def get_bams_by_lane(
