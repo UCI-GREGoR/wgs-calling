@@ -9,9 +9,7 @@ rule compare_sv_callers:
             sampleid=list(
                 set(manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"])
             ),
-            merge_tool=config["behaviors"]["sv-endpoints"][wildcards.endpoint]["sv-ensemble"][
-            "merge-tool"
-            ],
+            merge_tool="svdb",
         ),
         r_resources="workflow/scripts/compare_sv_callers.R",
     output:
