@@ -15,12 +15,12 @@ def construct_export_files(
     linker_fn = checkpoints.generate_linker.get().output[0]
     linker_df = pd.read_csv(linker_fn, sep="\t")
     subjectids = manifest.loc[
-        ((manifest["projectid"] == wildcards.projectid) | manifest["projectid"].isna().to_list()),
+        ((manifest["projectid"] == wildcards.projectid) | manifest["projectid"].isna()),
         "sampleid",
     ].to_list()
     targets = linker_df.loc[
-        ((linker_df["project"] == wildcards.projectid) | linker_df["project"].isna().to_list())
-        & [x in subjectids for x in linker_df["index"]],
+        ((linker_df["project"] == wildcards.projectid) | linker_df["project"].isna())
+        & pd.Series([x in subjectids for x in linker_df["index"]]),
         "external",
     ]
     res = expand(
@@ -45,11 +45,11 @@ def construct_nonexport_files(
     linker_fn = checkpoints.generate_linker.get().output[0]
     linker_df = pd.read_csv(linker_fn, sep="\t")
     subjectids = manifest.loc[
-        (manifest["projectid"] == wildcards.projectid) | manifest["projectid"].isna().to_list(),
+        (manifest["projectid"] == wildcards.projectid) | manifest["projectid"].isna(),
         "sampleid",
     ].to_list()
     targets = linker_df.loc[
-        (linker_df["project"] == wildcards.projectid) | linker_df["project"].isna().to_list(),
+        (linker_df["project"] == wildcards.projectid) | linker_df["project"].isna(),
         "index",
     ].to_list()
     nonexport_targets = [subject for subject in subjectids if subject not in targets]
