@@ -16,14 +16,23 @@ behaviors:
     - "combined-lanes"
   bqsr: yes
   snv-caller: "deepvariant"
-  sv-callers:
-    - "manta"
-    - "lumpy"
-    - "delly"
-  sv-ensemble:
-    merge-tool: "svdb"
-    min-count: 2
-  sv-remove-breakends: yes
+  sv-endpoints:
+    strict:
+      sv-callers:
+        - "manta"
+        - "lumpy"
+        - "delly"
+      sv-ensemble:
+        merge-tool: "svdb"
+        min-count: 2
+      sv-remove-breakends: yes
+    lenient:
+      sv-callers:
+        - "manta"
+      sv-ensemble:
+        merge-tool: "svdb"
+        min-count: 1
+      sv-remove-breakends: yes
   outcome: "release"
   symlink-fastqs: no
   trim-adapters-before-alignment: yes

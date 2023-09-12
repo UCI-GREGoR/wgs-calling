@@ -118,13 +118,14 @@ if config["behaviors"]["outcome"] != "fastqc" and config["behaviors"]["outcome"]
     )
     TARGETS.append(
         [
-            tc.construct_sv_targets(manifest),
+            tc.construct_sv_targets(config, manifest),
         ]
     )
     TARGETS.append(
         expand(
-            "results/reports/{projectid}/sv_caller_comparison.html",
+            "results/reports/{projectid}/{endpoint}/sv_caller_comparison.html",
             projectid=list(set(manifest["projectid"])),
+            endpoint=config["behaviors"]["sv-endpoints"].keys(),
         )
     )
 
@@ -203,6 +204,6 @@ include: "rules/prepare_fastqs.smk"
 include: "rules/references.smk"
 include: "rules/somalier.smk"
 include: "rules/svaba.smk"
-include: "rules/{}.smk".format(config["behaviors"]["sv-ensemble"]["merge-tool"])
+include: "rules/svdb.smk"
 
 include: "rules/verifybamid2.smk"
