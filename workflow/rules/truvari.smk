@@ -85,14 +85,14 @@ rule truvari_ensemble_sv_vcf:
     input:
         "results/final/{projectid}/{sampleid}.sv.truvari-raw.vcf.gz",
     output:
-        "results/final/{projectid}/{sampleid}.sv.vcf.gz",
+        "results/final/{projectid}/{sampleid}.sv.{endpoint}.vcf.gz",
     params:
-        bcftools_filter_count="( INFO/NumCollapsed = {} | INFO/NumCollapsed = '.' )".format(
-            config["behaviors"]["sv-ensemble"]["min-count"]
+        bcftools_filter_count=lambda wildcards: "( INFO/NumCollapsed = {} | INFO/NumCollapsed = '.' )".format(
+            config["behaviors"]["sv-endpoints"][wildcards.endpoint]["sv-ensemble"]["min-count"]
         ),
         bcftools_filter_sources="",
     benchmark:
-        "results/performance_benchmarks/truvari_ensemble_sv_vcf/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/truvari_ensemble_sv_vcf/{projectid}/{sampleid}.{endpoint}.tsv"
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:

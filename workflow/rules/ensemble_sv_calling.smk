@@ -9,11 +9,13 @@ rule compare_sv_callers:
             sampleid=list(
                 set(manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"])
             ),
-            merge_tool=config["behaviors"]["sv-ensemble"]["merge-tool"],
+            merge_tool=config["behaviors"]["sv-endpoints"][wildcards.endpoint]["sv-ensemble"][
+            "merge-tool"
+            ],
         ),
         r_resources="workflow/scripts/compare_sv_callers.R",
     output:
-        "results/reports/{projectid}/sv_caller_comparison.html",
+        "results/reports/{projectid}/{endpoint}/sv_caller_comparison.html",
     params:
         sv_callers=config["behaviors"]["sv-callers"],
     conda:

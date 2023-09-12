@@ -383,15 +383,15 @@ rule create_sv_vcf_export:
     and as such the genotypes are "simplified" to '0/1'
     """
     input:
-        "results/final/{projectid}/{sqid}.sv.vcf.gz",
+        "results/final/{projectid}/{sqid}.sv.{endpoint}.vcf.gz",
     output:
-        temp("results/export/{projectid}/{sampleid}_{lsid}_{sqid}.sv.with-bnd.vcf.gz"),
+        temp("results/export/{projectid}/{sampleid}_{lsid}_{sqid}.sv.{endpoint}.with-bnd.vcf.gz"),
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
         exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_sv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
+        "results/performance_benchmarks/create_sv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.{endpoint}.tsv"
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:
@@ -410,13 +410,13 @@ rule create_sv_vcf_export:
 
 use rule create_sv_vcf_export as create_sv_vcf_nonexport with:
     output:
-        "results/nonexport/{projectid}/{sqid}.sv.with-bnd.vcf.gz",
+        "results/nonexport/{projectid}/{sqid}.sv.{endpoint}.with-bnd.vcf.gz",
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
         exportid="{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
+        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sqid}.{endpoint}.tsv"
 
 
 rule create_sv_vcf_export_simplified_id:
@@ -432,15 +432,15 @@ rule create_sv_vcf_export_simplified_id:
     and as such the genotypes are "simplified" to '0/1'
     """
     input:
-        "results/final/{projectid}/{sampleid}.sv.vcf.gz",
+        "results/final/{projectid}/{sampleid}.sv.{endpoint}.vcf.gz",
     output:
-        temp("results/export/{projectid}/{sampleid}.sv.with-bnd.vcf.gz"),
+        temp("results/export/{projectid}/{sampleid}.sv.{endpoint}.with-bnd.vcf.gz"),
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
         exportid="{sampleid}",
     benchmark:
-        "results/performance_benchmarks/create_sv_vcf_export_simplified_id/export/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/create_sv_vcf_export_simplified_id/export/{projectid}/{sampleid}.{endpoint}.tsv"
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:
@@ -458,13 +458,13 @@ rule create_sv_vcf_export_simplified_id:
 
 use rule create_sv_vcf_export_simplified_id as create_sv_vcf_nonexport_simplified_id with:
     output:
-        "results/nonexport/{projectid}/{sampleid}.sv.with-bnd.vcf.gz",
+        "results/nonexport/{projectid}/{sampleid}.sv.{endpoint}.with-bnd.vcf.gz",
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
         exportid="{sampleid}",
     benchmark:
-        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sampleid}.{endpoint}.tsv"
 
 
 rule remove_breakends:
@@ -474,9 +474,11 @@ rule remove_breakends:
     input:
         "{prefix}.sv.with-bnd.vcf.gz",
     output:
-        temp("{prefix}.sv.vcf.gz"),
+        temp("{prefix}.sv.{endpoint}.vcf.gz"),
     params:
-        remove_breakends=config["behaviors"]["sv-remove-breakends"],
+        remove_breakends=lambda wildcards: config["behaviors"]["sv-endpoints"][wildcards.endpoint][
+            "sv-remove-breakends"
+        ],
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:

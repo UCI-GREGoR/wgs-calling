@@ -118,13 +118,14 @@ if config["behaviors"]["outcome"] != "fastqc" and config["behaviors"]["outcome"]
     )
     TARGETS.append(
         [
-            tc.construct_sv_targets(manifest),
+            tc.construct_sv_targets(config, manifest),
         ]
     )
     TARGETS.append(
         expand(
-            "results/reports/{projectid}/sv_caller_comparison.html",
+            "results/reports/{projectid}/{endpoint}/sv_caller_comparison.html",
             projectid=list(set(manifest["projectid"])),
+            endpoint=config["behaviors"]["sv-endpoints"].keys(),
         )
     )
 

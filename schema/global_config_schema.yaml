@@ -38,31 +38,42 @@ properties:
       snv-caller:
         type: string
         pattern: "^deepvariant$"
-      sv-callers:
-        type: array
-        items:
-          type: string
-          pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
-      sv-ensemble:
+      sv-endpoints:
         type: object
-        properties:
-          merge-tool:
-            type: string
-            pattern: "^truvari$|^svdb$"
-          min-count:
-            type: integer
-            min: 1
-          required-callers:
-            type: array
-            items:
-              type: string
-              pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
-        required:
-          - merge-tool
-          - min-count
-        additionalProperties: no
-      sv-remove-breakends:
-        type: boolean
+        patternProperties:
+          "^.*$":
+            type: object
+            properties:
+              sv-callers:
+                type: array
+                items:
+                  type: string
+                pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
+              sv-ensemble:
+                type: object
+                properties:
+                  merge-tool:
+                    type: string
+                    pattern: "^truvari$|^svdb$"
+                  min-count:
+                    type: integer
+                    min: 1
+                  required-callers:
+                    type: array
+                    items:
+                      type: string
+                      pattern: "^delly$|^lumpy$|^manta$|^tiddit$|^svaba$"
+                required:
+                  - merge-tool
+                  - min-count
+                additionalProperties: no
+              sv-remove-breakends:
+                type: boolean
+            required:
+              - sv-callers
+              - sv-ensemble
+              - sv-remove-breakends
+            additionalProperties: no
       outcome:
         type: string
         pattern: "^fastqc$|^alignment$|^calling$|^release$"
@@ -100,7 +111,7 @@ properties:
       - aligner
       - snv-caller
       - sv-callers
-      - sv-ensemble
+      - sv-outcomes
       - sv-remove-breakends
       - outcome
       - symlink-fastqs
