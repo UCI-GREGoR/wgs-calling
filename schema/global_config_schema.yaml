@@ -110,9 +110,7 @@ properties:
     required:
       - aligner
       - snv-caller
-      - sv-callers
-      - sv-outcomes
-      - sv-remove-breakends
+      - sv-endpoints
       - outcome
       - symlink-fastqs
       - trim-adapters-before-alignment
