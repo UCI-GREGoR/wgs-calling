@@ -23,14 +23,12 @@ behaviors:
         - "lumpy"
         - "delly"
       sv-ensemble:
-        merge-tool: "svdb"
         min-count: 2
       sv-remove-breakends: yes
     lenient:
       sv-callers:
         - "manta"
       sv-ensemble:
-        merge-tool: "svdb"
         min-count: 1
       sv-remove-breakends: yes
   outcome: "release"
