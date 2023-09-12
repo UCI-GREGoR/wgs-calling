@@ -204,6 +204,6 @@ include: "rules/prepare_fastqs.smk"
 include: "rules/references.smk"
 include: "rules/somalier.smk"
 include: "rules/svaba.smk"
-include: "rules/{}.smk".format(config["behaviors"]["sv-ensemble"]["merge-tool"])
+include: "rules/sdvb.smk"
 
 include: "rules/verifybamid2.smk"
