@@ -807,7 +807,7 @@ rule export_fastqs_remote:
     input:
         fastqs_r1=lambda wildcards: [
             tc.get_fastqs_by_lane_and_sampleid(
-                projectid, sampleid, "R1", checkpoints, manifest, suffix
+                projectid, sampleid, "R1", checkpoints, manifest, "001.fastq.gz"
             )
             for projectid, sampleid in list(
                 set(
@@ -820,7 +820,7 @@ rule export_fastqs_remote:
         ],
         fastqs_r2=lambda wildcards: [
             tc.get_fastqs_by_lane_and_sampleid(
-                projectid, sampleid, "R2", checkpoints, manifest, suffix
+                projectid, sampleid, "R2", checkpoints, manifest, "001.fastq.gz"
             )
             for projectid, sampleid in list(
                 set(
