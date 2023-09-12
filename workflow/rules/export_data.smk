@@ -806,17 +806,25 @@ rule export_fastqs_remote:
     """
     input:
         fastqs_r1=lambda wildcards: [
-            "results/fastqs/{}/{}_{}_R1_001.fastq.gz".format(wildcards.projectid, sampleid, lane)
-            for sampleid, lane in zip(
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "lane"],
+            tc.compute_fastqs_by_lane_and_sampleid(
+                projectid, sampleid, "R1", checkpoints, manifest, suffix
+            )
+            for projectid, sampleid in unique(
+                zip(
+                    manifest.loc[manifest["projectid"] == wildcards.projectid, "projectid"],
+                    manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                )
             )
         ],
         fastqs_r2=lambda wildcards: [
-            "results/fastqs/{}/{}_{}_R2_001.fastq.gz".format(wildcards.projectid, sampleid, lane)
-            for sampleid, lane in zip(
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "lane"],
+            tc.compute_fastqs_by_lane_and_sampleid(
+                projectid, sampleid, "R2", checkpoints, manifest, suffix
+            )
+            for projectid, sampleid in unique(
+                zip(
+                    manifest.loc[manifest["projectid"] == wildcards.projectid, "projectid"],
+                    manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                )
             )
         ],
     output:
@@ -837,5 +845,5 @@ rule export_fastqs_remote:
             config_resources["default"]["queue"], config_resources["queues"]
         ),
     shell:
-        'aws s3 sync {params.profile} --exclude="*" --include="*.fastq.gz" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/fastqs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*001.fastq.gz" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/fastqs && '
         "touch {output}"
