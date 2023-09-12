@@ -809,10 +809,12 @@ rule export_fastqs_remote:
             tc.compute_fastqs_by_lane_and_sampleid(
                 projectid, sampleid, "R1", checkpoints, manifest, suffix
             )
-            for projectid, sampleid in unique(
-                zip(
-                    manifest.loc[manifest["projectid"] == wildcards.projectid, "projectid"],
-                    manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+            for projectid, sampleid in list(
+                set(
+                    zip(
+                        manifest.loc[manifest["projectid"] == wildcards.projectid, "projectid"],
+                        manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                    )
                 )
             )
         ],
@@ -820,10 +822,12 @@ rule export_fastqs_remote:
             tc.compute_fastqs_by_lane_and_sampleid(
                 projectid, sampleid, "R2", checkpoints, manifest, suffix
             )
-            for projectid, sampleid in unique(
-                zip(
-                    manifest.loc[manifest["projectid"] == wildcards.projectid, "projectid"],
-                    manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+            for projectid, sampleid in list(
+                set(
+                    zip(
+                        manifest.loc[manifest["projectid"] == wildcards.projectid, "projectid"],
+                        manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                    )
                 )
             )
         ],
