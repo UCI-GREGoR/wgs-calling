@@ -42,7 +42,7 @@ rule ensemble_sv_vcf:
         bcftools_filter_count=lambda wildcards: "INFO/FOUNDBY >= {}".format(
             config["behaviors"]["sv-endpoints"][wildcards.endpoint]["sv-ensemble"]["min-count"]
         ),
-        bcftools_filter_sources=" & INFO/svdb_origin ~ '"
+        bcftools_filter_sources=lambda wildcards: " & INFO/svdb_origin ~ '"
         + "' & INFO/svdb_origin ~ '".join(
             config["behaviors"]["sv-endpoints"][wildcards.endpoint]["sv-ensemble"][
                 "required-callers"
