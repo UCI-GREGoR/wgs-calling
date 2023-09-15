@@ -5,7 +5,7 @@ rule compare_sv_callers:
     """
     input:
         sv_source_data=lambda wildcards: expand(
-            "results/reports/sv_data/{{projectid}}/{sampleid}.sv.{merge_tool}-raw.tsv",
+            "results/reports/sv_data/{{projectid}}/{sampleid}.sv.{{endpoint}}.{merge_tool}-raw.tsv",
             sampleid=list(
                 set(manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"])
             ),
