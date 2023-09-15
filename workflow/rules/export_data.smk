@@ -383,15 +383,15 @@ rule create_sv_vcf_export:
     and as such the genotypes are "simplified" to '0/1'
     """
     input:
-        "results/final/{projectid}/{sqid}.sv.vcf.gz",
+        "results/final/{projectid}/{sqid}.sv.{endpoint}.vcf.gz",
     output:
-        temp("results/export/{projectid}/{sampleid}_{lsid}_{sqid}.sv.with-bnd.vcf.gz"),
+        temp("results/export/{projectid}/{sampleid}_{lsid}_{sqid}.sv.{endpoint}.with-bnd.vcf.gz"),
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
         exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_sv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
+        "results/performance_benchmarks/create_sv_vcf_export/export/{projectid}/{sampleid}_{lsid}_{sqid}.{endpoint}.tsv"
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:
@@ -410,13 +410,13 @@ rule create_sv_vcf_export:
 
 use rule create_sv_vcf_export as create_sv_vcf_nonexport with:
     output:
-        "results/nonexport/{projectid}/{sqid}.sv.with-bnd.vcf.gz",
+        "results/nonexport/{projectid}/{sqid}.sv.{endpoint}.with-bnd.vcf.gz",
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
         exportid="{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
+        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sqid}.{endpoint}.tsv"
 
 
 rule create_sv_vcf_export_simplified_id:
@@ -432,15 +432,15 @@ rule create_sv_vcf_export_simplified_id:
     and as such the genotypes are "simplified" to '0/1'
     """
     input:
-        "results/final/{projectid}/{sampleid}.sv.vcf.gz",
+        "results/final/{projectid}/{sampleid}.sv.{endpoint}.vcf.gz",
     output:
-        temp("results/export/{projectid}/{sampleid}.sv.with-bnd.vcf.gz"),
+        temp("results/export/{projectid}/{sampleid}.sv.{endpoint}.with-bnd.vcf.gz"),
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
         exportid="{sampleid}",
     benchmark:
-        "results/performance_benchmarks/create_sv_vcf_export_simplified_id/export/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/create_sv_vcf_export_simplified_id/export/{projectid}/{sampleid}.{endpoint}.tsv"
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:
@@ -458,13 +458,13 @@ rule create_sv_vcf_export_simplified_id:
 
 use rule create_sv_vcf_export_simplified_id as create_sv_vcf_nonexport_simplified_id with:
     output:
-        "results/nonexport/{projectid}/{sampleid}.sv.with-bnd.vcf.gz",
+        "results/nonexport/{projectid}/{sampleid}.sv.{endpoint}.with-bnd.vcf.gz",
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
         exportid="{sampleid}",
     benchmark:
-        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sampleid}.{endpoint}.tsv"
 
 
 rule remove_breakends:
@@ -472,11 +472,13 @@ rule remove_breakends:
     Conditionally remove breakends from ensemble called SVs based on user configuration
     """
     input:
-        "{prefix}.sv.with-bnd.vcf.gz",
+        "{prefix}.sv.{endpoint}.with-bnd.vcf.gz",
     output:
-        temp("{prefix}.sv.vcf.gz"),
+        temp("{prefix}.sv.endpoint-{endpoint}.vcf.gz"),
     params:
-        remove_breakends=config["behaviors"]["sv-remove-breakends"],
+        remove_breakends=lambda wildcards: config["behaviors"]["sv-endpoints"][wildcards.endpoint][
+            "sv-remove-breakends"
+        ],
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:
@@ -544,12 +546,26 @@ rule create_export_manifest:
         gvcf_tbi=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi"
         ),
-        sv_vcf=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz"
-        ),
-        sv_tbi=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi"
-        ),
+        sv_vcf=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
+        sv_tbi=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.tbi"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
         cram_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "cram.md5"
         ),
@@ -568,12 +584,26 @@ rule create_export_manifest:
         gvcf_tbi_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi.md5"
         ),
-        sv_vcf_md5=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.md5"
-        ),
-        sv_tbi_md5=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi.md5"
-        ),
+        sv_vcf_md5=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.md5"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
+        sv_tbi_md5=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.tbi.md5"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
     output:
         temp("results/export/{projectid}/manifest.tsv"),
     shell:
@@ -615,23 +645,75 @@ rule create_nonexported_manifest:
         gvcf_tbi_md5=lambda wildcards: ed.construct_nonexport_files(
             wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi.md5"
         ),
-        sv_vcf=lambda wildcards: ed.construct_nonexport_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz"
-        ),
-        sv_tbi=lambda wildcards: ed.construct_nonexport_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi"
-        ),
-        sv_vcf_md5=lambda wildcards: ed.construct_nonexport_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.md5"
-        ),
-        sv_tbi_md5=lambda wildcards: ed.construct_nonexport_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi.md5"
-        ),
+        sv_vcf=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_nonexport_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
+        sv_tbi=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_nonexport_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.tbi"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
+        sv_vcf_md5=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_nonexport_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.md5"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
+        sv_tbi_md5=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_nonexport_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.tbi.md5"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
     output:
         temp("results/nonexport/{projectid}/manifest.tsv"),
     shell:
         "echo {input.vcf} {input.tbi} {input.gvcf} {input.gvcf_tbi} "
         "{input.sv_vcf} {input.sv_tbi} | sed 's/ /\\n/g' > {output}"
+
+
+rule zip_vcfs:
+    """
+    At downstream user request, zip all vcfs without indices for single download.
+    """
+    input:
+        vcf=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "snv.vcf.gz"
+        ),
+        sv_vcf=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_nonexport_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
+    output:
+        "results/export/{projectid}/{projectid}_vcfs.zip",
+    shell:
+        "zip -j {output} {input.vcf} {input.sv_vcf}"
 
 
 rule export_data_local:
@@ -655,12 +737,26 @@ rule export_data_local:
         gvcf_tbi=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi"
         ),
-        sv_vcf=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz"
-        ),
-        sv_tbi=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi"
-        ),
+        sv_vcf=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
+        sv_tbi=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.tbi"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
         cram_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "cram.md5"
         ),
@@ -679,11 +775,28 @@ rule export_data_local:
         gvcf_tbi_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi.md5"
         ),
-        sv_vcf_md5=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.md5"
-        ),
-        sv_tbi_md5=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi.md5"
+        sv_vcf_md5=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.md5"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
+        sv_tbi_md5=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.tbi.md5"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
+        vcf_zip=expand(
+            "results/export/{{projectid}}/{{projectid}}_vcfs.{suffix}", suffix=["zip", "zip.md5"]
         ),
         manifest="results/export/{projectid}/manifest.tsv",
     output:
@@ -721,12 +834,26 @@ rule export_data_remote:
         gvcf_tbi=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi"
         ),
-        sv_vcf=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz"
-        ),
-        sv_tbi=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi"
-        ),
+        sv_vcf=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
+        sv_tbi=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.tbi"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
         cram_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "cram.md5"
         ),
@@ -745,12 +872,26 @@ rule export_data_remote:
         gvcf_tbi_md5=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.g.vcf.gz.tbi.md5"
         ),
-        sv_vcf_md5=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.md5"
-        ),
-        sv_tbi_md5=lambda wildcards: ed.construct_export_files(
-            wildcards, manifest, checkpoints, "sv.vcf.gz.tbi.md5"
-        ),
+        sv_vcf_md5=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.md5"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
+        sv_tbi_md5=lambda wildcards: [
+            z
+            for y in [
+                ed.construct_export_files(
+                    wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz.tbi.md5"
+                )
+                for endpoint in config["behaviors"]["sv-endpoints"].keys()
+            ]
+            for z in y
+        ],
         manifest="results/export/{projectid}/manifest.tsv",
     output:
         "results/export/{projectid}/s3_transfer_complete.txt",
@@ -786,18 +927,42 @@ rule export_fastqs_remote:
     """
     input:
         fastqs_r1=lambda wildcards: [
-            "results/fastqs/{}/{}_{}_R1_001.fastq.gz".format(wildcards.projectid, sampleid, lane)
-            for sampleid, lane in zip(
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "lane"],
-            )
+            z
+            for y in [
+                tc.get_fastqs_by_lane_and_sampleid(
+                    projectid, sampleid, "R1", checkpoints, manifest, "001.fastq.gz"
+                )
+                for projectid, sampleid in list(
+                    set(
+                        zip(
+                            manifest.loc[
+                                manifest["projectid"] == wildcards.projectid, "projectid"
+                            ],
+                            manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                        )
+                    )
+                )
+            ]
+            for z in y
         ],
         fastqs_r2=lambda wildcards: [
-            "results/fastqs/{}/{}_{}_R2_001.fastq.gz".format(wildcards.projectid, sampleid, lane)
-            for sampleid, lane in zip(
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
-                manifest.loc[manifest["projectid"] == wildcards.projectid, "lane"],
-            )
+            z
+            for y in [
+                tc.get_fastqs_by_lane_and_sampleid(
+                    projectid, sampleid, "R2", checkpoints, manifest, "001.fastq.gz"
+                )
+                for projectid, sampleid in list(
+                    set(
+                        zip(
+                            manifest.loc[
+                                manifest["projectid"] == wildcards.projectid, "projectid"
+                            ],
+                            manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
+                        )
+                    )
+                )
+            ]
+            for z in y
         ],
     output:
         "results/fastqs/{projectid}/s3_transfer_complete.txt",
@@ -817,5 +982,5 @@ rule export_fastqs_remote:
             config_resources["default"]["queue"], config_resources["queues"]
         ),
     shell:
-        'aws s3 sync {params.profile} --exclude="*" --include="*.fastq.gz" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/fastqs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*001.fastq.gz" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/fastqs && '
         "touch {output}"

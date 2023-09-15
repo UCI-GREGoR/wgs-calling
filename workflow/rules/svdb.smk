@@ -3,14 +3,14 @@ rule merge_sv_vcfs:
     Given SV callsets from various callers, combine into a single vcf
     """
     input:
-        expand(
+        lambda wildcards: expand(
             "results/{toolname}/{{projectid}}/{{sampleid}}.{toolname}.duphold-filtered.vcf.gz",
-            toolname=config["behaviors"]["sv-callers"],
+            toolname=config["behaviors"]["sv-endpoints"][wildcards.endpoint]["sv-callers"],
         ),
     output:
-        temp("results/final/{projectid}/{sampleid}.sv.svdb-raw.vcf.gz"),
+        temp("results/final/{projectid}/{sampleid}.sv.{endpoint}.svdb-raw.vcf.gz"),
     benchmark:
-        "results/performance_benchmarks/merge_sv_vcfs/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/merge_sv_vcfs/{projectid}/{sampleid}.{endpoint}.tsv"
     conda:
         "../envs/svdb.yaml" if not use_containers else None
     container:
@@ -35,20 +35,25 @@ rule ensemble_sv_vcf:
     number of SV caller inputs
     """
     input:
-        "results/final/{projectid}/{sampleid}.sv.svdb-raw.vcf.gz",
+        "results/final/{projectid}/{sampleid}.sv.{endpoint}.svdb-raw.vcf.gz",
     output:
-        "results/final/{projectid}/{sampleid}.sv.vcf.gz",
+        "results/final/{projectid}/{sampleid}.sv.{endpoint}.vcf.gz",
     params:
-        bcftools_filter_count="INFO/FOUNDBY >= {}".format(
-            config["behaviors"]["sv-ensemble"]["min-count"]
+        bcftools_filter_count=lambda wildcards: "INFO/FOUNDBY >= {}".format(
+            config["behaviors"]["sv-endpoints"][wildcards.endpoint]["sv-ensemble"]["min-count"]
         ),
-        bcftools_filter_sources=" & INFO/svdb_origin ~ '"
-        + "' & INFO/svdb_origin ~ '".join(config["behaviors"]["sv-ensemble"]["required-callers"])
+        bcftools_filter_sources=lambda wildcards: " & INFO/svdb_origin ~ '"
+        + "' & INFO/svdb_origin ~ '".join(
+            config["behaviors"]["sv-endpoints"][wildcards.endpoint]["sv-ensemble"][
+                "required-callers"
+            ]
+        )
         + "'"
-        if "required-callers" in config["behaviors"]["sv-ensemble"]
+        if "required-callers"
+        in config["behaviors"]["sv-endpoints"][wildcards.endpoint]["sv-ensemble"]
         else "",
     benchmark:
-        "results/performance_benchmarks/ensemble_sv_vcf/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/ensemble_sv_vcf/{projectid}/{sampleid}.{endpoint}.tsv"
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:
@@ -69,11 +74,11 @@ rule summarize_sv_variant_sources:
     the variant from its info content, with the goal of getting this information into an Rmd report
     """
     input:
-        "results/final/{projectid}/{sampleid}.sv.svdb-raw.vcf.gz",
+        "results/final/{projectid}/{sampleid}.sv.{endpoint}.svdb-raw.vcf.gz",
     output:
-        "results/reports/sv_data/{projectid}/{sampleid}.sv.svdb-raw.tsv",
+        "results/reports/sv_data/{projectid}/{sampleid}.sv.{endpoint}.svdb-raw.tsv",
     benchmark:
-        "results/performance_benchmarks/summarize_sv_variant_sources/{projectid}/{sampleid}.tsv"
+        "results/performance_benchmarks/summarize_sv_variant_sources/{projectid}/{sampleid}.{endpoint}.tsv"
     conda:
         "../envs/bcftools.yaml" if not use_containers else None
     container:
