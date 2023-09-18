@@ -7,7 +7,7 @@
 ## the DAG itself can be a costly operation for some runs.
 ## as a hack: if no conda environments are present at all, run a preflight pass that
 ## exclusively constructs conda environments.
-if [[ ! -d .snakemake/conda ]] ; then
+if [[ ! -d "snakemake/conda" ]] || ( [[ -d "snakemake/conda" ]] && [[ -z "$(ls -A .snakemake/conda)" ]] ) ; then
     snakemake -j1 -p --rerun-incomplete --rerun-triggers mtime --use-conda --use-singularity --conda-create-envs-only
 fi
 snakemake -j150 --profile ../sge-profile -p --rerun-incomplete --rerun-triggers mtime --use-conda --use-singularity --cluster-config config/cluster.yaml
