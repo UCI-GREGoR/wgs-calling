@@ -3,6 +3,53 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.2]
+
+### Fixed
+
+- wrapper performance modification made more permissive, such that it runs if the conda directory
+  exists but has nothing in it, as opposed to only if the directory is absent entirely. this should
+  allow it to coexist with minor snakemake preflight runs before actual deployment.
+- updated this changelog for several recent releases
+
+## [0.5.1]
+
+### Fixed
+
+- minor patches to multiple SV endpoint support
+- SV caller comparison report is only emitted for endpoints including at least two callers
+  - in addition to this making conceptual sense, UpSetR does not support it otherwise
+- for performance reasons, wrapper now attempts to run --conda-create-envs-only at the first run
+  - creating all conda envs at once interacted poorly with snakemake remotes, causing intermittent
+    timeouts that could be solved by simply relaunching, but hey it was inconvenient
+
+## [0.5.0]
+
+### Added
+
+- multiple SV endpoints
+  - in config, specify named ensembled calling regimes. these are processed in parallel
+    and reported out as separate exported vcfs.
+- zip exported local vcfs and export the zip file
+  - end user was having to GUI click many times, causing substantial bottleneck
+
+### Fixed
+
+- fastq export to remote S3 now correctly handles input fastqs provided as combined across lane data
+  - versions since 0.4.0 were exporting a mismash of incorrectly tracked fastqs
+
+### Removed
+
+- truvari (didn't work anyway)
+- ensemble SV calling flag for merge tool (only svdb is currently supported)
+
+## [0.4.2]
+
+### Fixed
+
+- removed unhandled arbitrary resource
+- permit samples to have completely unspecified sex (so, not in legacy table and not in new plaintext linker)
+
 ## [0.4.1]
 
 ### Fixed
