@@ -50,12 +50,6 @@ The following settings are nested under the key `behaviors` and are user-configu
 |`qc-type`|list of strings; for read and alignment qc: the pipeline can run QC either split by lane or combined across lanes. Either or both can be chosen. Split by lane QC is highly recommended and preferred. Deactivating combined lane QC can result in some substantial runtime improvements in some contexts. Permitted values: `lane-specific` or `combined-lanes` (or both)|
 |`bqsr`|boolean; whether to run BQSR (experimental; please just say yes to this)|
 |`snv-caller`|string; which calling tool to use for SNVs. permitted values: `deepvariant`|
-|`sv-endpoints`|definitions of SV ensemble calling regimes. each set should be defined under this tag, with a unique name (e.g. `strict`, `lenient`); this tag will be present in the output vcf for this callset.|
-||`sv-callers`: list of strings; which calling tool(s) to use for this ensemble call. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`|
-||`sv-ensemble`: parameters controlling ensemble call resolution between the callers|
-||  `min-count`: integer; the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering|
-||  `required-callers`: list of strings; a list of which tools, if any, a variant absolutely must be called by to survive ensemble filtering|
-||`sv-remove-breakends`: boolean; whether or not to filter `SVTYPE=BND` variants from ensemble calling output|
 |`outcome`|string; which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`; or `release` to prepare results for distribution|
 |`symlink-fastqs`|boolean; whether to copy (no) or symlink (yes) input fastqs into workspace. symlinking is faster and more memory-efficient, but less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch. S3 remotes (prefixed with `s3://`) are supported for input fastqs, but in that case this option will be ignored|
 |`trim-adapters-before-alignment`|boolean; whether to use adapter trimmed fastq output of `fastp` as input to aligner. permitted values: `yes`, `no`, or `legacy`. legacy behavior for this option is to not use trimmed output for alignment.|
@@ -64,6 +58,19 @@ The following settings are nested under the key `behaviors` and are user-configu
 |`export-s3`|parameters for controlling optional upload to s3|
 ||`bucket-name`: string; name of s3 bucket to which to sync data|
 ||`profile-name`: string; optional name of aws profile to use for data sync|
+
+The following settings control the definition of SV ensemble calling regimes. Each regime should be defined under `behaviors::sv-endpoints`, with a unique name (e.g. `strict`, `lenient`). At least one must be defined, but multiple can coexist and will be produced in parallel, with their unique name in their output vcf filenames.
+
+|Ensemble Setting|Description|
+|`sv-callers`|list of strings; which calling tool(s) to use for this ensemble call. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`|
+|`sv-ensemble`|parameters controlling ensemble call resolution between the callers|
+||`min-count`: integer; the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering|
+||`required-callers`: list of strings; a list of which tools, if any, a variant absolutely must be called by to survive ensemble filtering|
+|`sv-remove-breakends`|boolean; whether or not to filter `SVTYPE=BND` variants from ensemble calling output|
+
+
+
+
 
 The following tool-specific parameters are nested under the key `parameters`.
 
