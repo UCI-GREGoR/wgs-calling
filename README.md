@@ -39,21 +39,23 @@ The following settings are recognized in `config/config.yaml`. Note that each re
 |`multiqc-read-config`|string; relative path to configuration settings for pre-alignment multiQC report|
 |`multiqc-alignment-config`|string; relative path to configuration settings for post-alignment multiQC report|
 |`genome-build`|string: requested genome reference build to use for this analysis run. this should match the tags used in the reference data blocks below. Values are configurable, but at a minimum accepts `grch38`|
+|`apptainer-image-dir`|string; relative path to apptainer images for rules. only used if `behaviors::use-containers` (see below) is true|
 
 The following settings are nested under the key `behaviors` and are user-configurable modifiers to how the pipeline will run.
 
 |Behavior|Description|
 |---|---|
-|`use-containers`|boolean; whether to, when possible, use either the docker or singularity image for each rule, or instead the rule-specific conda environment. See discussion below for how to choose this setting, and how it interacts with snakemake invocations.
+|`use-containers`|boolean; whether to, when possible, use either the docker or singularity image for each rule, or instead the rule-specific conda environment. See discussion below for how to choose this setting, and how it interacts with snakemake invocations.|
 |`aligner`|string; which alignment tool to use. permitted values: `bwa`, `bwa-mem2`|
 |`qc-type`|list of strings; for read and alignment qc: the pipeline can run QC either split by lane or combined across lanes. Either or both can be chosen. Split by lane QC is highly recommended and preferred. Deactivating combined lane QC can result in some substantial runtime improvements in some contexts. Permitted values: `lane-specific` or `combined-lanes` (or both)|
 |`bqsr`|boolean; whether to run BQSR (experimental; please just say yes to this)|
 |`snv-caller`|string; which calling tool to use for SNVs. permitted values: `deepvariant`|
-|`sv-callers`|list of strings; which calling tool(s) to use for SVs. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`
-|`sv-ensemble`|settings controlling SV ensemble calling. note that the below settings can be applied in combination|
-||`min-count`: integer; the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering|
-||`required-callers`: list of strings; a list of which tools, if any, a variant absolutely must appear in to survive ensemble filtering|
-|`sv-remove-breakends`|boolean; whether or not to filter `SVTYPE=BND` variants from ensemble calling output|
+|`sv-endpoints`|definitions of SV ensemble calling regimes. each set should be defined under this tag, with a unique name (e.g. `strict`, `lenient`); this tag will be present in the output vcf for this callset.|
+||`sv-callers`: list of strings; which calling tool(s) to use for this ensemble call. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`|
+||`sv-ensemble`: parameters controlling ensemble call resolution between the callers|
+||  `min-count`: integer; the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering|
+||  `required-callers`: list of strings; a list of which tools, if any, a variant absolutely must be called by to survive ensemble filtering|
+||`sv-remove-breakends`: boolean; whether or not to filter `SVTYPE=BND` variants from ensemble calling output|
 |`outcome`|string; which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`; or `release` to prepare results for distribution|
 |`symlink-fastqs`|boolean; whether to copy (no) or symlink (yes) input fastqs into workspace. symlinking is faster and more memory-efficient, but less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch. S3 remotes (prefixed with `s3://`) are supported for input fastqs, but in that case this option will be ignored|
 |`trim-adapters-before-alignment`|boolean; whether to use adapter trimmed fastq output of `fastp` as input to aligner. permitted values: `yes`, `no`, or `legacy`. legacy behavior for this option is to not use trimmed output for alignment.|
@@ -79,7 +81,7 @@ The following tool-specific parameters are nested under the key `parameters`.
 |`tiddit`|**DEPRECATED.** parameters specific to [TIDDIT](https://github.com/SciLifeLab/TIDDIT)|
 ||`min-contig-size`: integer; minimum size of contigs on which to make calls, in bases. a minimum size of 2000000 will remove the remaining non-standard contigs present in the no-alt version of GRCh38, for example. unfortunately, TIDDIT does not directly support calling regions|
 
-The following general genome reference files are nested under the key `parameters`, and are expected to be available to multiple tools in the pipeline.
+The following general genome reference files are nested under the key `references`, and are expected to be available to multiple tools in the pipeline.
 
 |Annotation Type|Description|
 |---|---|
@@ -96,8 +98,6 @@ The following reference files are split out by individual tool.
 ||`known-indels-vcf-gz-tbi`|string; tabix index for above known indels vcf|
 ||`dbsnp138-vcf`|string; VCF of dbSNP variation for BQSR. intended to be pulled from Broad's cloud files|
 ||`dbsnp138-vcf-idx`|string; .idx index file for above dbSNP vcf|
-|`collectwgsmetrics`||reference files specific for GATK4 post-alignment QC utility `CollectWgsMetrics`|
-||`reportable-regions`|string; set of bed intervals to be considered for `CollectWgsMetrics` output|
 |`verifybamid2`||reference data files specific to [VerifyBamID2](https://github.com/Griffan/VerifyBamID)|
 ||`db-V`|string; filename for assorted Verify annotation files|
 ||`db-UD`|string; filename for assorted Verify annotation files|
@@ -114,6 +114,12 @@ The following reference files are split out by individual tool.
 |`manta`||reference data files specific to [manta](https://github.com/Illumina/manta)|
 ||`calling-range-bed-gz`|string; bgzip-compressed bedfile of valid calling ranges, e.g. autosomes. manta recommends not providing very many regions here, as it evidently causes problems with its task dispatch heuristics
 ||`calling-range-bed-gz-tbi`|string; tabix index of above compressed bedfile|
+|`somalier`||reference data files specific to [somalier](https://github.com/brentp/somalier)|
+||`sites-vcf-gz`|string; predefined set of informative sites to extract from each sample|
+|`giraffe`||experimental, currently ignored|
+||`graph-gbz`|string; experimental, currently ignored|
+||`graph-dist`|string; experimental, currently ignored|
+||`graph-min`|string; experimental, currently ignored|
 
 Two manifest formats are accepted, depending on the format of input available.
 
