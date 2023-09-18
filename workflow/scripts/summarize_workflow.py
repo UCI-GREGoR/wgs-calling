@@ -79,26 +79,44 @@ def get_conda_version_string(pkgname: str, require_first: bool = False):
         return "{not found in installed conda environments}"
 
 
-def describe_ensemble_calling_settings(config: dict) -> list:
+def get_all_sv_callers(config: dict) -> list:
+    """
+    Across all ensemble calling paradigms, get all requested SV callers
+    """
+    res = []
+    for endpoint in config["behaviors"]["sv-endpoints"].keys():
+        res.extend(config["behaviors"]["sv-endpoints"][endpoint]["sv-callers"])
+    return res
+
+
+def describe_ensemble_calling_settings(config: dict) -> str:
     """
     Parse config settings into human-readable description of
     SV ensemble calling settings
     """
-    ensemble_filtering_criteria = []
-    ensemble_min_count = config["behaviors"]["sv-ensemble"]["min-count"]
-    if ensemble_min_count > 1:
-        ensemble_filtering_criteria.append(
-            "present in at least {} tools' post-merge output".format(ensemble_min_count)
-        )
-    if "required-callers" in config["behaviors"]["sv-ensemble"]:
-        ensemble_filtering_criteria.append(
-            "must be present in {}".format(
-                ",".join(config["behaviors"]["sv-ensemble"]["required-callers"])
+    ensemble_filtering_criteria = ""
+    for endpoint in config["behaviors"]["sv-endpoints"].keys():
+        ensemble_filtering_criterion = '\n\nendpoint "' + endpoint + '": '
+        sv_callers = config["behaviors"]["sv-endpoints"][endpoint]["sv-callers"]
+        ensemble_filtering_criterion += "SV callers: " + ", ".join(sv_callers) + "; "
+        ensemble_min_count = config["behaviors"]["sv-endpoints"][endpoint]["sv-ensemble"][
+            "min-count"
+        ]
+        if ensemble_min_count > 1:
+            ensemble_filtering_criterion += (
+                "present in at least {} tools' post-merge output".format(ensemble_min_count) + "; "
             )
-        )
-    if len(ensemble_filtering_criteria) == 0:
-        ensemble_filtering_criteria.append("no additional filters requested in user configuration")
-    return ensemble_filtering_criteria
+        if "required-callers" in config["behaviors"]["sv-endpoints"][endpoint]["sv-ensemble"]:
+            ensemble_filtering_criterion += (
+                "must be present in {}".format(
+                    ",".join(config["behaviors"]["sv-ensemble"]["required-callers"])
+                )
+                + "; "
+            )
+        if config["behaviors"]["sv-endpoints"][endpoint]["sv-remove-breakends"]:
+            ensemble_filtering_criterion += "breakends removed from processed results; "
+        ensemble_filtering_criteria += ensemble_filtering_criterion
+    return ensemble_filtering_criteria.rstrip("; ")
 
 
 def run_summarize_workflow(template_name, config, manta_config_fn, outfn):
