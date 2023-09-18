@@ -62,6 +62,7 @@ The following settings are nested under the key `behaviors` and are user-configu
 The following settings control the definition of SV ensemble calling regimes. Each regime should be defined under `behaviors::sv-endpoints`, with a unique name (e.g. `strict`, `lenient`). At least one must be defined, but multiple can coexist and will be produced in parallel, with their unique name in their output vcf filenames.
 
 |Ensemble Setting|Description|
+|---|---|
 |`sv-callers`|list of strings; which calling tool(s) to use for this ensemble call. at least one should be specified. permitted values: `manta`, `tiddit`, `svaba`, `delly`, `lumpy`|
 |`sv-ensemble`|parameters controlling ensemble call resolution between the callers|
 ||`min-count`: integer; the minimum number of tools' outputs in which a variant (or something similar nearby) must appear to survive ensemble filtering|
