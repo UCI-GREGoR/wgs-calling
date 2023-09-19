@@ -27,19 +27,18 @@ Fastqs were concurrently processed by [fastp](https://github.com/OpenGene/fastp)
 
 Reads are aligned to human reference genome {{ config["genome-build"] }} with {{ config.behaviors.aligner }}.
 Aside from standard defaults, softclipping of alts (`-Y`) and a fixed `-K` are provided to stabilize output across
-repeated runs. {% if config["behaviors"]["trim-adapters-before-alignment"] %} Following best practices, reads trimmed for the residual Illumina adapter content are used for
-alignment. Note that this differs from prior CLO workflow behavior but matches field standards. {% else %} Untrimmed reads (that is, not the output of fastp) are used for alignment. This does not match field standards, but effective soft clipping will likely limit the impact of this discrepancy on downstream performance. {% endif %}
-Following best practices, duplicate reads are annotated with [GATK](https://github.com/broadinstitute/gatk)
+repeated runs. Following best practices, reads trimmed for the residual Illumina adapter content are used for
+alignment. Following best practices, duplicate reads are annotated with [GATK](https://github.com/broadinstitute/gatk)
 {{ get_conda_version_string("gatk4") }} MarkDuplicates. 
 Furthermore, duplicate reads are actually removed from the bam output of this step.
 This improves compatibility with downstream tools that cannot handle marked duplicate annotations (e.g.
 [Sentieon products](https://support.sentieon.com/versions/201808.06/manual/DNAscope_usage/dnascope/)).
-Again following best practices, quality scores are recalibrated with GATK {{ get_conda_version_string("gatk4") }}
-BaseRecalibrator/ApplyBQSR.
+{% if config.behaviors.bqsr %} Again following best practices, quality scores are recalibrated with GATK {{ get_conda_version_string("gatk4") }}
+BaseRecalibrator/ApplyBQSR. {% else %} BQSR is not applied to these aligned reads. {% endif %}
 
-Following BQSR, aligned reads are analyzed with GATK {{ get_conda_version_string("gatk4") }} CollectMultipleMetrics, modules
+Aligned reads are analyzed with GATK {{ get_conda_version_string("gatk4") }} CollectMultipleMetrics, modules
 CollectAlignmentSummaryMetrics, CollectInsertSizeMetrics, QualityScoreDistribution, CollectSequencingArtifactMetrics,
-CollectQualityYieldMetrics; CollectGcBiasMetrics; and CollectWgsMetrics. {% if config["behaviors"]["trim-adapters-before-alignment"] %} CollectMultipleMetrics is run with INCLUDE_UNPAIRED active, but due to the use of fastp before alignment, these reads should be prefiltered. {% else %} CollectMultipleMetrics is run with INCLUDE_UNPAIRED active. {% endif %} CollectWgsMetrics is run genome-wide. Reads are further analyzed with [alignstats](https://github.com/jfarek/alignstats) {{ get_conda_version_string("alignstats") }}; [VerifyBamID](https://github.com/Griffan/VerifyBamID) {{ get_conda_version_string("verifybamid2") }}; and [somalier](https://github.com/brentp/somalier) {{ get_conda_version_string("somalier") }}. Note that currently self-reported sex information is pulled from the upstream 'labbook' sheet, and as such the completeness of this sexcheck assessment is only as good as the completeness of the 'labbook' annotations. Furthermore, the relatedness information encoded in the subject ID is not parsed out for direct relatedness checking, as this is flagged for inclusion in a downstream inter-flowcell QC workflow.
+CollectQualityYieldMetrics; CollectGcBiasMetrics; and CollectWgsMetrics. CollectMultipleMetrics is run with INCLUDE_UNPAIRED active, but due to the use of fastp before alignment, these reads should be prefiltered. CollectWgsMetrics is run genome-wide. Reads are further analyzed with [alignstats](https://github.com/jfarek/alignstats) {{ get_conda_version_string("alignstats") }}; [VerifyBamID](https://github.com/Griffan/VerifyBamID) {{ get_conda_version_string("verifybamid2") }}; and [somalier](https://github.com/brentp/somalier) {{ get_conda_version_string("somalier") }}.
 
 {% endif %}
 
@@ -122,33 +121,11 @@ with the following exceptions.
 
 {% endif %}
 
-
 {% if "tiddit" in config["behaviors"]["sv-callers"] %}
 ### TIDDIT
 
-{% if get_conda_version_string("tiddit").startswith("3") %}
-
 [TIDDIT](https://github.com/SciLifeLab/TIDDIT) {{ get_conda_version_string("tiddit") }}
 was run with default settings.
-
-There are certain incompatibilities between TIDDIT >=3 TIDDIT 2. The relevant
-workflow modifications are as follows:
-
-  - TIDDIT uses an internal python fasta parser that implicitly requires the only instance of the '>' character to be
-    the first character of the sequence description line.
-    Conservatively, all fastas are sanitized to remove extra '>' characters when ingested into the pipeline.
-
-  - TIDDIT features local realignment of reads, and for this purpose calls bwa.
-    By default,, the reference fasta has indices that are expected by bwa-mem2, specifically the
-    modified `*.bwt.2bit.64` file, which differs from the older `*.bwt` file expected by traditional bwa. When the `*.bwt` file is absent,
-    TIDDIT >=3 fails with a cryptic error. Based on this observation, the `*.bwt` file is separately prepared whenever TIDDIT >=3 is
-    invoked in this version of the workflow.
-
-{% else %}
-
-TIDDIT {{ get_conda_version_string("tiddit") }} was run with default settings.
-
-{% endif %}
 
 {% endif %}
 
@@ -203,7 +180,7 @@ criteria: {{ ensemble_filtering_criteria|join("; ") }}.
 
 ### Aligned Reads
 
-Aligned bam files are mapped to generic sample IDs and converted to lossless crams.
+Aligned bam files are mapped to external IDs according to the configured linker and converted to lossless crams.
 For recordkeeping, this pipeline's version is added to the bam header as a comment (@CO) tag.
 For additional recordkeeping, the source path for the input reference fasta used for this pipeline
 is also added to the cram header. For posterity, that same information is reported here:
