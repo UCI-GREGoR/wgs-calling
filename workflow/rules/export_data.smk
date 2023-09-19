@@ -703,7 +703,7 @@ rule zip_vcfs:
         sv_vcf=lambda wildcards: [
             z
             for y in [
-                ed.construct_nonexport_files(
+                ed.construct_export_files(
                     wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz"
                 )
                 for endpoint in config["behaviors"]["sv-endpoints"].keys()
