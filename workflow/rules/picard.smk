@@ -262,6 +262,11 @@ rule picard_collectgcbiasmetrics:
 rule picard_collectwgsmetrics:
     """
     Run gatk version of picard CollectWgsMetrics
+
+    New: use "fast algorithm," which reportedly features
+    improvements for >=10X regions, and is about the same
+    for lower regions. Unclear how equivalent this is
+    to the standard algorithm.
     """
     input:
         bam="results/aligned_bams/{fileprefix}.bam",
@@ -299,4 +304,5 @@ rule picard_collectwgsmetrics:
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "
         "-OUTPUT {output.txt} "
+        "--USE_FAST_ALGORITHM true "
         "--TMP_DIR {params.tmpdir}"
