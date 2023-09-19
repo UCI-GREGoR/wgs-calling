@@ -904,6 +904,10 @@ rule export_data_remote:
         if "export-s3" in config["behaviors"]
         and "profile-name" in config["behaviors"]["export-s3"]
         else "",
+    conda:
+        "../envs/awscli.yaml" if not use_containers else None
+    container:
+        "{}/awscli.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["awscli"]["threads"]
     resources:
         mem_mb=config_resources["awscli"]["memory"],
@@ -975,6 +979,10 @@ rule export_fastqs_remote:
         if "export-s3" in config["behaviors"]
         and "profile-name" in config["behaviors"]["export-s3"]
         else "",
+    conda:
+        "../envs/awscli.yaml" if not use_containers else None
+    container:
+        "{}/awscli.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
