@@ -14,7 +14,9 @@ rule combine_input_fastqs_by_lane:
     If these were reliably bgzipped, we could just cat them; but it seems like this isn't guaranteed.
     """
     input:
-        lambda wildcards: tc.get_fastqs_by_lane(wildcards, checkpoints, manifest, "001.fastq.gz"),
+        lambda wildcards: tc.get_fastqs_by_lane(
+            wildcards, checkpoints, manifest, "results/fastqs", "001.fastq.gz"
+        ),
     output:
         temp("results/fastqs_combined/pretrimming/{projectid}/{sampleid}_{readgroup}_001.fastq.gz"),
     conda:
@@ -33,6 +35,8 @@ rule combine_input_fastqs_by_lane:
 
 use rule combine_input_fastqs_by_lane as combine_fastp_fastqs_by_lane with:
     input:
-        lambda wildcards: tc.get_fastqs_by_lane(wildcards, checkpoints, manifest, "fastq.fastq.gz"),
+        lambda wildcards: tc.get_fastqs_by_lane(
+            wildcards, checkpoints, manifest, "results/fastqs", "fastq.fastq.gz"
+        ),
     output:
         temp("results/fastqs_combined/posttrimming/{projectid}/{sampleid}_{readgroup}_001.fastq.gz"),

@@ -930,13 +930,19 @@ rule export_fastqs_remote:
             z
             for y in [
                 tc.get_fastqs_by_lane_and_sampleid(
-                    projectid, sampleid, "R1", checkpoints, manifest, "001.fastq.gz"
-                )
-                for projectid, sampleid in list(
-                    set(
-                        zip(
-                            manifest.loc[
-                                manifest["projectid"] == wildcards.projectid, "projectid"
+                    projectid,
+                    sampleid,
+                    "R1",
+                        checkpoints,
+                        manifest,
+                        "results/fastqs",
+                        "001.fastq.gz",
+                    )
+                    for projectid, sampleid in list(
+                        set(
+                            zip(
+                                manifest.loc[
+                    manifest["projectid"] == wildcards.projectid, "projectid"
                             ],
                             manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
                         )
@@ -949,13 +955,19 @@ rule export_fastqs_remote:
             z
             for y in [
                 tc.get_fastqs_by_lane_and_sampleid(
-                    projectid, sampleid, "R2", checkpoints, manifest, "001.fastq.gz"
-                )
-                for projectid, sampleid in list(
-                    set(
-                        zip(
-                            manifest.loc[
-                                manifest["projectid"] == wildcards.projectid, "projectid"
+                    projectid,
+                    sampleid,
+                    "R2",
+                        checkpoints,
+                        manifest,
+                        "results/fastqs",
+                        "001.fastq.gz",
+                    )
+                    for projectid, sampleid in list(
+                        set(
+                            zip(
+                                manifest.loc[
+                    manifest["projectid"] == wildcards.projectid, "projectid"
                             ],
                             manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
                         )

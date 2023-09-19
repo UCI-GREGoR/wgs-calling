@@ -65,6 +65,7 @@ def get_fastqs_by_lane_and_sampleid(
     readgroup: str,
     checkpoints: Checkpoints,
     manifest: pd.DataFrame,
+    prefix: str,
     suffix: str,
 ) -> list:
     query = 'projectid == "{}" and sampleid == "{}"'.format(projectid, sampleid)
@@ -89,7 +90,8 @@ def get_fastqs_by_lane_and_sampleid(
                 ).output[0].open() as f:
                     available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
     result = expand(
-        "results/fastqs/{projectid}/{sampleid}_{lane}_{readgroup}_{suffix}",
+        "{prefix}/{projectid}/{sampleid}_{lane}_{readgroup}_{suffix}",
+        prefix=prefix,
         projectid=projectid,
         sampleid=sampleid,
         lane=available_lanes,
@@ -103,13 +105,20 @@ def get_fastqs_by_lane(
     wildcards: Namedlist,
     checkpoints: Checkpoints,
     manifest: pd.DataFrame,
+    prefix: str,
     suffix: str,
 ) -> list:
     """
     For a project and sample, get all the expected fastqs for the subject based on manifest lanes
     """
     return get_fastqs_by_lane_and_sampleid(
-        wildcards.projectid, wildcards.sampleid, wildcards.readgroup, checkpoints, manifest, suffix
+        wildcards.projectid,
+        wildcards.sampleid,
+        wildcards.readgroup,
+        checkpoints,
+        manifest,
+        prefix,
+        suffix,
     )
 
 
