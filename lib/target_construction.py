@@ -12,19 +12,9 @@ def map_fastq_from_project_and_sample(
     """
     Get a particular fastq based on projectid and sampleid
     """
-    ## New: allow rewiring of the DAG to provide adapter-trimmed fastqs directly to aligner
-    if config["behaviors"]["trim-adapters-before-alignment"] is True:
-        return "results/fastp/{}/{}_{}_{}_fastp.fastq.gz".format(
-            wildcards.projectid, wildcards.sampleid, wildcards.lane, rp
-        )
-
-    query = 'projectid == "{}" and sampleid == "{}" and lane == "{}"'.format(
-        wildcards.projectid, wildcards.sampleid, wildcards.lane
+    return "results/fastp/{}/{}_{}_{}_fastp.fastq.gz".format(
+        wildcards.projectid, wildcards.sampleid, wildcards.lane, rp
     )
-    result = manifest.query(query)
-    assert len(result) == 1
-    result = result[rp.lower()]
-    return "results/fastqs/{}/{}".format(wildcards.projectid, os.path.basename(result.to_list()[0]))
 
 
 def map_fastqs_to_manifest(wildcards: Namedlist, manifest: pd.DataFrame, readtag: str) -> str:

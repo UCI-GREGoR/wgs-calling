@@ -75,11 +75,6 @@ properties:
         pattern: "^fastqc$|^alignment$|^calling$|^release$"
       symlink-fastqs:
         type: boolean
-      trim-adapters-before-alignment:
-        oneOf:
-          - type: boolean
-          - type: string
-            pattern: "^legacy$"
       assume-last-sample-sex:
         type: string
         pattern: "^[fF]emale$|^[mM]ale$"
@@ -109,7 +104,6 @@ properties:
       - sv-endpoints
       - outcome
       - symlink-fastqs
-      - trim-adapters-before-alignment
     additionalProperties: no
   parameters:
     type: object
