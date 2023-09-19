@@ -3,6 +3,25 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0 (unreleased)]
+
+### Fixed
+
+- automated methods summary should be able to conditionally include SV parameter descriptions,
+  based on which tools are actually requested in any of the endpoints
+
+### Removed
+
+- the ability to circumvent adapter trimming
+
+## [0.5.3]
+
+### Fixed
+
+- automated methods summary can handle SV endpoints
+  - the conditional inclusion of SV parameter descriptions isn't responsive, but at least it runs,
+    and there is a separate description of each endpoint
+
 ## [0.5.2]
 
 ### Fixed
