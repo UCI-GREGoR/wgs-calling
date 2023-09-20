@@ -62,13 +62,13 @@ using [bcftools](https://github.com/samtools/bcftools) {{ get_conda_version_stri
 This pipeline is designed to perform ensemble SV calling, combining and filtering the
 results of multiple short read callers.
 
-{% if is in ("delly", get_all_sv_callers) %}
+{% if is_required_sv_caller(config, "delly") %}
 ### Delly
 
 [Delly](https://github.com/dellytools/delly) {{ get_conda_version_string("delly") }} was run with default settings.
 {% endif %}
 
-{% if is in ("manta", get_all_sv_callers) %}
+{% if is_required_sv_caller(config, "manta") %}
 ### Manta
 
 {% if "manta" in cp %}
@@ -115,7 +115,7 @@ with the following exceptions.
 {% endif %}
 
 
-{% if is in ("tiddit", get_all_sv_callers) %}
+{% if is_required_sv_caller(config, "tiddit") %}
 ### TIDDIT
 
 {% if get_conda_version_string("tiddit").startswith("3") %}
@@ -144,13 +144,13 @@ TIDDIT {{ get_conda_version_string("tiddit") }} was run with default settings.
 
 {% endif %}
 
-{% if is in ("svaba", get_all_sv_callers) %}
+{% if is_required_sv_caller(config, "svaba") %}
 ### SvABA
 
 [SvABA](https://github.com/walaj/svaba) {{ get_conda_version_string("svaba") }} was run with default settings.
 {% endif %}
 
-{% if is in ("lumpy", get_all_sv_callers) %}
+{% if is_required_sv_caller(config, "lumpy") %}
 ### lumpy
 
 [lumpy](https://github.com/arq5x/lumpy-sv) {{ get_conda_version_string("lumpy-sv") }} was run according to the project's
