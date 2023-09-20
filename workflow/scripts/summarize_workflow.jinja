@@ -61,21 +61,13 @@ using [bcftools](https://github.com/samtools/bcftools) {{ get_conda_version_stri
 This pipeline is designed to perform ensemble SV calling, combining and filtering the
 results of multiple short read callers.
 
-{% if (config["behaviors"]["sv-callers"]|length) == 1 %}
-
-Note that because only one caller was used in this run, the benefits of ensemble
-calling will be very limited, and the results will reflect the single tool's results with
-duphold filters applied as appropriate.
-
-{% endif %}
-
-{% if "delly" in config["behaviors"]["sv-callers"] %}
+{% if is in ("delly", get_all_sv_callers) %}
 ### Delly
 
 [Delly](https://github.com/dellytools/delly) {{ get_conda_version_string("delly") }} was run with default settings.
 {% endif %}
 
-{% if "manta" in config["behaviors"]["sv-callers"] %}
+{% if is in ("manta", get_all_sv_callers) %}
 ### Manta
 
 {% if "manta" in cp %}
@@ -121,7 +113,7 @@ with the following exceptions.
 
 {% endif %}
 
-{% if "tiddit" in config["behaviors"]["sv-callers"] %}
+{% if is in ("tiddit", get_all_sv_callers) %}
 ### TIDDIT
 
 [TIDDIT](https://github.com/SciLifeLab/TIDDIT) {{ get_conda_version_string("tiddit") }}
@@ -129,13 +121,13 @@ was run with default settings.
 
 {% endif %}
 
-{% if "svaba" in config["behaviors"]["sv-callers"] %}
+{% if is in ("svaba", get_all_sv_callers) %}
 ### SvABA
 
 [SvABA](https://github.com/walaj/svaba) {{ get_conda_version_string("svaba") }} was run with default settings.
 {% endif %}
 
-{% if "lumpy" in config["behaviors"]["sv-callers"] %}
+{% if is in ("lumpy", get_all_sv_callers) %}
 ### lumpy
 
 [lumpy](https://github.com/arq5x/lumpy-sv) {{ get_conda_version_string("lumpy-sv") }} was run according to the project's
@@ -168,7 +160,7 @@ The duphold-filtered results of each SV tool are then merged with [svdb](https:/
 In brief, svdb first merges similar variants within each tool's individual
 output, and then performs a similar merge of variants across the remaining variants from each tool. After
 the merge is complete, this instance of the pipeline is configured to filter variants based on the following
-criteria: {{ ensemble_filtering_criteria|join("; ") }}.
+criteria: {{ ensemble_filtering_criteria }}.
 
 {% endif %}
 
