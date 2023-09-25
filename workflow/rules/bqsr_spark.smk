@@ -73,7 +73,6 @@ if config["behaviors"]["bqsr"]:
             recal_table="results/bqsr/{projectid}/{sampleid}.recal_table",
         output:
             bam="results/aligned_bams/{projectid}/{sampleid}.bam",
-            bai="results/aligned_bams/{projectid}/{sampleid}.bai",
         params:
             tmpdir=tempDir,
             java_args=config_resources["gatk_bqsr_apply_bqsr"]["java_args"],
