@@ -188,6 +188,7 @@ rule all:
 
 include: "rules/acquire_data.smk"
 include: "rules/alignstats.smk"
+include: "rules/apptainer.smk"
 include: "rules/bqsr.smk"
 include: "rules/bwamem.smk"
 include: "rules/combine_fastqs.smk"
@@ -211,5 +212,4 @@ include: "rules/references.smk"
 include: "rules/somalier.smk"
 include: "rules/svaba.smk"
 include: "rules/svdb.smk"
-
 include: "rules/verifybamid2.smk"
