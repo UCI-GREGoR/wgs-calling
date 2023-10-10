@@ -80,9 +80,6 @@ properties:
           - type: boolean
           - type: string
             pattern: "^legacy$"
-      assume-last-sample-sex:
-        type: string
-        pattern: "^[fF]emale$|^[mM]ale$"
       import-s3:
         type: object
         properties:

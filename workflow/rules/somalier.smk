@@ -80,9 +80,7 @@ rule somalier_build_pedfile:
             manifest["projectid"] == wildcards.projectid, "sampleid"
         ].to_list(),
         projectid=lambda wildcards: wildcards.projectid,
-        last_sample_sex=config["behaviors"]["assume-last-sample-sex"]
-        if "assume-last-sample-sex" in config["behaviors"]
-        else "unknown",
+        last_sample_sex="unknown",
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
