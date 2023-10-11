@@ -15,11 +15,11 @@ rule apptainer_deepvariant:
         image_version=config["parameters"]["deepvariant"]["docker-version"],
     conda:
         "../envs/apptainer.yaml" if not use_containers else None
-    threads: config_resources["default"]["threads"]
+    threads: config_resources["apptainer"]["threads"]
     resources:
-        mem_mb=config_resources["default"]["memory"],
+        mem_mb=config_resources["apptainer"]["memory"],
         qname=lambda wildcards: rc.select_queue(
-            config_resources["default"]["queue"], config_resources["queues"]
+            config_resources["apptainer"]["queue"], config_resources["queues"]
         ),
     shell:
         "apptainer pull --dir {params.outdir} docker://google/deepvariant:{params.image_version}"

@@ -46,6 +46,8 @@ properties:
     additionalProperties: false
   alignstats:
     <<: *defaults
+  apptainer:
+    <<: *defaults
   awscli:
     <<: *defaults
   bcftools:

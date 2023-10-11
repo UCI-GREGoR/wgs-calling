@@ -15,6 +15,10 @@ alignstats:
   threads: 4
   memory: 8000
   queue: "small"
+apptainer:
+  threads: 1
+  memory: 8000
+  queue: "small"
 awscli:
   threads: 1
   memory: 2000
