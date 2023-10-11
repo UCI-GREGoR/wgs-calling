@@ -35,6 +35,9 @@ properties:
       bqsr:
         type: boolean
         default: yes
+      remove-duplicates:
+        type: boolean
+        default: yes
       snv-caller:
         type: string
         pattern: "^deepvariant$"
@@ -75,9 +78,6 @@ properties:
         pattern: "^fastqc$|^alignment$|^calling$|^release$"
       symlink-fastqs:
         type: boolean
-      assume-last-sample-sex:
-        type: string
-        pattern: "^[fF]emale$|^[mM]ale$"
       import-s3:
         type: object
         properties:

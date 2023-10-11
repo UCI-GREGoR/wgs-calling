@@ -79,14 +79,15 @@ def get_conda_version_string(pkgname: str, require_first: bool = False):
         return "{not found in installed conda environments}"
 
 
-def get_all_sv_callers(config: dict) -> list:
+def is_required_sv_caller(config: dict, toolname: str) -> bool:
     """
-    Across all ensemble calling paradigms, get all requested SV callers
+    Across all ensemble calling paradigms, determine if a specified
+    tool is ever requested.
     """
     res = []
     for endpoint in config["behaviors"]["sv-endpoints"].keys():
         res.extend(config["behaviors"]["sv-endpoints"][endpoint]["sv-callers"])
-    return res
+    return toolname in res
 
 
 def describe_ensemble_calling_settings(config: dict) -> str:

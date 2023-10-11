@@ -4,3 +4,4 @@ channels:
 dependencies:
   - gatk4
   - snakemake-wrapper-utils
+  - r-base >=4

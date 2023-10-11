@@ -65,6 +65,7 @@ rule mark_duplicates:
     benchmark:
         "results/performance_benchmarks/mark_duplicates/{projectid}/{sampleid}.tsv"
     params:
+        remove_duplicates="true" if config["behaviors"]["remove-duplicates"] else "false",
         tmpdir=tempDir,
         bamlist=lambda wildcards: " -INPUT ".join(
             tc.get_bams_by_lane(wildcards, checkpoints, config, manifest, "bam")
@@ -86,7 +87,7 @@ rule mark_duplicates:
         'gatk --java-options "{params.java_args}" MarkDuplicates '
         "-INPUT {params.bamlist} "
         "-OUTPUT {output.bam} "
-        "-REMOVE_DUPLICATES true "
+        "-REMOVE_DUPLICATES {params.remove_duplicates} "
         "-METRICS_FILE {output.score} "
         "--CREATE_INDEX false "
         "--TMP_DIR {params.tmpdir}"
