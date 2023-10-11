@@ -34,6 +34,7 @@ behaviors:
   outcome: "release"
   symlink-fastqs: no
   trim-adapters-before-alignment: yes
+  remove-duplicates: yes
   import-s3:
     profile-name: "profile-name"
   export-directory: "/path/to/top/level/exports"
