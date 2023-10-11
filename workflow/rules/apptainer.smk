@@ -8,11 +8,11 @@ rule apptainer_deepvariant:
     """
     output:
         "results/apptainer_images/deepvariant_{}.sif".format(
-            config["deepvariant"]["docker-version"]
+            config["parameters"]["deepvariant"]["docker-version"]
         ),
     params:
         outdir="results/apptainer_images",
-        image_version=config["deepvariant"]["docker-version"],
+        image_version=config["parameters"]["deepvariant"]["docker-version"],
     conda:
         "../envs/apptainer.yaml" if not use_containers else None
     threads: config_resources["default"]["threads"]
