@@ -23,12 +23,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - reference data import rule that invokes aws cli is now run under aws conda env or container
 - secret dependency of gatk CollectMultipleMetrics on R is addressed in gatk conda environment
+- automated methods summary should be able to conditionally include SV parameter descriptions,
+  based on which tools are actually requested in any of the endpoints. maybe.
+
+
+### Removed
+
+- the ability to circumvent adapter trimming
 
 ## [0.5.3]
 
 ### Fixed
 
-- take a swing at improving SV ensemble calling methods generation
+- automated methods summary can handle SV endpoints
+  - the conditional inclusion of SV parameter descriptions isn't responsive, but at least it runs,
+    and there is a separate description of each endpoint
 
 ## [0.5.2]
 
