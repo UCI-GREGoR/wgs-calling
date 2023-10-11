@@ -168,13 +168,13 @@ rule create_snv_gvcf_export:
 
 use rule create_snv_gvcf_export as create_snv_gvcf_nonexport with:
     output:
-        "results/nonexport/{projectid}/{sqid}.snv.g.vcf.gz",
+        "results/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.snv.g.vcf.gz",
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
-        exportid="{sqid}",
+        exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
+        "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
 
 
 rule create_snv_gvcf_export_simplified_id:
@@ -270,13 +270,13 @@ rule create_snv_vcf_export:
 
 use rule create_snv_vcf_export as create_snv_vcf_nonexport with:
     output:
-        temp("results/nonexport/{projectid}/{sqid}.snv-allregions.vcf.gz"),
+        temp("results/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.snv-allregions.vcf.gz"),
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
-        exportid="{sqid}",
+        exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
+        "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
 
 
 rule create_snv_vcf_export_simplified_id:
@@ -410,13 +410,13 @@ rule create_sv_vcf_export:
 
 use rule create_sv_vcf_export as create_sv_vcf_nonexport with:
     output:
-        "results/nonexport/{projectid}/{sqid}.sv.{endpoint}.with-bnd.vcf.gz",
+        "results/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.sv.{endpoint}.with-bnd.vcf.gz",
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
-        exportid="{sqid}",
+        exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sqid}.{endpoint}.tsv"
+        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.{endpoint}.tsv"
 
 
 rule create_sv_vcf_export_simplified_id:
