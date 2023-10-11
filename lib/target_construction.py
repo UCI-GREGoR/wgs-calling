@@ -12,19 +12,9 @@ def map_fastq_from_project_and_sample(
     """
     Get a particular fastq based on projectid and sampleid
     """
-    ## New: allow rewiring of the DAG to provide adapter-trimmed fastqs directly to aligner
-    if config["behaviors"]["trim-adapters-before-alignment"] is True:
-        return "results/fastp/{}/{}_{}_{}_fastp.fastq.gz".format(
-            wildcards.projectid, wildcards.sampleid, wildcards.lane, rp
-        )
-
-    query = 'projectid == "{}" and sampleid == "{}" and lane == "{}"'.format(
-        wildcards.projectid, wildcards.sampleid, wildcards.lane
+    return "results/fastp/{}/{}_{}_{}_fastp.fastq.gz".format(
+        wildcards.projectid, wildcards.sampleid, wildcards.lane, rp
     )
-    result = manifest.query(query)
-    assert len(result) == 1
-    result = result[rp.lower()]
-    return "results/fastqs/{}/{}".format(wildcards.projectid, os.path.basename(result.to_list()[0]))
 
 
 def map_fastqs_to_manifest(wildcards: Namedlist, manifest: pd.DataFrame, readtag: str) -> str:
@@ -75,6 +65,7 @@ def get_fastqs_by_lane_and_sampleid(
     readgroup: str,
     checkpoints: Checkpoints,
     manifest: pd.DataFrame,
+    prefix: str,
     suffix: str,
 ) -> list:
     query = 'projectid == "{}" and sampleid == "{}"'.format(projectid, sampleid)
@@ -99,7 +90,8 @@ def get_fastqs_by_lane_and_sampleid(
                 ).output[0].open() as f:
                     available_lanes = ["L" + x.rstrip().zfill(3) for x in f.readlines()]
     result = expand(
-        "results/fastqs/{projectid}/{sampleid}_{lane}_{readgroup}_{suffix}",
+        "{prefix}/{projectid}/{sampleid}_{lane}_{readgroup}_{suffix}",
+        prefix=prefix,
         projectid=projectid,
         sampleid=sampleid,
         lane=available_lanes,
@@ -113,13 +105,20 @@ def get_fastqs_by_lane(
     wildcards: Namedlist,
     checkpoints: Checkpoints,
     manifest: pd.DataFrame,
+    prefix: str,
     suffix: str,
 ) -> list:
     """
     For a project and sample, get all the expected fastqs for the subject based on manifest lanes
     """
     return get_fastqs_by_lane_and_sampleid(
-        wildcards.projectid, wildcards.sampleid, wildcards.readgroup, checkpoints, manifest, suffix
+        wildcards.projectid,
+        wildcards.sampleid,
+        wildcards.readgroup,
+        checkpoints,
+        manifest,
+        prefix,
+        suffix,
     )
 
 

@@ -66,7 +66,6 @@ def standard_config():
             "sv-caller": ["manta", "tiddit"],
             "outcome": "fastqc",
             "symlink-fastqs": True,
-            "trim-adapters-before-alignment": "legacy",
         },
         "references": {
             "grch100": {"fasta": "my.fa", "reportable-regions": "my.reportable-regions"}

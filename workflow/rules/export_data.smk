@@ -703,7 +703,7 @@ rule zip_vcfs:
         sv_vcf=lambda wildcards: [
             z
             for y in [
-                ed.construct_nonexport_files(
+                ed.construct_export_files(
                     wildcards, manifest, checkpoints, "sv.endpoint-" + endpoint + ".vcf.gz"
                 )
                 for endpoint in config["behaviors"]["sv-endpoints"].keys()
@@ -904,6 +904,10 @@ rule export_data_remote:
         if "export-s3" in config["behaviors"]
         and "profile-name" in config["behaviors"]["export-s3"]
         else "",
+    conda:
+        "../envs/awscli.yaml" if not use_containers else None
+    container:
+        "{}/awscli.sif".format(apptainer_images) if use_containers else None
     threads: config_resources["awscli"]["threads"]
     resources:
         mem_mb=config_resources["awscli"]["memory"],
@@ -918,25 +922,64 @@ rule export_data_remote:
         "touch {output}"
 
 
+rule export_fastq_remote:
+    """
+    Copy single fastq to remote deployment bucket.
+
+    All-at-once sync takes forever, so utilize HPC.
+    """
+    input:
+        fastq="results/fastqs/{projectid}/{sampleid}.fastq.gz",
+    output:
+        tracker="results/fastqs/{projectid}/{sampleid}.fastq.s3_transfer_complete.txt",
+    params:
+        bucketname=config["behaviors"]["export-s3"]["bucket-name"]
+        if "export-s3" in config["behaviors"]
+        else None,
+        profile="--profile {}".format(config["behaviors"]["export-s3"]["profile-name"])
+        if "export-s3" in config["behaviors"]
+        and "profile-name" in config["behaviors"]["export-s3"]
+        else "",
+    threads: 1
+    resources:
+        mem_mb=config_resources["awscli"]["memory"],
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["awscli"]["queue"], config_resources["queues"]
+        ),
+    shell:
+        "aws s3 cp {params.profile} {input.fastq} {params.bucketname}/wgs-short-read/{wildcards.projectid}/fastqs/ && "
+        "touch {output.tracker}"
+
+
+localrules:
+    export_fastqs_remote,
+
+
 rule export_fastqs_remote:
     """
-    Sync fastqs to remote deployment s3 bucket
+    Trigger all per-sample, per-lane, per-readgroup fastqs to be exported to
+    remote S3 target, if configured.
 
-    I'm not currently certain that this is exactly how I want this process to work,
-    so consider this rule somewhat WIP
+    This was taking forever as a single sync, so it's going to leverage HPC now.
     """
     input:
         fastqs_r1=lambda wildcards: [
             z
             for y in [
                 tc.get_fastqs_by_lane_and_sampleid(
-                    projectid, sampleid, "R1", checkpoints, manifest, "001.fastq.gz"
-                )
-                for projectid, sampleid in list(
-                    set(
-                        zip(
-                            manifest.loc[
-                                manifest["projectid"] == wildcards.projectid, "projectid"
+                    projectid,
+                    sampleid,
+                    "R1",
+                        checkpoints,
+                        manifest,
+                        "results/fastqs",
+                        "001.fastq.s3_transfer_complete.txt",
+                    )
+                    for projectid, sampleid in list(
+                        set(
+                            zip(
+                                manifest.loc[
+                    manifest["projectid"] == wildcards.projectid, "projectid"
                             ],
                             manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
                         )
@@ -949,13 +992,19 @@ rule export_fastqs_remote:
             z
             for y in [
                 tc.get_fastqs_by_lane_and_sampleid(
-                    projectid, sampleid, "R2", checkpoints, manifest, "001.fastq.gz"
-                )
-                for projectid, sampleid in list(
-                    set(
-                        zip(
-                            manifest.loc[
-                                manifest["projectid"] == wildcards.projectid, "projectid"
+                    projectid,
+                    sampleid,
+                    "R2",
+                        checkpoints,
+                        manifest,
+                        "results/fastqs",
+                        "001.fastq.s3_transfer_complete.txt",
+                    )
+                    for projectid, sampleid in list(
+                        set(
+                            zip(
+                                manifest.loc[
+                    manifest["projectid"] == wildcards.projectid, "projectid"
                             ],
                             manifest.loc[manifest["projectid"] == wildcards.projectid, "sampleid"],
                         )
@@ -966,21 +1015,5 @@ rule export_fastqs_remote:
         ],
     output:
         "results/fastqs/{projectid}/s3_transfer_complete.txt",
-    params:
-        export_dir="results/fastqs/{projectid}",
-        bucketname=config["behaviors"]["export-s3"]["bucket-name"]
-        if "export-s3" in config["behaviors"]
-        else None,
-        profile="--profile {}".format(config["behaviors"]["export-s3"]["profile-name"])
-        if "export-s3" in config["behaviors"]
-        and "profile-name" in config["behaviors"]["export-s3"]
-        else "",
-    threads: config_resources["default"]["threads"]
-    resources:
-        mem_mb=config_resources["default"]["memory"],
-        qname=lambda wildcards: rc.select_queue(
-            config_resources["default"]["queue"], config_resources["queues"]
-        ),
     shell:
-        'aws s3 sync {params.profile} --exclude="*" --include="*001.fastq.gz" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/fastqs && '
         "touch {output}"

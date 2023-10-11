@@ -3,6 +3,42 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0]
+
+### Added
+
+- userspace configuration of removal of duplicates after marking
+  - relates to GL issue #4. part of an anticipated testing sequence to determine
+    the source of unpaired reads when attempting to debuild bams or crams
+    back into fastqs. this functionality will default to pre-0.6 behavior for the
+    time being
+
+### Changed
+
+- DeepVariant is invoked under [apptainer](https://apptainer.org/) directly
+  - this addresses a sporadic issue experienced by other users in which snakemake
+    is sporadically incapable of running the DeepVariant docker container
+
+### Fixed
+
+- reference data import rule that invokes aws cli is now run under aws conda env or container
+- secret dependency of gatk CollectMultipleMetrics on R is addressed in gatk conda environment
+- automated methods summary should be able to conditionally include SV parameter descriptions,
+  based on which tools are actually requested in any of the endpoints. maybe.
+
+
+### Removed
+
+- the ability to circumvent adapter trimming
+
+## [0.5.3]
+
+### Fixed
+
+- automated methods summary can handle SV endpoints
+  - the conditional inclusion of SV parameter descriptions isn't responsive, but at least it runs,
+    and there is a separate description of each endpoint
+
 ## [0.5.2]
 
 ### Fixed

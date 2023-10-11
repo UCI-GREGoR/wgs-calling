@@ -65,6 +65,7 @@ rule mark_duplicates:
     benchmark:
         "results/performance_benchmarks/mark_duplicates/{projectid}/{sampleid}.tsv"
     params:
+        remove_duplicates="true" if config["behaviors"]["remove-duplicates"] else "false",
         tmpdir=tempDir,
         bamlist=lambda wildcards: " -INPUT ".join(
             tc.get_bams_by_lane(wildcards, checkpoints, config, manifest, "bam")
@@ -86,7 +87,7 @@ rule mark_duplicates:
         'gatk --java-options "{params.java_args}" MarkDuplicates '
         "-INPUT {params.bamlist} "
         "-OUTPUT {output.bam} "
-        "-REMOVE_DUPLICATES true "
+        "-REMOVE_DUPLICATES {params.remove_duplicates} "
         "-METRICS_FILE {output.score} "
         "--CREATE_INDEX false "
         "--TMP_DIR {params.tmpdir}"
@@ -262,6 +263,11 @@ rule picard_collectgcbiasmetrics:
 rule picard_collectwgsmetrics:
     """
     Run gatk version of picard CollectWgsMetrics
+
+    New: use "fast algorithm," which reportedly features
+    improvements for >=10X regions, and is about the same
+    for lower regions. Unclear how equivalent this is
+    to the standard algorithm.
     """
     input:
         bam="results/aligned_bams/{fileprefix}.bam",
@@ -299,4 +305,5 @@ rule picard_collectwgsmetrics:
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "
         "-OUTPUT {output.txt} "
+        "--USE_FAST_ALGORITHM true "
         "--TMP_DIR {params.tmpdir}"

@@ -53,7 +53,7 @@ The following settings are nested under the key `behaviors` and are user-configu
 |`outcome`|string; which endpoint to run to. permitted values: `fastqc` (for read QC only); `alignment`; or `calling`; or `release` to prepare results for distribution|
 |`symlink-fastqs`|boolean; whether to copy (no) or symlink (yes) input fastqs into workspace. symlinking is faster and more memory-efficient, but less reproducible, as the upstream files may vanish leaving no way to regenerate your analysis from scratch. S3 remotes (prefixed with `s3://`) are supported for input fastqs, but in that case this option will be ignored|
 |`trim-adapters-before-alignment`|boolean; whether to use adapter trimmed fastq output of `fastp` as input to aligner. permitted values: `yes`, `no`, or `legacy`. legacy behavior for this option is to not use trimmed output for alignment.|
-|`assume-last-sample-sex`|**DEPRECATED.** boolean; upstream convention is to include a low-depth NA24385 as the final sample in every flowcell. that sample is not annotated in the logbook in a way that the parser understands. to maintain compatibility with Somalier sexcheck, set this to `female`. if no sex should be assumed for the sample, delete this configuration option|
+|`remove-duplicates`|boolean; whether or not to remove reads that are flagged as duplicates by `gatk MarkDuplicates`. the default behavior is to remove duplicates. this flag is added as part of testing the possible introduction of unpaired reads in bams that are fine downstream but create issues in back-conversion to ubams.|
 |`export-directory`|string; top-level path to where output files should be moved after release run is complete. delete this option to disable.|
 |`export-s3`|parameters for controlling optional upload to s3|
 ||`bucket-name`: string; name of s3 bucket to which to sync data|
@@ -86,7 +86,6 @@ The following tool-specific parameters are nested under the key `parameters`.
 ||`docker-version`: string; which docker tag to use when pulling the official DeepVariant docker image|
 |`manta`|parameters specific to [Manta](https://github.com/Illumina/manta)|
 ||`config-ini`: string; relative path to Manta local configuration data. see Manta documentation for more specific information about permitted values in this config file. the exposure of this file, which is passed to `configManta.py`, is done in anticipation of toggling settings that can reduce Manta's substantial runtime, e.g. `enableRemoteReadRetrievalForInsertionsInGermlineCallingModes`
-|`tiddit`|**DEPRECATED.** parameters specific to [TIDDIT](https://github.com/SciLifeLab/TIDDIT)|
 ||`min-contig-size`: integer; minimum size of contigs on which to make calls, in bases. a minimum size of 2000000 will remove the remaining non-standard contigs present in the no-alt version of GRCh38, for example. unfortunately, TIDDIT does not directly support calling regions|
 
 The following general genome reference files are nested under the key `references`, and are expected to be available to multiple tools in the pipeline.
