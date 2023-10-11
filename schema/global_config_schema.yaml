@@ -35,6 +35,9 @@ properties:
       bqsr:
         type: boolean
         default: yes
+      remove-duplicates:
+        type: boolean
+        default: yes
       snv-caller:
         type: string
         pattern: "^deepvariant$"
