@@ -918,7 +918,7 @@ rule export_data_remote:
         'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" --include="*.crai*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/crams && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/snv_vcfs && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.g.vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/snv_gvcfs && '
-        'aws s3 sync {params.profile} --exclude="*" --include="*.sv.vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/sv_vcfs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.sv.*vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/sv_vcfs && '
         "touch {output}"
 
 
