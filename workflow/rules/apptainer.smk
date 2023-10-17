@@ -11,7 +11,6 @@ rule apptainer_deepvariant:
             config["parameters"]["deepvariant"]["docker-version"]
         ),
     params:
-        outdir="results/apptainer_images",
         image_version=config["parameters"]["deepvariant"]["docker-version"],
     conda:
         "../envs/apptainer.yaml" if not use_containers else None
@@ -22,4 +21,5 @@ rule apptainer_deepvariant:
             config_resources["apptainer"]["queue"], config_resources["queues"]
         ),
     shell:
-        "apptainer pull --dir {params.outdir} docker://google/deepvariant:{params.image_version}"
+        "echo 'y' | apptainer cache clean && "
+        "apptainer build {output} docker://google/deepvariant:{params.image_version}"
