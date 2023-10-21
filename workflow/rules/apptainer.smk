@@ -12,6 +12,7 @@ rule apptainer_deepvariant:
         ),
     params:
         image_version=config["parameters"]["deepvariant"]["docker-version"],
+        tmpdir=tempDir,
     conda:
         "../envs/apptainer.yaml" if not use_containers else None
     threads: config_resources["apptainer"]["threads"]
@@ -20,6 +21,7 @@ rule apptainer_deepvariant:
         qname=lambda wildcards: rc.select_queue(
             config_resources["apptainer"]["queue"], config_resources["queues"]
         ),
+        tmpdir=tempDir,
     shell:
-        "echo 'y' | apptainer cache clean && "
-        "apptainer build {output} docker://google/deepvariant:{params.image_version}"
+        "mkdir -p {params.tmpdir} && "
+        "APPTAINER_TMPDIR=$(realpath {params.tmpdir}) apptainer build --disable-cache {output} docker://google/deepvariant:{params.image_version}"
