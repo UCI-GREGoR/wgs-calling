@@ -815,12 +815,43 @@ rule export_data_local:
         "{input.bash} {params.export_directory} {output}"
 
 
+rule export_cram_remote:
+    """
+    Copy single cram to remote deployment bucket.
+
+    All-at-once sync takes forever, so utilize HPC.
+    """
+    input:
+        cram="results/export/{projectid}/{sampleid}.cram",
+    output:
+        tracker="results/export/{projectid}/{sampleid}.cram.s3_transfer_complete.txt",
+    params:
+        bucketname=config["behaviors"]["export-s3"]["bucket-name"]
+        if "export-s3" in config["behaviors"]
+        else None,
+        profile="--profile {}".format(config["behaviors"]["export-s3"]["profile-name"])
+        if "export-s3" in config["behaviors"]
+        and "profile-name" in config["behaviors"]["export-s3"]
+        else "",
+    threads: 1
+    resources:
+        mem_mb=config_resources["awscli"]["memory"],
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["awscli"]["queue"], config_resources["queues"]
+        ),
+    shell:
+        "aws s3 cp {params.profile} {input.cram} {params.bucketname}/wgs-short-read/{wildcards.projectid}/crams/ && "
+        "touch {output.tracker}"
+
+
 rule export_data_remote:
     """
     Sync results/export data contents to remote deployment s3 bucket
     """
     input:
-        cram=lambda wildcards: ed.construct_export_files(wildcards, manifest, checkpoints, "cram"),
+        cram=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "cram.s3_transfer_complete.txt"
+        ),
         crai=lambda wildcards: ed.construct_export_files(wildcards, manifest, checkpoints, "crai"),
         vcf=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.vcf.gz"
@@ -915,7 +946,7 @@ rule export_data_remote:
             config_resources["awscli"]["queue"], config_resources["queues"]
         ),
     shell:
-        'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" --include="*.crai*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/crams && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.crai*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/crams && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/snv_vcfs && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.g.vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/snv_gvcfs && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.sv.*vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/sv_vcfs && '
