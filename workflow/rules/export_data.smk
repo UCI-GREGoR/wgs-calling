@@ -712,6 +712,14 @@ rule zip_vcfs:
         ],
     output:
         "results/export/{projectid}/{projectid}_vcfs.zip",
+    conda:
+        "../envs/unzip.yaml" if not use_containers else None
+    threads: config_resources["default"]["threads"]
+    resources:
+        mem_mb=config_resources["default"]["memory"],
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["default"]["queue"], config_resources["queues"]
+        ),
     shell:
         "zip -j {output} {input.vcf} {input.sv_vcf}"
 
