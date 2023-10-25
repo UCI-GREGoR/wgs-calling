@@ -841,12 +841,15 @@ rule export_cram_remote:
         if "export-s3" in config["behaviors"]
         and "profile-name" in config["behaviors"]["export-s3"]
         else "",
+    conda:
+        "../envs/awscli.yaml" if not use_containers else None
     threads: 1
     resources:
         mem_mb=config_resources["awscli"]["memory"],
         qname=lambda wildcards: rc.select_queue(
             config_resources["awscli"]["queue"], config_resources["queues"]
         ),
+    retries: 5
     shell:
         "aws s3 cp {params.profile} {input.cram} {params.bucketname}/wgs-short-read/{wildcards.projectid}/crams/ && "
         "touch {output.tracker}"
@@ -953,6 +956,7 @@ rule export_data_remote:
         qname=lambda wildcards: rc.select_queue(
             config_resources["awscli"]["queue"], config_resources["queues"]
         ),
+    retries: 5
     shell:
         'aws s3 sync {params.profile} --exclude="*" --include="*.crai*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/crams && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/snv_vcfs && '
@@ -979,12 +983,15 @@ rule export_fastq_remote:
         if "export-s3" in config["behaviors"]
         and "profile-name" in config["behaviors"]["export-s3"]
         else "",
+    conda:
+        "../envs/awscli.yaml" if not use_containers else None
     threads: 1
     resources:
         mem_mb=config_resources["awscli"]["memory"],
         qname=lambda wildcards: rc.select_queue(
             config_resources["awscli"]["queue"], config_resources["queues"]
         ),
+    retries: 5
     shell:
         "aws s3 cp {params.profile} {input.fastq} {params.bucketname}/wgs-short-read/{wildcards.projectid}/fastqs/ && "
         "touch {output.tracker}"
