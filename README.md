@@ -81,6 +81,8 @@ The following tool-specific parameters are nested under the key `parameters`.
 ||`K`: integer; chunk size parameter. `bwa` defaults this to `1e7*{threads}`, but to maintain consistency independent of thread count, this is manually fixed. higher numbers improve runtime at the cost of (marginally) increased RAM usage|
 |`bwa-mem2`|parameters specific to [bwa-mem2](https://github.com/bwa-mem2/bwa-mem2)|
 ||`K`: integer; chunk size parameter. see the corresponding `bwa` option for details|
+|`gatk-collectwgsmetrics`|parameters specific to [gatk/Picard CollectWgsMetrics](https://gatk.broadinstitute.org/hc/en-us/articles/13832707851035-CollectWgsMetrics-Picard-)
+||`read-length`: for the CollectWgsMetrics fast algorithm, an estimate of read length in each library. note that for mysterious reasons, possibly due to paired end reads, this needs to be much higher than e.g. 150bp for a 150x2 library. the default, 300, is 2x150. it can be increased if CollectWgsMetrics complains of index out of bounds errors, but it's unclear what impact an excessively high read length estimate will have|
 |`deepvariant`|parameters specific to [deepvariant](https://github.com/google/deepvariant)|
 ||`number-shards`: integer; how many shards to break calling into. needs to be at most the number of available threads in the submission queue|
 ||`docker-version`: string; which docker tag to use when pulling the official DeepVariant docker image|

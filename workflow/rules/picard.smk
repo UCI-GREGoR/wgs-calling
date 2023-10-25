@@ -283,6 +283,7 @@ rule picard_collectwgsmetrics:
     params:
         tmpdir=tempDir,
         java_args=config_resources["gatk_collectwgsmetrics"]["java_args"],
+        read_length=config["parameters"]["gatk-collectwgsmetrics"]["read-length"],
     conda:
         "../envs/gatk4.yaml" if not use_containers else None
     container:
@@ -300,4 +301,6 @@ rule picard_collectwgsmetrics:
         "-INPUT {input.bam} "
         "-REFERENCE_SEQUENCE {input.fasta} "
         "-OUTPUT {output.txt} "
-        "--TMP_DIR {params.tmpdir}"
+        "--TMP_DIR {params.tmpdir} "
+        "--USE_FAST_ALGORITHM true "
+        "--READ_LENGTH {params.read_length}"
