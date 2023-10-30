@@ -44,7 +44,7 @@ bwa_map_and_sort:
   memory: 500000
   queue: "large"
 deepvariant:
-  threads: 16
+  threads: 12
   make_examples_memory: 192000
   call_variants_memory: 480000
   postprocess_variants_memory: 32000
