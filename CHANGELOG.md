@@ -3,6 +3,25 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0]
+
+### Added
+
+- environments for additional rules that have sporadically missing dependencies
+  on HPC compute fleets
+
+### Changed
+
+- default configuration setting for duplicate removal is set from `yes` to `no`.
+  this is designed for compatibility with users attempting to dealign the reads
+  in preparation for realignment, and who do not have the capacity to run `samtools fixmate`
+- reactivated the `gatk CollectWgsMetrics` fast algorithm, once again, but it even
+  seems to work this time, and reduces runtime by approximately 50%
+
+### Fixed
+
+- various bugs were introduced during code migration and are hopefully resolved
+
 ## [0.6.0]
 
 ### Added
