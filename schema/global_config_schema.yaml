@@ -136,6 +136,15 @@ properties:
           - number-shards
           - docker-version
         additionalProperties: no
+      gatk-collectwgsmetrics:
+        type: object
+        properties:
+          read-length:
+            type: integer
+            min: 1
+          required:
+            - read-length
+          additionalProperties: no
       manta:
         type: object
         properties:
@@ -155,6 +164,7 @@ properties:
         additionalProperties: no
     required:
       - deepvariant
+      - gatk-collectwgsmetrics
       - manta
       - tiddit
     additionalProperties: no

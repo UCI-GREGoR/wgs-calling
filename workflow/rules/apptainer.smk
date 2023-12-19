@@ -8,18 +8,20 @@ rule apptainer_deepvariant:
     """
     output:
         "results/apptainer_images/deepvariant_{}.sif".format(
-            config["deepvariant"]["docker-version"]
+            config["parameters"]["deepvariant"]["docker-version"]
         ),
     params:
-        outdir="results/apptainer_images",
-        image_version=config["deepvariant"]["docker-version"],
+        image_version=config["parameters"]["deepvariant"]["docker-version"],
+        tmpdir=tempDir,
     conda:
         "../envs/apptainer.yaml" if not use_containers else None
-    threads: config_resources["default"]["threads"]
+    threads: config_resources["apptainer"]["threads"]
     resources:
-        mem_mb=config_resources["default"]["memory"],
+        mem_mb=config_resources["apptainer"]["memory"],
         qname=lambda wildcards: rc.select_queue(
-            config_resources["default"]["queue"], config_resources["queues"]
+            config_resources["apptainer"]["queue"], config_resources["queues"]
         ),
+        tmpdir=tempDir,
     shell:
-        "apptainer pull --dir {params.outdir} docker://google/deepvariant:{params.image_version}"
+        "mkdir -p {params.tmpdir} && "
+        "APPTAINER_TMPDIR=$(realpath {params.tmpdir}) apptainer build --disable-cache {output} docker://google/deepvariant:{params.image_version}"

@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DeepVariant is invoked under [apptainer](https://apptainer.org/) directly
   - this addresses a sporadic issue experienced by other users in which snakemake
     is sporadically incapable of running the DeepVariant docker container
+- remote export of crams now happens per-cram
+  - this step was incredibly slow, and now is quasiparallelized
 
 ### Fixed
 
@@ -25,11 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - secret dependency of gatk CollectMultipleMetrics on R is addressed in gatk conda environment
 - automated methods summary should be able to conditionally include SV parameter descriptions,
   based on which tools are actually requested in any of the endpoints. maybe.
+- assorted hidden build dependencies or those inconsistently present on compute nodes are added to conda yaml
 
 
 ### Removed
 
-- the ability to circumvent adapter trimming
+- most deprecations
 
 ## [0.5.3]
 
