@@ -4,3 +4,4 @@ dependencies:
     - apptainer
     - squashfs-tools
     - squashfuse
+    - coreutils

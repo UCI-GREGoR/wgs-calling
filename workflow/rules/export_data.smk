@@ -168,13 +168,13 @@ rule create_snv_gvcf_export:
 
 use rule create_snv_gvcf_export as create_snv_gvcf_nonexport with:
     output:
-        "results/nonexport/{projectid}/{sqid}.snv.g.vcf.gz",
+        "results/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.snv.g.vcf.gz",
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
-        exportid="{sqid}",
+        exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
+        "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
 
 
 rule create_snv_gvcf_export_simplified_id:
@@ -270,13 +270,13 @@ rule create_snv_vcf_export:
 
 use rule create_snv_vcf_export as create_snv_vcf_nonexport with:
     output:
-        temp("results/nonexport/{projectid}/{sqid}.snv-allregions.vcf.gz"),
+        temp("results/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.snv-allregions.vcf.gz"),
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
-        exportid="{sqid}",
+        exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sqid}.tsv"
+        "results/performance_benchmarks/create_snv_vcf_export/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.tsv"
 
 
 rule create_snv_vcf_export_simplified_id:
@@ -410,13 +410,13 @@ rule create_sv_vcf_export:
 
 use rule create_sv_vcf_export as create_sv_vcf_nonexport with:
     output:
-        "results/nonexport/{projectid}/{sqid}.sv.{endpoint}.with-bnd.vcf.gz",
+        "results/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.sv.{endpoint}.with-bnd.vcf.gz",
     params:
         pipeline_version=pipeline_version,
         reference_build=lambda wildcards: sm.format_reference_build(reference_build),
-        exportid="{sqid}",
+        exportid="{sampleid}_{lsid}_{sqid}",
     benchmark:
-        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sqid}.{endpoint}.tsv"
+        "results/performance_benchmarks/create_sv_vcf_export/nonexport/{projectid}/{sampleid}_{lsid}_{sqid}.{endpoint}.tsv"
 
 
 rule create_sv_vcf_export_simplified_id:
@@ -712,6 +712,14 @@ rule zip_vcfs:
         ],
     output:
         "results/export/{projectid}/{projectid}_vcfs.zip",
+    conda:
+        "../envs/unzip.yaml" if not use_containers else None
+    threads: config_resources["default"]["threads"]
+    resources:
+        mem_mb=config_resources["default"]["memory"],
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["default"]["queue"], config_resources["queues"]
+        ),
     shell:
         "zip -j {output} {input.vcf} {input.sv_vcf}"
 
@@ -815,12 +823,46 @@ rule export_data_local:
         "{input.bash} {params.export_directory} {output}"
 
 
+rule export_cram_remote:
+    """
+    Copy single cram to remote deployment bucket.
+
+    All-at-once sync takes forever, so utilize HPC.
+    """
+    input:
+        cram="results/export/{projectid}/{sampleid}.cram",
+    output:
+        tracker="results/export/{projectid}/{sampleid}.cram.s3_transfer_complete.txt",
+    params:
+        bucketname=config["behaviors"]["export-s3"]["bucket-name"]
+        if "export-s3" in config["behaviors"]
+        else None,
+        profile="--profile {}".format(config["behaviors"]["export-s3"]["profile-name"])
+        if "export-s3" in config["behaviors"]
+        and "profile-name" in config["behaviors"]["export-s3"]
+        else "",
+    conda:
+        "../envs/awscli.yaml" if not use_containers else None
+    threads: 1
+    resources:
+        mem_mb=config_resources["awscli"]["memory"],
+        qname=lambda wildcards: rc.select_queue(
+            config_resources["awscli"]["queue"], config_resources["queues"]
+        ),
+    retries: 5
+    shell:
+        "aws s3 cp {params.profile} {input.cram} {params.bucketname}/wgs-short-read/{wildcards.projectid}/crams/ && "
+        "touch {output.tracker}"
+
+
 rule export_data_remote:
     """
     Sync results/export data contents to remote deployment s3 bucket
     """
     input:
-        cram=lambda wildcards: ed.construct_export_files(wildcards, manifest, checkpoints, "cram"),
+        cram=lambda wildcards: ed.construct_export_files(
+            wildcards, manifest, checkpoints, "cram.s3_transfer_complete.txt"
+        ),
         crai=lambda wildcards: ed.construct_export_files(wildcards, manifest, checkpoints, "crai"),
         vcf=lambda wildcards: ed.construct_export_files(
             wildcards, manifest, checkpoints, "snv.vcf.gz"
@@ -914,11 +956,12 @@ rule export_data_remote:
         qname=lambda wildcards: rc.select_queue(
             config_resources["awscli"]["queue"], config_resources["queues"]
         ),
+    retries: 5
     shell:
-        'aws s3 sync {params.profile} --exclude="*" --include="*.cram*" --include="*.crai*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/crams && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.crai*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/crams && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/snv_vcfs && '
         'aws s3 sync {params.profile} --exclude="*" --include="*.snv.g.vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/snv_gvcfs && '
-        'aws s3 sync {params.profile} --exclude="*" --include="*.sv.vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/sv_vcfs && '
+        'aws s3 sync {params.profile} --exclude="*" --include="*.sv.*vcf*" {params.export_dir} {params.bucketname}/wgs-short-read/{wildcards.projectid}/sv_vcfs && '
         "touch {output}"
 
 
@@ -940,12 +983,15 @@ rule export_fastq_remote:
         if "export-s3" in config["behaviors"]
         and "profile-name" in config["behaviors"]["export-s3"]
         else "",
+    conda:
+        "../envs/awscli.yaml" if not use_containers else None
     threads: 1
     resources:
         mem_mb=config_resources["awscli"]["memory"],
         qname=lambda wildcards: rc.select_queue(
             config_resources["awscli"]["queue"], config_resources["queues"]
         ),
+    retries: 5
     shell:
         "aws s3 cp {params.profile} {input.fastq} {params.bucketname}/wgs-short-read/{wildcards.projectid}/fastqs/ && "
         "touch {output.tracker}"

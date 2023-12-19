@@ -136,6 +136,7 @@ def run_summarize_workflow(template_name, config, manta_config_fn, outfn):
         manta_settings=cp,
         ensemble_filtering_criteria=ensemble_filtering_criteria,
         pipeline_git_version=get_pipeline_git_version(),
+        is_required_sv_caller=is_required_sv_caller,
     )
     with open(outfn, "w") as f:
         f.write(template_string)

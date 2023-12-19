@@ -33,7 +33,7 @@ behaviors:
       sv-remove-breakends: yes
   outcome: "release"
   symlink-fastqs: no
-  remove-duplicates: yes
+  remove-duplicates: no
   import-s3:
     profile-name: "profile-name"
   export-directory: "/path/to/top/level/exports"
@@ -49,6 +49,8 @@ parameters:
   deepvariant:
     number-shards: 16
     docker-version: "1.5.0"
+  gatk-collectwgsmetrics:
+    read-length: 300
   manta:
     config-ini: "config/configManta.py.ini"
   tiddit:

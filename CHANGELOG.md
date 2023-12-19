@@ -3,6 +3,25 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0]
+
+### Added
+
+- environments for additional rules that have sporadically missing dependencies
+  on HPC compute fleets
+
+### Changed
+
+- default configuration setting for duplicate removal is set from `yes` to `no`.
+  this is designed for compatibility with users attempting to dealign the reads
+  in preparation for realignment, and who do not have the capacity to run `samtools fixmate`
+- reactivated the `gatk CollectWgsMetrics` fast algorithm, once again, but it even
+  seems to work this time, and reduces runtime by approximately 50%
+
+### Fixed
+
+- various bugs were introduced during code migration and are hopefully resolved
+
 ## [0.6.0]
 
 ### Added
@@ -18,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DeepVariant is invoked under [apptainer](https://apptainer.org/) directly
   - this addresses a sporadic issue experienced by other users in which snakemake
     is sporadically incapable of running the DeepVariant docker container
+- remote export of crams now happens per-cram
+  - this step was incredibly slow, and now is quasiparallelized
 
 ### Fixed
 
@@ -25,11 +46,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - secret dependency of gatk CollectMultipleMetrics on R is addressed in gatk conda environment
 - automated methods summary should be able to conditionally include SV parameter descriptions,
   based on which tools are actually requested in any of the endpoints. maybe.
+- assorted hidden build dependencies or those inconsistently present on compute nodes are added to conda yaml
 
 
 ### Removed
 
-- the ability to circumvent adapter trimming
+- most deprecations
 
 ## [0.5.3]
 
