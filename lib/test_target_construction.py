@@ -238,13 +238,17 @@ def test_construct_snv_targets(standard_config, standard_manifest):
     assert observed == expected
 
 
-def test_construct_sv_targets(standard_manifest):
+def test_construct_sv_targets(standard_config, standard_manifest):
     """
     Test that construct_sv_targets can determine
     the output sorted vcf files of the structural variant sub-dag.
     """
-    expected = ["results/final/PROJ1/{}.sv.vcf.gz".format(x) for x in ["SAM1", "SAM2", "SAM3"]]
-    observed = tc.construct_sv_targets(standard_manifest)
+    expected = expand(
+        "results/final/PROJ1/{sampleid}.sv.{endpoint}.vcf.gz",
+        sampleid=["SAM1", "SAM2", "SAM3"],
+        endpoint=["strict", "lenient"],
+    )
+    observed = tc.construct_sv_targets(standard_config, standard_manifest)
     ## this function is used for snakemake target population, so order is irrelevant
     expected.sort()
     observed.sort()

@@ -63,7 +63,14 @@ def standard_config():
         "behaviors": {
             "aligner": "bwa-mem2",
             "snv-caller": "deepvariant",
-            "sv-caller": ["manta", "tiddit"],
+            "sv-endpoints": {
+                "strict": {
+                    "sv-callers": ["manta", "lumpy", "delly"],
+                    "sv-ensemble": {"min-count": 2},
+                    "sv-remove-breakends": True,
+                },
+                "lenient": {"sv-callers": ["manta"]},
+            },
             "outcome": "fastqc",
             "symlink-fastqs": True,
         },
