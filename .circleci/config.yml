@@ -1,0 +1,44 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+
+jobs:
+  build_and_test:
+    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+    docker:
+      - image: condaforge/mambaforge:latest
+    # Add steps to the job
+    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "82:36:a6:28:7b:85:be:1e:52:91:f1:6f:3a:4b:b5:d6"
+      - checkout
+      - run:
+          name: build_and_test_python
+          command: |
+            mamba install -c bioconda -c conda-forge -y curl gnupg pytest-cov pytest-lazy-fixture pandas snakemake configparser
+            pytest --cov=workflow/scripts --cov=lib workflow/scripts lib
+            curl -Os https://uploader.codecov.io/latest/linux/codecov
+            chmod +x codecov
+            ./codecov -R . -c -F python
+      - run:
+          name: build_and_test_r
+          command: |
+            mamba install -c conda-forge -y curl gnupg r-covr r-testthat r-ggplot2 r-stringr sed
+            Rscript ./run_tests.R | sed 's|name":"|name":"workflow/scripts/|g' | tail -n 1 > r_coverage.json
+            curl -Os https://uploader.codecov.io/latest/linux/codecov
+            chmod +x codecov
+            ./codecov -R . -c -f r_coverage.json -F r
+
+
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+workflows:
+  ci:
+    jobs:
+      - build_and_test
