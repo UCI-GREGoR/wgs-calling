@@ -1,5 +1,9 @@
 # Snakemake workflow: WGS Pipeline
 
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/UCI-GREGoR/wgs-calling/tree/default.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/UCI-GREGoR/wgs-calling/tree/default)
+
+[![codecov](https://codecov.io/gh/UCI-GREGoR/wgs-calling/graph/badge.svg?token=INHLOF8HVU)](https://codecov.io/gh/UCI-GREGoR/wgs-calling)
+
 This workflow is intended to be the R&D space for the PMGRC WGS analysis pipeline.
 
 New global targets should be added in `workflow/Snakefile`. Content in `workflow/Snakefile` and the snakefiles in `workflow/rules` should be specifically _rules_; python infrastructure should be composed as subroutines under `lib/` and constructed in such a manner as to be testable with [pytest](https://docs.pytest.org/en/7.2.x/). Rules can call embedded scripts (in python or R/Rmd) from `workflow/scripts`; again, these should be constructed to be testable with pytest or [testthat](https://testthat.r-lib.org/).
