@@ -1,4 +1,3 @@
-library(openxlsx, quietly = TRUE)
 library(stringr, quietly = TRUE)
 
 #' Combine subject ID, analyte ID, and sequencing index ID
@@ -66,86 +65,6 @@ apply.id.mappings <- function(df, vec) {
   vec
 }
 
-#' Parse legacy manual logbook data, attempt to minimally standardize,
-#' and convert into some sort of useful format.
-#'
-#' @description
-#' For legacy support, this function supports
-#' input in the form of a manually annotated Excel document created by lab
-#' staff. The format largely defies description, and varies from tab to tab.
-#' For any future applications, this functionality should _never_ be used;
-#' rather, input information should be provided via the data type-specific
-#' linker files.
-#'
-#' @param input.fn character; name of spreadsheet containing logbook data.
-#' In practical use, this was a local copy pulled from a google sheet,
-#' to make individual runs of the workflow comparatively resilient to the
-#' mercurial changes of the file upstream.
-#' @return data.frame; formatted linker data
-parse.logbook <- function(input.fn) {
-  stopifnot(
-    is.character(input.fn),
-    length(input.fn) == 1
-  )
-  sheet.names <- openxlsx::getSheetNames(input.fn)
-  subject.id <- c()
-  jira.tickets <- c()
-  index.id <- c()
-  analyte.id <- c()
-  project.id <- c()
-  sex.id <- c()
-  for (sheet.name in sheet.names) {
-    df <- openxlsx::read.xlsx(input.fn, sheet = sheet.name, check.names = FALSE)
-    colnames(df) <- tolower(colnames(df))
-    if (colnames(df)[1] == "pmgrc.id") {
-      ## resolve chaos
-      subject.col <- 1
-      jira.col <- which(stringr::str_detect(colnames(df), "jira\\.ticket\\.for\\.batches\\.in\\.flight"))
-      index.col <- which(stringr::str_detect(colnames(df), "sq\\.id"))
-      analyte.col <- which(stringr::str_detect(colnames(df), "ls\\.id"))
-      project.col <- which(stringr::str_detect(colnames(df), "ru\\.id"))
-      sex.col <- which(stringr::str_detect(colnames(df), "biological\\.sex"))
-      if (length(jira.col) == 0) {
-        jira.col <- which(stringr::str_detect(colnames(df), "^jira\\.ticket\\(s\\)\\.\\("))
-      }
-      if (length(jira.col) != 1) {
-        next
-      }
-      ## "fix": upstream logbook has sporadic freetext annotations that indicate when a
-      ## subject needs to have an ID update applied to it. for some IDs, this information
-      ## is not recorded but rather just applied without annotation. It's not clear what
-      ## governs the difference between those two situations
-      df[, subject.col] <- apply.id.mappings(df, df[, subject.col])
-      for (row.num in seq_len(nrow(df))) {
-        subject.id <- c(subject.id, df[row.num, subject.col])
-        jira.tickets <- c(jira.tickets, df[row.num, jira.col])
-        index.id <- c(index.id, df[row.num, index.col])
-        analyte.id <- c(analyte.id, df[row.num, analyte.col])
-        project.id <- c(project.id, df[row.num, project.col])
-        if (length(sex.col) == 1) {
-          sex.id <- c(sex.id, df[row.num, sex.col])
-        } else {
-          sex.id <- c(sex.id, "Unknown")
-        }
-      }
-    }
-  }
-  res <- data.frame(
-    subject = subject.id,
-    jira = jira.tickets,
-    project = project.id,
-    index = index.id,
-    analyte = analyte.id,
-    sex = sex.id
-  )
-  ## remove entries with useless content
-  res <- res[!(is.na(res[, 1]) & is.na(res[, 2]) & is.na(res[, 3]) & is.na(res[, 4]) & is.na(res[, 5])), ]
-  ## construct output stems for deliverables, if sufficient information is present to fit the accepted format
-  output.stems <- construct.output.stems(res)
-  res$external <- output.stems
-  res
-}
-
 #' Contextually overwrite or append linker information to an existing
 #' data frame from a simple two column id->value linker file
 #'
@@ -195,21 +114,14 @@ add.linker.data <- function(df, linker.fn, target.colname) {
 #' Run primary logic of this script, wrapped such that sourcing
 #' this file will not cause actual code execution.
 #'
-#' @param logbook.fn character or NULL; name of input legacy
-#' logbook file. Can be NULL, in which case it is effectively ignored
 #' @param sex.linker.fn character or NULL; name of input sex linker
 #' file. Can be NULL, in which case it is effectively ignored
 #' @param external.id.linker.fn character or NULL; name of input external
 #' ID linker file. Can be NULL, in which case it is effectively ignored
 #' @param out.fn character; name of file to which to write output linker data
-run.construct.linker <- function(logbook.fn,
-                                 sex.linker.fn,
+run.construct.linker <- function(sex.linker.fn,
                                  external.id.linker.fn,
                                  out.fn) {
-  stopifnot(
-    is.character(logbook.fn) || is.null(logbook.fn),
-    length(logbook.fn) <= 1
-  )
   stopifnot(
     is.character(sex.linker.fn) || is.null(sex.linker.fn),
     length(sex.linker.fn) <= 1
@@ -231,9 +143,6 @@ run.construct.linker <- function(logbook.fn,
     sex = c("A")
   )
   df <- df[-1, ]
-  if (!is.null(logbook.fn)) {
-    df <- parse.logbook(logbook.fn)
-  }
   if (!is.null(sex.linker.fn)) {
     df <- add.linker.data(df, sex.linker.fn, "sex")
   }
@@ -256,7 +165,6 @@ run.construct.linker <- function(logbook.fn,
 
 if (exists("snakemake")) {
   run.construct.linker(
-    snakemake@params[["logbook"]],
     snakemake@params[["sex_linker"]],
     snakemake@params[["external_id_linker"]],
     snakemake@output[["linker"]]
