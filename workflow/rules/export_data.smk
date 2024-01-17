@@ -6,7 +6,6 @@ checkpoint generate_linker:
     output:
         linker="results/export/linker.tsv",
     params:
-        logbook=config["sample-logbook"] if "sample-logbook" in config else None,
         sex_linker=config["sample-linking"]["sex"]
         if "sample-linking" in config and "sex" in config["sample-linking"]
         else None,
